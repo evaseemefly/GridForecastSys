@@ -130,3 +130,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+AreaNames_DIR=r'D:\git仓库\GridForecastSys\byjupyter\data'
+AreaNames_FilesName=['names_S','names_N','names_E']
+AreaNames_Dict={'n':'names_N','e':'names_E','s':'names_S'}

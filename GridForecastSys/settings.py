@@ -131,6 +131,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-AreaNames_DIR=r'D:\git仓库\GridForecastSys\byjupyter\data'
+AreaNames_DIR=r'D:\git仓库\GridForecastSys\extra_data\grid_data'
 AreaNames_FilesName=['names_S','names_N','names_E']
 AreaNames_Dict={'n':'names_N','e':'names_E','s':'names_S'}

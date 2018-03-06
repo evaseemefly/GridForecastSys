@@ -35,3 +35,17 @@ class ForecastInfo(models.Model):
         verbose_name=u"预报数据"
         verbose_name_plural=verbose_name
 
+class ForecastTodayInfo(models.Model):
+    id = models.AutoField(primary_key=True)
+    # CASCADE为默认的级联删除
+    gid = models.CharField(max_length=4,default=None)
+    generatedate = models.DateField(default=datetime.now)
+    max_value = models.FloatField()
+    max_date = models.DateField(default=datetime.now)
+    # max_per = models.FloatField()
+    # min_value = models.FloatField()
+    # min_date = models.DateField(default=datetime.now)
+    # min_per = models.FloatField()
+    class Meta:
+        verbose_name=u"预报数据"
+        verbose_name_plural=verbose_name

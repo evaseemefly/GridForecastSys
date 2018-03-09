@@ -9,7 +9,10 @@ import sys
 
 from django.shortcuts import render
 from django.views.generic.base import View
-from django.http import HttpRequest
+from django.http import HttpRequest,HttpResponse
+from django.core import serializers
+
+import json
 
 from utils.file_readgrids import AreaNamesFileInfo
 from GridForecastSys import settings
@@ -17,9 +20,44 @@ from GridForecastSys import settings
 
 from Station.models import GridInfo
 
+def getgrid(request,num=1):
+    num1=num
+    pass
+
 class Grid(View):
-    def get(self,request):
+    def post(self,request):
         self.initGrid()
+
+    def get(self,request, forecastdate=None, area=None):
+    # def get(self,request,num=1):
+        '''
+
+        :param forecastdate:
+        :param area:
+        :return:
+        '''
+        # date=num
+        self.getarea(area)
+        pass
+
+    def getarea(self,area):
+        '''
+        根据传入的area获取指定区域的信息list
+        :param area:
+        :return:
+        '''
+        data=None
+        if area!='all':
+            # targetAreas=GridInfo.objects.get(area)
+            targetAreas=GridInfo.objects.filter(area=area)
+            list_areas=list(targetAreas)
+            data=serializers.serialize("json",targetAreas,ensure_ascii=False)
+            # 用此种方法会报错：TypeError: Object of type 'GridInfo' is not JSON serializable
+            databyjson=json.dumps(list_areas)
+        # data=
+        print(area)
+        print(databyjson)
+        return HttpResponse(data,content_type='application/json')
 
     def initGrid(self):
         '''

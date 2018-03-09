@@ -75,5 +75,6 @@ class GridForecast:
         }
         pd.io.sql.to_sql(df,db_name,engine,schema=table_name, if_exists='append',index=False,dtype=dtypedict)
 
+
 grid= GridForecast()
 grid.run()

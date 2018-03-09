@@ -24,4 +24,6 @@ from Station.views import Grid
 urlpatterns = [
     path('admin/', admin.site.urls),
     url('^gridinit/$',Grid.as_view(),name='init'),
+    url('^getgrid/(?P<forecastdate>[0-9]{8})/(?P<area>\S*)/$',Grid.as_view(),name='getgrid'),
+    # url(r'^getgrid/(?P<forecastdate>[0-9]+)/$',Grid.as_view(),name='getgrid'),
 ]

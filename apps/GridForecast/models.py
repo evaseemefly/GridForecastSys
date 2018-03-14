@@ -19,6 +19,17 @@ from Station.models import GridInfo
 #         verbose_name=u"网格信息"
 #         verbose_name_plural=verbose_name
 
+class ForecastDetailInfo(models.Model):
+    id=models.AutoField(primary_key=True)
+    date=models.DateField(default=datetime.now)
+    tdate=models.DateTimeField(default=datetime.now)
+    hs = models.FloatField(default=-999.0)
+    code = models.CharField(default='ERROR', max_length=6)
+
+    class Meta:
+        verbose_name=u"每日预报详细数据"
+        verbose_name_plural=verbose_name
+
 class ForecastInfo(models.Model):
     id=models.AutoField(primary_key=True)
     # CASCADE为默认的级联删除

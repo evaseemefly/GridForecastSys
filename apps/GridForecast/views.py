@@ -37,7 +37,9 @@ class ForecastDetialInfoView(View):
 
         pass
 
-
+class ForecastHomeView(View):
+    def get(self,request):
+        return render(request, "home.html")
 
 class ForecastDailyInfoView(View):
     '''

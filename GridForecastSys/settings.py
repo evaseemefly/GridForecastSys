@@ -130,6 +130,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS=[
+    os.path.join(BASE_DIR,'static'),
+    ('mapfiles', os.path.join(STATIC_URL, 'mapfiles').replace('\\', '/')),
+]
 
 AreaNames_DIR=r'D:\git仓库\GridForecastSys\extra_data\grid_data'
 AreaNames_FilesName=['names_S','names_N','names_E']

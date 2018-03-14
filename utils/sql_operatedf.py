@@ -10,7 +10,19 @@ import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.types import NVARCHAR,VARCHAR
 
-class GridForecast:
+class DataFrameInfo:
+    def writeInDb(self,df,db_name,table_name):
+        # 4、连接数据库，并写入
+        # '数据库类型+数据库驱动名称://用户名:口令@机器地址:端口号/数据库名'
+        # 注意若使用mysql+mysqlconnector 默认使用的是mysql-python（此模块已不再更新py3的版本）
+        # connect=create_engine('mysql+mysqlconnector://admin:admin123@localhost:3306/gridforecast')
+        engine = create_engine('mysql+mysqldb://admin:admin123@localhost:3306/gridforecast')
+        dtypedict={
+            'str':VARCHAR(length=4),
+        }
+        pd.io.sql.to_sql(df,table_name,engine,schema=db_name, if_exists='append',index=False,dtype=dtypedict)
+
+class ForecastDailyInfo(DataFrameInfo):
     db_name='gridforecast_forecastdailyinfo'
     table_name='gridforecast'
     now_str='2018-03-07 00:00'
@@ -73,8 +85,63 @@ class GridForecast:
         dtypedict={
             'str':VARCHAR(length=4),
         }
-        pd.io.sql.to_sql(df,db_name,engine,schema=table_name, if_exists='append',index=False,dtype=dtypedict)
+        pd.io.sql.to_sql(df,table_name,engine,schema=db_name, if_exists='append',index=False,dtype=dtypedict)
+
+class ForecastDetailInfo(DataFrameInfo):
+    '''
+    每日预报详细数据
+    '''
+    db_name = 'gridforecast'
+    table_name = 'gridforecast_forecastdetailinfo'
+    now_str = '2018-03-14 00:00'
+
+    def run(self,path):
+        read_date = pd.read_csv(path, ',')
+        # 1 转换df
+        df_convert=self.convert_df(read_date)
+        # 2生成要写入数据库的df
+        df_merage = pd.DataFrame(columns=['tdate', 'hs', 'code', 'date'])
+        for val in df_convert.columns.values:
+            df_temp = self.create_temp_df(df_convert, val, self.now_str)
+            #     print(df_temp)
+            df_merage = df_merage.append(df_temp)
+        self.writeInDb(df_merage, self.db_name, self.table_name)
 
 
-grid= GridForecast()
-grid.run()
+    def convert_df(self,df):
+        '''
+        处理原始dataframe，生成转换后的df（index为预报时间，columns为网格名称）
+        :param df:
+        :return:
+        '''
+        #1.1 获取所有的columns
+        cols = list(df)
+        #1.2 获取'1'（factor）的所在位置，并移至第一列
+        cols.insert(0, cols.pop(cols.index('1')))
+        # 2 设置0与1列为层次索引
+        read_date = df.set_index(['1', '0'])
+        # 3 生成转换后的df（index为预报时间，columns为网格名称）
+        df_convert = read_date.T['HS']
+        return df_convert
+
+    def create_temp_df(self,df_convert_1, columns_key, nowday):
+        '''
+        以列名作为新的df的code，提取hs数据
+        :param columns_key:
+        :param nowday:
+        :return:
+        '''
+        df_new = pd.DataFrame(df_convert_1.loc[:, columns_key])
+        #     print(df_new)
+        df_new['code'] = columns_key
+        df_new['date'] = nowday
+        df_new = df_new.reset_index()
+        df_new = df_new.rename(columns={'index': 'tdate'})
+        df_new = df_new.rename(columns={columns_key: 'hs'})
+        #     print(df_new)
+        return df_new
+
+# grid= ForecastDailyInfo()
+grid= ForecastDetailInfo()
+grid.run('convert_date.csv')
+

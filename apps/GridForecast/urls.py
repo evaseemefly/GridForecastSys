@@ -8,7 +8,7 @@ from .views import ForecastDailyInfoView,ForecastHomeView
 app_name='[forecast]'
 urlpatterns = [
     #获取指定日期的预报数据
-    url(r'^daily/(?P<date>[0-9]{8})/(?P<area>\S*)/$', ForecastDailyInfoView.as_view(), name="getdailyforecast"),
+    url(r'^daily/(?P<date>[0-9]{8})/(?P<area>\S*)/$', ForecastDailyInfoView.as_view(), name="forecast-get-dailyforecast"),
 
-    url(r'^home/$',ForecastHomeView.as_view() , name="forecasthome"),
+    url(r'^home/$',ForecastHomeView.as_view() , name="forecast-home"),
 ]

@@ -23,12 +23,12 @@ class DataFrameInfo:
         pd.io.sql.to_sql(df,table_name,engine,schema=db_name, if_exists='append',index=False,dtype=dtypedict)
 
 class ForecastDailyInfo(DataFrameInfo):
-    db_name='gridforecast_forecastdailyinfo'
-    table_name='gridforecast'
-    now_str='2018-03-07 00:00'
+    db_name='gridforecast'
+    table_name='gridforecast_forecastdailyinfo'
+    now_str='2018-03-14 00:00'
 
-    def run(self):
-        df=self.readcsv('convert_date.csv')
+    def run(self,path):
+        df=self.readcsv(path)
         df_value=self.getmaxvalue(df)
         df_date=self.getmaxdate(df)
         df_finall=self.df_concat(df_value,df_date,self.now_str)
@@ -75,17 +75,17 @@ class ForecastDailyInfo(DataFrameInfo):
         final_data['code']=final_data.index
         return final_data
 
-    def writeInDb(self,df,db_name,table_name):
-
-        # 4、连接数据库，并写入
-        # '数据库类型+数据库驱动名称://用户名:口令@机器地址:端口号/数据库名'
-        # 注意若使用mysql+mysqlconnector 默认使用的是mysql-python（此模块已不再更新py3的版本）
-        # connect=create_engine('mysql+mysqlconnector://admin:admin123@localhost:3306/gridforecast')
-        engine = create_engine('mysql+mysqldb://admin:admin123@localhost:3306/gridforecast')
-        dtypedict={
-            'str':VARCHAR(length=4),
-        }
-        pd.io.sql.to_sql(df,table_name,engine,schema=db_name, if_exists='append',index=False,dtype=dtypedict)
+    # def writeInDb(self,df,db_name,table_name):
+    #
+    #     # 4、连接数据库，并写入
+    #     # '数据库类型+数据库驱动名称://用户名:口令@机器地址:端口号/数据库名'
+    #     # 注意若使用mysql+mysqlconnector 默认使用的是mysql-python（此模块已不再更新py3的版本）
+    #     # connect=create_engine('mysql+mysqlconnector://admin:admin123@localhost:3306/gridforecast')
+    #     engine = create_engine('mysql+mysqldb://admin:admin123@localhost:3306/gridforecast')
+    #     dtypedict={
+    #         'str':VARCHAR(length=4),
+    #     }
+    #     pd.io.sql.to_sql(df,table_name,engine,schema=db_name, if_exists='append',index=False,dtype=dtypedict)
 
 class ForecastDetailInfo(DataFrameInfo):
     '''
@@ -141,7 +141,7 @@ class ForecastDetailInfo(DataFrameInfo):
         #     print(df_new)
         return df_new
 
-# grid= ForecastDailyInfo()
-grid= ForecastDetailInfo()
+grid= ForecastDailyInfo()
+# grid= ForecastDetailInfo()
 grid.run('convert_date.csv')
 

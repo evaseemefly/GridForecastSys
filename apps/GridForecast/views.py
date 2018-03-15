@@ -70,7 +70,7 @@ class ForecastDailyInfoView(View):
         # 错误如下：AttributeError: 'str' object has no attribute '_meta'
         # json_data_dict=model_to_dict(json_list)
         json_data_dump=json.dumps(json_list,default=lambda obj:obj.__dict__,ensure_ascii=False)
-        return HttpResponse(json_data,content_type='application/json')
+        return HttpResponse(json_data_dump,content_type='application/json')
 
 
     def getDateMaxForecastInfo(self,date,area):

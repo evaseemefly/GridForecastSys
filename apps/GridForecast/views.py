@@ -39,7 +39,7 @@ class ForecastDetialInfoView(View):
 
 class ForecastHomeView(View):
     def get(self,request):
-        return render(request, "home.html")
+        return render(request, "home-new.html")
 
 class ForecastDailyInfoView(View):
     '''

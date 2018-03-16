@@ -4,6 +4,7 @@
 
     <script type="application/javascript" src="{% static 'js/map/maptiles.js'%}"></script>
     <script src="http://echarts.baidu.com/build/dist/echarts-all.js"></script>
+    <script type="application/javascript" src="{% static 'js/vue/vue.js'%}"></script>
     <script type="application/javascript">
         var forecast_dict = new Array();
         var forecast_dict_test = {};
@@ -435,53 +436,77 @@
             bar.setOption(option_mybar);
         }
 
+        function fillarea(area){
+            var date_str="20180314";
+            var dict_area=null;
+            switch (area)
+            {
+
+                //北海
+                case 'n':
+                    dict_area=loadAreaMaxData(date_str,area);
+                    addshp("{% static 'files/north.zip'%}",dict_area);
+                    break;
+                //东海
+                case 'e':
+                    dict_area=loadAreaMaxData(date_str,area);
+                    addshp("{% static 'files/east.zip'%}",dict_area);
+                    break;
+                //南海
+                case 's':
+                    dict_area=loadAreaMaxData(date_str,area);
+                    addshp("{% static 'files/south.zip'%}",dict_area);
+                    break;
+                //全国
+                case 'a':
+                    break;
+            }
+        }
+
+        function loadAreaMaxData(date_str,area){
+            //从后台获取指定时间，指定海区的极值数据，并以dict的方式返回
+            var data_checkarea= load_targetAreaMaxData(date_str,area);
+            var dict_area=json2dict(data_checkarea);
+            return dict_area;
+        }
+
+        function addshp(shp_path,dict_area){
+            //为当天地图添加图层
+            shp(shp_path).then(function(temp_geojson) {
+                //						geojson = temp_geojson;
+                //do something with your geojson
+                addShape(dict_area,temp_geojson, null, null, mymap);
+
+                geojson = L.geoJson(temp_geojson, {
+                    style: mystyle,
+                    onEachFeature: onEachFeature
+                }).addTo(mymap);
+            });
+        }
+
         $(function() {
             {#dict_south= random_forecast("S",51, 9);#}
+
+             var vm1=new Vue({
+				el:'#top_nav_ul',
+				data:{
+					items:[
+					{message:'北海',code:'n'},
+					{message:'东海',code:'e'},
+					{message:'南海',code:'s'},
+					{message:'全国',code:'a'}]
+				},
+				methods:{
+					fillarea:function(value){
+						fillarea(value);
+					}
+				}
+			});
+
             var data_checkarea= load_targetAreaMaxData("20180314","S");
             var dict_south=json2dict(data_checkarea);
-            {#dict_east=random_forecast("E",85,9);#}
-            {#dict_north=random_forecast("N",77,9);#}
-            //var my_geojson;
-            //貌似这个then是一个ajax请求，顺序执行时此处不会立即被执行
-            {#shp("files/north.zip").then(function(temp_geojson) {#}
 
-            shp("{% static 'files/north.zip'%}").then(function(temp_geojson) {
-                //						geojson = temp_geojson;
-                //do something with your geojson
-                addShape(dict_north,temp_geojson, null, null, mymap);
-
-                geojson = L.geoJson(temp_geojson, {
-                    style: mystyle,
-                    onEachFeature: onEachFeature
-                }).addTo(mymap);
-            });
-
-            {#<link rel="stylesheet" href="{% static 'css/flatui/flat-ui.css'%}">#}
-            {#shp("files/east.zip").then(function(temp_geojson) {#}
-
-            shp("{% static 'files/east.zip'%}").then(function(temp_geojson) {
-                //						geojson = temp_geojson;
-                //do something with your geojson
-                addShape(dict_east,temp_geojson, null, null, mymap);
-
-                geojson = L.geoJson(temp_geojson, {
-                    style: mystyle,
-                    onEachFeature: onEachFeature
-                }).addTo(mymap);
-            });
-
-            {#shp("files/south.zip").then(function(temp_geojson) {#}
-            shp("{% static 'files/south.zip'%}").then(function(temp_geojson) {
-                //						geojson = temp_geojson;
-                //do something with your geojson
-                addShape(dict_south,temp_geojson, null, null, mymap);
-
-                geojson = L.geoJson(temp_geojson, {
-                    style: mystyle,
-                    onEachFeature: onEachFeature
-                }).addTo(mymap);
-            });
-            //					var test_dic = forecast_dict;
+            addshp("{% static 'files/south.zip'%}",dict_south);
             var test_dic = forecast_dict_test;
             loadWaveData();
 

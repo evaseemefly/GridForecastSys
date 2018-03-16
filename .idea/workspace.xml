@@ -28,41 +28,72 @@
     <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="home.html" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/templates/home.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="480">
-              <caret line="460" column="0" lean-forward="true" selection-start-line="460" selection-start-column="0" selection-end-line="460" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="_Layout.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/templates/shared/_Layout.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="161">
-              <caret line="7" column="62" lean-forward="false" selection-start-line="7" selection-start-column="62" selection-end-line="7" selection-end-column="62" />
-              <folding>
-                <element signature="n#block#1;n#!!top" expanded="false" />
-                <element signature="n#block#2;n#!!top" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="_Layout_main.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/templates/shared/_Layout_main.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="392">
-              <caret line="91" column="67" lean-forward="true" selection-start-line="91" selection-start-column="67" selection-end-line="91" selection-end-column="67" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <splitter split-orientation="horizontal" split-proportion="0.37740862">
+      <split-first>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
+          <file leaf-file-name="home-new.html" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/templates/home-new.html">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="364">
+                  <caret line="456" column="20" lean-forward="true" selection-start-line="456" selection-start-column="20" selection-end-line="456" selection-end-column="20" />
+                  <folding>
+                    <element signature="e#513#2123#0#HTML" expanded="false" />
+                    <element signature="e#2174#2657#0#HTML" expanded="false" />
+                    <element signature="e#2691#2946#0#HTML" expanded="false" />
+                    <element signature="e#3045#3577#0#HTML" expanded="false" />
+                    <element signature="e#3693#4747#0#HTML" expanded="false" />
+                    <element signature="e#4786#5175#0#HTML" expanded="false" />
+                    <element signature="e#5364#5508#0#HTML" expanded="false" />
+                    <element signature="e#5794#5949#0#HTML" expanded="false" />
+                    <element signature="e#5985#6249#0#HTML" expanded="false" />
+                    <element signature="e#6319#6480#0#HTML" expanded="false" />
+                    <element signature="e#6868#10116#0#HTML" expanded="false" />
+                    <element signature="e#10170#10697#0#HTML" expanded="false" />
+                    <element signature="e#11046#11270#0#HTML" expanded="false" />
+                    <element signature="e#11327#11508#0#HTML" expanded="false" />
+                    <element signature="e#11586#14394#0#HTML" expanded="false" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="maptiles.js" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/static/js/map/maptiles.js">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="28">
+                  <caret line="1" column="4" lean-forward="false" selection-start-line="1" selection-start-column="4" selection-end-line="1" selection-end-column="4" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-first>
+      <split-second>
+        <leaf>
+          <file leaf-file-name="home-other.html" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/templates/home-other.html">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="280">
+                  <caret line="509" column="46" lean-forward="true" selection-start-line="509" selection-start-column="46" selection-end-line="509" selection-end-column="46" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="views.py" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/apps/GridForecast/views.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="346">
+                  <caret line="41" column="40" lean-forward="false" selection-start-line="41" selection-start-column="40" selection-end-line="41" selection-end-column="40" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-second>
+    </splitter>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -100,13 +131,17 @@
         <option value="$PROJECT_DIR$/GridForecastSys/settings.py" />
         <option value="$PROJECT_DIR$/static/js/map/maptiles.js" />
         <option value="$PROJECT_DIR$/utils/sql_operatedf.py" />
-        <option value="$PROJECT_DIR$/templates/shared/_Layout_topnav.html" />
-        <option value="$PROJECT_DIR$/templates/shared/_Layout.html" />
         <option value="$PROJECT_DIR$/templates/home-new.html" />
         <option value="$PROJECT_DIR$/apps/GridForecast/urls.py" />
-        <option value="$PROJECT_DIR$/apps/GridForecast/views.py" />
-        <option value="$PROJECT_DIR$/templates/home.html" />
         <option value="$PROJECT_DIR$/templates/shared/_Layout_main.html" />
+        <option value="$PROJECT_DIR$/templates/shared/_Layout.html" />
+        <option value="$PROJECT_DIR$/templates/home.html" />
+        <option value="$PROJECT_DIR$/templates/shared/home-vue.html" />
+        <option value="$PROJECT_DIR$/templates/home-vue.html" />
+        <option value="$PROJECT_DIR$/templates/shared/_Layout_topnav.html" />
+        <option value="$PROJECT_DIR$/templates/home-backup.html" />
+        <option value="$PROJECT_DIR$/templates/home-other.html" />
+        <option value="$PROJECT_DIR$/apps/GridForecast/views.py" />
       </list>
     </option>
   </component>
@@ -117,8 +152,9 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-7" />
-    <option name="width" value="1546" />
+    <option name="x" value="123" />
+    <option name="y" value="172" />
+    <option name="width" value="1759" />
     <option name="height" value="830" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -137,7 +173,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -166,37 +202,39 @@
             <path>
               <item name="GridForecastSys" type="b2602c69:ProjectViewProjectNode" />
               <item name="GridForecastSys" type="462c0819:PsiDirectoryNode" />
-              <item name="GridForecastSys" type="462c0819:PsiDirectoryNode" />
+              <item name="templates" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="GridForecastSys" type="b2602c69:ProjectViewProjectNode" />
               <item name="GridForecastSys" type="462c0819:PsiDirectoryNode" />
               <item name="templates" type="462c0819:PsiDirectoryNode" />
+              <item name="shared" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
-    <property name="settings.editor.selected.configurable" value="vcs.Git" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../电商商城项目/MxShop - resource" />
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\git仓库\GridForecastSys\apps" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\git仓库\GridForecastSys\templates" />
+      <recent name="D:\git仓库\GridForecastSys\static\js\vue" />
       <recent name="D:\git仓库\GridForecastSys\templates\shared" />
       <recent name="D:\git仓库\GridForecastSys\static\files" />
       <recent name="D:\git仓库\GridForecastSys\static\fonts" />
-      <recent name="D:\git仓库\GridForecastSys\static\mapfiles" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\git仓库\GridForecastSys\templates" />
+      <recent name="D:\git仓库\GridForecastSys\apps" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -281,8 +319,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
-    <editor active="true" />
+    <frame x="-9" y="-9" width="1938" height="1048" extended-state="6" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39116022" sideWeight="0.50208336" order="7" side_tool="true" content_ui="tabs" />
@@ -290,14 +327,13 @@
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.17627856" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14765458" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19259657" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32942432" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="manage.py@GridForecastSys" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33497536" sideWeight="0.49791667" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="SciView" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23027718" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.30147782" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39454976" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="调试" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -307,6 +343,7 @@
       <window_info id="运行" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3297062" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="manage.py@GridForecastSys" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33497536" sideWeight="0.49791667" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
@@ -376,15 +413,13 @@
           <option name="timeStamp" value="39" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/templates/home.html</url>
-          <line>112</line>
-          <properties lambdaOrdinal="-1" />
+          <url>file://$PROJECT_DIR$/templates/home-new.html</url>
+          <line>115</line>
           <option name="timeStamp" value="72" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/templates/home.html</url>
-          <line>109</line>
-          <properties lambdaOrdinal="-1" />
+          <url>file://$PROJECT_DIR$/templates/home-new.html</url>
+          <line>112</line>
           <option name="timeStamp" value="73" />
         </line-breakpoint>
       </breakpoints>
@@ -454,29 +489,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/apps/Station/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/apps/Station/admin.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="184">
-          <caret line="8" column="0" lean-forward="false" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://C:/ProgramData/Anaconda3/Lib/site-packages/django/views/generic/base.py" />
-    <entry file="file://C:/ProgramData/Anaconda3/Lib/site-packages/django/core/handlers/base.py" />
-    <entry file="file://$PROJECT_DIR$/manage.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="377">
-          <caret line="14" column="39" lean-forward="false" selection-start-line="14" selection-start-column="39" selection-end-line="14" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://D:/MyPogram/Lib/site-packages/sqlalchemy/dialects/mysql/mysqlconnector.py" />
     <entry file="file://$PROJECT_DIR$/apps/GridForecast/migrations/0003_forecastdailyinfo.py" />
     <entry file="file://$PROJECT_DIR$/apps/GridForecast/migrations/__init__.py">
@@ -552,14 +564,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/templates/shared/_Layout_topnav.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="184">
-          <caret line="8" column="14" lean-forward="false" selection-start-line="8" selection-start-column="14" selection-end-line="8" selection-end-column="14" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/GridForecastSys/settings.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="551">
@@ -568,19 +572,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/static/js/map/maptiles.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-322">
-          <caret line="4" column="20" lean-forward="false" selection-start-line="4" selection-start-column="20" selection-end-line="4" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/home.html">
+    <entry file="file://$PROJECT_DIR$/templates/home-new.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="69">
           <caret line="3" column="0" lean-forward="false" selection-start-line="3" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#513#2123#0#HTML" expanded="false" />
+            <element signature="e#2174#2657#0#HTML" expanded="false" />
+            <element signature="e#2691#2946#0#HTML" expanded="false" />
+            <element signature="e#3045#3577#0#HTML" expanded="false" />
+            <element signature="e#3693#4747#0#HTML" expanded="false" />
+            <element signature="e#4786#5175#0#HTML" expanded="false" />
+            <element signature="e#5364#5508#0#HTML" expanded="false" />
+            <element signature="e#5794#5949#0#HTML" expanded="false" />
+            <element signature="e#5985#6249#0#HTML" expanded="false" />
+            <element signature="e#6319#6480#0#HTML" expanded="false" />
+            <element signature="e#6868#10116#0#HTML" expanded="false" />
+            <element signature="e#10170#10697#0#HTML" expanded="false" />
+            <element signature="e#11046#11270#0#HTML" expanded="false" />
+            <element signature="e#11327#11508#0#HTML" expanded="false" />
+            <element signature="e#11586#14394#0#HTML" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -608,26 +620,29 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/apps/GridForecast/views.py">
+    <entry file="file://$PROJECT_DIR$/templates/shared/_Layout_main.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="759">
-          <caret line="46" column="7" lean-forward="true" selection-start-line="46" selection-start-column="7" selection-end-line="46" selection-end-column="7" />
+        <state relative-caret-position="224">
+          <caret line="98" column="4" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="119" selection-end-column="6" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/templates/shared/_Layout_main.html">
+    <entry file="file://$PROJECT_DIR$/templates/home-vue.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="392">
-          <caret line="91" column="67" lean-forward="true" selection-start-line="91" selection-start-column="67" selection-end-line="91" selection-end-column="67" />
-          <folding />
+        <state relative-caret-position="336">
+          <caret line="130" column="133" lean-forward="false" selection-start-line="130" selection-start-column="69" selection-end-line="130" selection-end-column="133" />
+          <folding>
+            <element signature="n#style#0;n#head#0;n#html#0;n#!!top" expanded="false" />
+            <element signature="n#style#0;n#nav#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/templates/shared/_Layout.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="161">
-          <caret line="7" column="62" lean-forward="false" selection-start-line="7" selection-start-column="62" selection-end-line="7" selection-end-column="62" />
+        <state relative-caret-position="560">
+          <caret line="20" column="31" lean-forward="false" selection-start-line="20" selection-start-column="31" selection-end-line="20" selection-end-column="31" />
           <folding>
             <element signature="n#block#1;n#!!top" expanded="false" />
             <element signature="n#block#2;n#!!top" expanded="false" />
@@ -635,11 +650,85 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/templates/home.html">
+    <entry file="file://$PROJECT_DIR$/templates/shared/_Layout_topnav.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="460" column="0" lean-forward="true" selection-start-line="460" selection-start-column="0" selection-end-line="460" selection-end-column="0" />
+        <state relative-caret-position="168">
+          <caret line="11" column="125" lean-forward="false" selection-start-line="11" selection-start-column="125" selection-end-line="11" selection-end-column="125" />
+          <folding>
+            <element signature="n#div#0;n#nav#0;n#!!top" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/static/js/vue/vue.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/static/js/map/maptiles.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="28">
+          <caret line="1" column="4" lean-forward="false" selection-start-line="1" selection-start-column="4" selection-end-line="1" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/home-backup.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="56">
+          <caret line="539" column="0" lean-forward="false" selection-start-line="539" selection-start-column="0" selection-end-line="539" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/ProgramData/Anaconda3/Lib/site-packages/jinja2/lexer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="159">
+          <caret line="50" column="0" lean-forward="false" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/home-other.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="280">
+          <caret line="509" column="46" lean-forward="true" selection-start-line="509" selection-start-column="46" selection-end-line="509" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/apps/GridForecast/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="346">
+          <caret line="41" column="40" lean-forward="false" selection-start-line="41" selection-start-column="40" selection-end-line="41" selection-end-column="40" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/home-new.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="364">
+          <caret line="456" column="20" lean-forward="true" selection-start-line="456" selection-start-column="20" selection-end-line="456" selection-end-column="20" />
+          <folding>
+            <element signature="e#513#2123#0#HTML" expanded="false" />
+            <element signature="e#2174#2657#0#HTML" expanded="false" />
+            <element signature="e#2691#2946#0#HTML" expanded="false" />
+            <element signature="e#3045#3577#0#HTML" expanded="false" />
+            <element signature="e#3693#4747#0#HTML" expanded="false" />
+            <element signature="e#4786#5175#0#HTML" expanded="false" />
+            <element signature="e#5364#5508#0#HTML" expanded="false" />
+            <element signature="e#5794#5949#0#HTML" expanded="false" />
+            <element signature="e#5985#6249#0#HTML" expanded="false" />
+            <element signature="e#6319#6480#0#HTML" expanded="false" />
+            <element signature="e#6868#10116#0#HTML" expanded="false" />
+            <element signature="e#10170#10697#0#HTML" expanded="false" />
+            <element signature="e#11046#11270#0#HTML" expanded="false" />
+            <element signature="e#11327#11508#0#HTML" expanded="false" />
+            <element signature="e#11586#14394#0#HTML" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>

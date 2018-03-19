@@ -39,7 +39,7 @@ class ForecastDetialInfoView(View):
 
 class ForecastHomeView(View):
     def get(self,request):
-        return render(request, "home.html")
+        return render(request, "home-new.html")
 
 class ForecastDailyInfoView(View):
     '''
@@ -70,7 +70,7 @@ class ForecastDailyInfoView(View):
         # 错误如下：AttributeError: 'str' object has no attribute '_meta'
         # json_data_dict=model_to_dict(json_list)
         json_data_dump=json.dumps(json_list,default=lambda obj:obj.__dict__,ensure_ascii=False)
-        return HttpResponse(json_data,content_type='application/json')
+        return HttpResponse(json_data_dump,content_type='application/json')
 
 
     def getDateMaxForecastInfo(self,date,area):
@@ -85,7 +85,7 @@ class ForecastDailyInfoView(View):
         date_convert="-".join([date[:4],date[4:6],date[6:8]])
         # 由于在数据库中保存的area都是大写的，此处需要处理一下
         area=area.upper()
-        if area!='a':
+        if area!='A':
             # forecastinfo_date_all = ForecastDailyInfo.objects.filter(Q(CODE__contains=area))
             forecastinfo_date_all= ForecastDailyInfo.objects.filter(Q(nowdate=date_convert)&Q(CODE__contains=area))
         else:

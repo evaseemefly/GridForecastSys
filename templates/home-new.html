@@ -107,7 +107,7 @@
          */
         function addShape(dict,data, feature, layer, map) {
             //!!!注意此处添加了shape文件后，由于是读取的geojson，文件，通过L.geoJSON后，需要将返回值赋值给geojson
-            var shape_layer=geojson = L.geoJSON(data, {
+            geojson= L.geoJSON(data, {
                 style: function(feature) {
                     //获取到当前的对象的code
                     var code = feature.properties.Code
@@ -130,11 +130,11 @@
                 },
                 //注意此处必须要将OnEachFeature放在里面才可以
                 onEachFeature: onEachFeature
-            });
-            shape_layer.bindPopup(function(layer) {
+            }).bindPopup(function(layer) {
                 return layer.feature.properties.description;
             }).addTo(map);
-            return shape_layer;
+            return geojson;
+            {#return geo_layer;#}
         }
 
         function highlightFeature(e) {
@@ -176,6 +176,8 @@
         }
 
         var geojson;
+
+        var my_shp_layer;
 
         function readShape(file, func) {
             shp("file").then(function(geojson) {
@@ -442,24 +444,27 @@
         function fillarea(area){
             var date_str="20180314";
             var dict_area=null;
-
+            var new_layer=null;
             switch (area)
             {
 
                 //北海
                 case 'n':
                     dict_area=loadAreaMaxData(date_str,area);
-                   out_shape_layer= addshp("{% static 'files/north.zip'%}",dict_area);
+                   {#new_layer= addshp("{% static 'files/north.zip'%}",dict_area,shp_layer);#}
+                    new_layer=addshp("{% static 'files/north.zip'%}",dict_area);
                     break;
                 //东海
                 case 'e':
                     dict_area=loadAreaMaxData(date_str,area);
-                   out_shape_layer= addshp("{% static 'files/east.zip'%}",dict_area);
+                   {#new_layer= addshp("{% static 'files/east.zip'%}",dict_area,shp_layer);#}
+                    new_layer=addshp("{% static 'files/east.zip'%}",dict_area);
                     break;
                 //南海
                 case 's':
                     dict_area=loadAreaMaxData(date_str,area);
-                   out_shape_layer= addshp("{% static 'files/south.zip'%}",dict_area);
+                   {#new_layer= addshp("{% static 'files/south.zip'%}",dict_area,shp_layer);#}
+                    new_layer=addshp("{% static 'files/south.zip'%}",dict_area);
                     break;
                 //全国
                 case 'a':
@@ -469,7 +474,8 @@
                      addshp("{% static 'files/south.zip'%}",dict_area);
                     break;
             }
-            return dict_area;
+            return [dict_area,new_layer];
+            {#return dict_area;#}
         }
 
         function loadAreaMaxData(date_str,area){
@@ -479,21 +485,27 @@
             return dict_area;
         }
 
-        function addshp(shp_path,dict_area){
-            {#var shape_layer=null;#}
+        function addshp(shp_path,dict_area,shp_layer){
+            var shape_layer=null;
             //为当天地图添加图层
             //注意此处then是异步的，所以无法返回shape_layer;
             shp(shp_path).then(function(temp_geojson) {
-                //						geojson = temp_geojson;
+                geojson = temp_geojson;
                 //do something with your geojson
-                out_shape_layer=addShape(dict_area,temp_geojson, null, null, mymap);
+                if(my_shp_layer!=null){
+                   mymap.removeLayer(my_shp_layer);
+                }
+                shp_layer=addShape(dict_area,temp_geojson, null, null, mymap);
 
-                geojson = L.geoJson(temp_geojson, {
-                    style: mystyle,
-                    onEachFeature: onEachFeature
-                }).addTo(mymap);
+                //geojson = L.geoJson(temp_geojson, {
+                //    style: mystyle,
+                //    onEachFeature: onEachFeature
+                //}).addTo(mymap);
+                my_shp_layer= shp_layer;
+            }).then(function(){
+                return shape_layer;
             });
-            {#return shape_layer;#}
+            return shape_layer;
         }
 
         $(function() {
@@ -501,8 +513,10 @@
             //					var test_dic = forecast_dict;
             //存储指定海区（北、东、南、全国）网格72小时极值的字典
             var dict_target=null;
+            var text_index=0;
+            var out_geo_layer=null;
+            {#var out_shape_layer=null;#}
 
-            var out_shape_layer=null;
             var vm1=new Vue({
                 el:'#top_nav_ul',
                 data:{
@@ -512,22 +526,22 @@
                         {message:'南海',code:'s'},
                         {message:'全国',code:'a'}],
                     selected:null,
+                    out_shape_layer:null,
                 },
                 methods:{
                     fillarea:function(value,item){
                         this.selected=item;
-
+                        text_index+=1;
                         //将字典转成arr
                         var arr_keys_forecastextreme = [];
                         var arr_values_forecastextreme = [];
                         var arr_obj_forecastextreme = [];
-                        if(out_shape_layer!=null){
-                            mymap.removeLayer(out_shape_layer);
-                        }
-                        dict_target=fillarea(value);
+
+                        {#dict_target=fillarea(value);#}
+                        var info=fillarea(value);
+                        dict_target=info[0];
+                        out_geo_layer=info[1];
                         //从当前地图中删除当前海区的layer，前提是当前海区的layer不为null，否则会报错
-
-
                         if(dict_target!=null){
                             var forecast_arr = dic2arr(dict_target);
                             var forecast_arr_obj=[];

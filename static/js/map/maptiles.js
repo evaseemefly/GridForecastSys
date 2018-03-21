@@ -1,5 +1,5 @@
 
-var mymap = L.map('basemap').setView([16.5, 115.9], 6);
+var mymap = L.map('basemap').setView([30.09, 127.75], 5);
 // var mymap = L.map('basemap').setView([51.505, -0.09], 13)
         mapLink = '../static/mapfiles/';
         L.tileLayer(

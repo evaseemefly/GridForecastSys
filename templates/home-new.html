@@ -451,18 +451,22 @@
                 //北海
                 case 'n':
                     dict_area=loadAreaMaxData(date_str,area);
+                    //缩放并定位到指定海区
+                    mymap.setView([38.3,123],7);
                    {#new_layer= addshp("{% static 'files/north.zip'%}",dict_area,shp_layer);#}
                     new_layer=addshp("{% static 'files/north.zip'%}",dict_area);
                     break;
                 //东海
                 case 'e':
                     dict_area=loadAreaMaxData(date_str,area);
+                    mymap.setView([28.6,125.35],6);
                    {#new_layer= addshp("{% static 'files/east.zip'%}",dict_area,shp_layer);#}
                     new_layer=addshp("{% static 'files/east.zip'%}",dict_area);
                     break;
                 //南海
                 case 's':
                     dict_area=loadAreaMaxData(date_str,area);
+                    mymap.setView([20.2,113.04],7);
                    {#new_layer= addshp("{% static 'files/south.zip'%}",dict_area,shp_layer);#}
                     new_layer=addshp("{% static 'files/south.zip'%}",dict_area);
                     break;

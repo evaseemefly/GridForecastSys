@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'GridForecast',
     'Station',
+    # django rest framework
+    'rest_framework',
 ]
 
 MIDDLEWARE = [

@@ -163,8 +163,11 @@
         function zoomToFeature(e) {
             //1 垃圾视角，并等比例放大
             mymap.fitBounds(e.target.getBounds());
+            //获取当前选定的网格的code
+            var code= e.target.feature.properties.Code;
+            var target_date='20180314';
             //2 弹出modal框，加载
-            loaderrmsg();
+            loadForecastModal(code,target_date);
         }
 
         function onEachFeature(feature, layer) {
@@ -216,94 +219,104 @@
         /*
          * 初始化echarts图标
          */
-        function loadWaveData() {
-            // 基于准备好的dom，初始化echarts图表
-            var myChart = echarts.init(document.getElementById('wave_data'));
-
-            var option = {
-                tooltip: {
-                    show: true
-                },
-                legend: {
-                    //							data: ['波浪', '周期']
-                    //去掉周期
-                    data: ['波浪']
-                },
-                xAxis: [{
-                    type: 'category',
-                    data: ["2018-2-1 15:00", "2018-2-1 16:00", "2018-2-1 17:00", "2018-2-1 18:00", "2018-2-1 19:00", "2018-2-1 20:00", "2018-2-1 21:00", "2018-2-1 22:00", "2018-2-1 23:00", "2018-2-2 00:00", "2018-2-2 01:00", "2018-2-2 02:00"],
-                    //使用以下方式实现显示全部x坐标上的点
-                    "axisLabel": {
-                        //interval: 0,
-                        textStyle: {
-                            color: '#FFFFFF'
-                        }
-                    },
-                    //                  interval:0
-                }],
-                yAxis: [{
-                    type: 'value',
-                    "axisLabel": {
-                        //					interval: 0,
-                        textStyle: {
-                            color: '#FFFFFF'
-                        }
-                    },
-                }],
-                series: [{
-                    "name": "波浪", //需要与legend中的data相同
-                    "type": "line",
-                    smooth: true, //不是折线，是曲线
-                    itemStyle: {
-                        normal: {
-                            //设置折点的颜色
-                            color: '#FFFF00',
-                            //注意lineStyle需要卸载normal里面
-                            //自定义折线颜色
-                            lineStyle: {
-                                color: '#00FF00'
-                            },
-                            //自定义折线下区域的颜色
-                            areaStyle: {
-                                color: '#FFFF00'
-                            },
-
-                            label: {
-                                show: true //显示每个点的值
-                            }
-                        }
-
-                    }, //向下填充区域
-                    "data": [0.37, 0.52, 0.32, 0.12, 0.32, 0.49, 0.61, 0.46, 0.35, 0.24, 0.12, 0.35],
-                    label: {
-                        normal: {
+        function loadWaveData(date,code) {
+            var targetUrl="/"
+            var url_arr=new Array();
+            url_arr.push("forecast");
+            url_arr.push("detial");
+            url_arr.push(date);
+            url_arr.push(code);
+            targetUrl+=url_arr.join("/");
+            targetUrl+="/";
+            $.ajax({
+                url: targetUrl, //json文件位置
+                type: "GET", //请求方式为get
+                dataType: "json", //返回数据格式为json
+                success: function (data) { //请求成功完成后要执行的方法
+                    //					console.log(data);
+                    var hs_values = [];
+                    var hs_date = [];
+                    $.each(data, function (index, value) {
+                        //						console.log(index+value);
+                        hs_values.push(value.hs);
+                        console.log(value.hs);
+                        hs_date.push(value.tdate);
+                        console.log(value.tdate);
+                    });
+                    var option = {
+                        tooltip: {
                             show: true
-                        }
-                    }
-                },
-                    //							{
-                    //								"name": "周期", //需要与legend中的data相同
-                    //								"type": "line",
-                    //								smooth: true, //不是折线，是曲线
-                    //								itemStyle: {
-                    //									normal: {
-                    //										areaStyle: {
-                    //											type: 'default'
-                    //										},
-                    //										//                    		label : {show: true}
-                    //									}
-                    //								}, //向下填充区域
-                    //								"data": [3.14, 3.21, 3.28, 3.35, 3.41, 3.47, 3.47, 3.55, 3.64, 3.73, 3.80, 3.86]
-                    //							},
-                ]
-            };
+                        },
+                        legend: {
+                            data: ['波浪', '周期']
+                        },
+                        xAxis: [{
+                            type: 'category',
+                            data: hs_date,
+                            //使用以下方式实现显示全部x坐标上的点
+                            "axisLabel": {
+                                //interval: 0,
+                                textStyle: {
+                                    color: '#FFFFFF'
+                                }
+                            },
 
-            // 为echarts对象加载数据
-            myChart.setOption(option);
+                            //                  interval:0
+                        }],
+                        yAxis: [{
+                            type: 'value',
+                            "axisLabel": {
+                                //					interval: 0,
+                                textStyle: {
+                                    color: '#FFFFFF'
+                                }
+                            },
+                        }],
+                        series: [{
+                            "name": "波浪", //需要与legend中的data相同
+                            "type": "line",
+                            smooth: true, //不是折线，是曲线
+                            itemStyle: {
+                                normal: {
+                                    //设置折点的颜色
+                                    color: '#FFFF00',
+                                    //注意lineStyle需要卸载normal里面
+                                    //自定义折线颜色
+                                    lineStyle: {
+                                        color: '#00FF00'
+                                    },
+                                    //自定义折线下区域的颜色
+                                    areaStyle: {
+                                        color: '#FFFF00'
+                                    },
+
+                                    label: {
+                                        show: true //显示每个点的值
+                                    }
+                                }
+
+                            }, //向下填充区域
+                            "data": hs_values,
+                            label: {
+                                normal: {
+                                    show: true
+                                }
+                            }
+                        },]
+                    };
+                    // 基于准备好的dom，初始化echarts图表
+                    var myChart = echarts.init(document.getElementById('wave_data'));
+                    // 为echarts对象加载数据
+                    myChart.setOption(option);
+
+                    //显示modal框
+                    $("#errorModal").modal();
+                }
+            });
         }
 
-        //加载并显示错误的消息框
-        function loaderrmsg() {
+        //加载并显示指定网格的72小时预报数据的modal框
+        function loadForecastModal(code,target_date) {
             /*
              * 加载错误信息
              * 1、根据后台返回的obj获取message放在modal-body中的mymsgcontent中
@@ -315,8 +328,10 @@
             var title = "海浪有效波高"
             //				$("mymsgcontent").attr("overflow","auto");
             document.getElementById("mymsgtitle").innerHTML = title;
+            //请求后台并填充echarts
+            loadWaveData(target_date,code);
             //				document.getElementById("mymsgcontent").innerHTML = msg;
-            $("#errorModal").modal();
+
         }
 
         info.addTo(mymap);
@@ -453,29 +468,29 @@
                     dict_area=loadAreaMaxData(date_str,area);
                     //缩放并定位到指定海区
                     mymap.setView([38.3,123],7);
-                   {#new_layer= addshp("{% static 'files/north.zip'%}",dict_area,shp_layer);#}
+                {#new_layer= addshp("{% static 'files/north.zip'%}",dict_area,shp_layer);#}
                     new_layer=addshp("{% static 'files/north.zip'%}",dict_area);
                     break;
                 //东海
                 case 'e':
                     dict_area=loadAreaMaxData(date_str,area);
                     mymap.setView([28.6,125.35],6);
-                   {#new_layer= addshp("{% static 'files/east.zip'%}",dict_area,shp_layer);#}
+                {#new_layer= addshp("{% static 'files/east.zip'%}",dict_area,shp_layer);#}
                     new_layer=addshp("{% static 'files/east.zip'%}",dict_area);
                     break;
                 //南海
                 case 's':
                     dict_area=loadAreaMaxData(date_str,area);
                     mymap.setView([20.2,113.04],7);
-                   {#new_layer= addshp("{% static 'files/south.zip'%}",dict_area,shp_layer);#}
+                {#new_layer= addshp("{% static 'files/south.zip'%}",dict_area,shp_layer);#}
                     new_layer=addshp("{% static 'files/south.zip'%}",dict_area);
                     break;
                 //全国
                 case 'a':
-                     dict_area=loadAreaMaxData(date_str,area);
-                     addshp("{% static 'files/north.zip'%}",dict_area);
-                     addshp("{% static 'files/east.zip'%}",dict_area);
-                     addshp("{% static 'files/south.zip'%}",dict_area);
+                    dict_area=loadAreaMaxData(date_str,area);
+                    addshp("{% static 'files/north.zip'%}",dict_area);
+                    addshp("{% static 'files/east.zip'%}",dict_area);
+                    addshp("{% static 'files/south.zip'%}",dict_area);
                     break;
             }
             return [dict_area,new_layer];
@@ -497,7 +512,7 @@
                 geojson = temp_geojson;
                 //do something with your geojson
                 if(my_shp_layer!=null){
-                   mymap.removeLayer(my_shp_layer);
+                    mymap.removeLayer(my_shp_layer);
                 }
                 shp_layer=addShape(dict_area,temp_geojson, null, null, mymap);
 

@@ -4,28 +4,34 @@ __author__='evaseemefly'
 
 from django.shortcuts import render
 from django.views.generic.base import View
-from django.http import HttpRequest,HttpResponse
+from django.http import HttpRequest,HttpResponse,JsonResponse
 from django.core import serializers
 from django.forms.models import model_to_dict
 from django.db.models import Q
-
-
+from rest_framework.response import Response
+from rest_framework.decorators import APIView
 import json
 
 
 
-from .models import ForecastDailyInfo
+from .models import ForecastDailyInfo,ForecastDetailInfo
+from .serializers import ForecastDetailInfoSerializer
 from utils import queryset2json
 
 
 # Create your views here.
+def convertDate(date_str):
+    date="-".join([date_str[:4],date_str[4:6],date_str[6:8]])
+    return date
 
-class ForecastDetialInfoView(View):
+class ForecastDetialInfoView(APIView):
     '''
     获取指定日期以及code的72小时预报值
     '''
     def get(self,request,date,code):
-        pass
+        data=self.getTargetCodeDetialData(date,code)
+        # return JsonResponse({'error': 'Some error'}, status=401)
+        return Response(data)
 
     def getTargetCodeDetialData(self,date,code):
         '''
@@ -34,8 +40,13 @@ class ForecastDetialInfoView(View):
         :param code:
         :return:
         '''
+        # 根据code以及预报生成的日期获取对应的预报值（72小时）
+        date_converted= convertDate(date)
+        # detialinfo=ForecastDetailInfo.objects.all()[:5]
+        detialinfo= ForecastDetailInfo.objects.filter(Q(code=code)&Q(date=date_converted))
+        detialinfo_serializer=ForecastDetailInfoSerializer(detialinfo,many=True)
+        return detialinfo_serializer.data
 
-        pass
 
 class ForecastHomeView(View):
     def get(self,request):
@@ -82,7 +93,8 @@ class ForecastDailyInfoView(View):
         # 获取当日的全部的极值预报
         # 注意此处传过来的date是 20180302这种形式的，需要转换
         # 使用''.join的方式可以以指定的形式拼接后面的参数（类型：list）
-        date_convert="-".join([date[:4],date[4:6],date[6:8]])
+        # date_convert="-".join([date[:4],date[4:6],date[6:8]])
+        date_convert=convertDate(date)
         # 由于在数据库中保存的area都是大写的，此处需要处理一下
         area=area.upper()
         if area!='A':

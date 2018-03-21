@@ -29,4 +29,7 @@ urlpatterns = [
     url('^forecast/',include('GridForecast.urls', namespace='forecast')),
 
     # url(r'^getgrid/(?P<forecastdate>[0-9]+)/$',Grid.as_view(),name='getgrid'),
+
+    # django resut framework
+    url(r'^api-auth/',include('rest_framework.urls'))
 ]

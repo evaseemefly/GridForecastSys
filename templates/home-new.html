@@ -239,16 +239,16 @@
                     $.each(data, function (index, value) {
                         //						console.log(index+value);
                         hs_values.push(value.hs);
-                        console.log(value.hs);
+                        {#console.log(value.hs);#}
                         hs_date.push(value.tdate);
-                        console.log(value.tdate);
+                        {#console.log(value.tdate);#}
                     });
                     var option = {
                         tooltip: {
                             show: true
                         },
                         legend: {
-                            data: ['波浪', '周期']
+                            data: ['波浪']
                         },
                         xAxis: [{
                             type: 'category',
@@ -274,29 +274,78 @@
                         }],
                         series: [{
                             "name": "波浪", //需要与legend中的data相同
-                            "type": "line",
+                            "type": "bar",
                             smooth: true, //不是折线，是曲线
                             itemStyle: {
                                 normal: {
                                     //设置折点的颜色
-                                    color: '#FFFF00',
-                                    //注意lineStyle需要卸载normal里面
-                                    //自定义折线颜色
                                     lineStyle: {
                                         color: '#00FF00'
                                     },
-                                    //自定义折线下区域的颜色
-                                    areaStyle: {
-                                        color: '#FFFF00'
-                                    },
+                                    //注意lineStyle需要卸载normal里面
+                                    //自定义折线颜色
 
-                                    label: {
-                                        show: true //显示每个点的值
-                                    }
+                                    //自定义折线下区域的颜色
+                                    //areaStyle: {
+                                    //    color: '#FFFF00'
+                                    //},
+                                    color: function(params) {
+                                        var color_arr = [];
+                                        //获取当前的hs的值
+                                        //var hs_value = params.series.data[params.seriesIndex];
+                                        var hs_value = params.data;
+                                        var hs_color = getColorbar(hs_value);
+                                        {#console.log(hs_value);#}
+                                        return hs_color;
+                                    },
+                                    //label: {
+                                    //    show: true //显示每个点的值
+                                    //}
                                 }
 
                             }, //向下填充区域
                             "data": hs_values,
+                            markPoint: {
+                                symbolSize: 4,
+                                //使用markPoint显示最大值及最小值
+                                data: [{
+                                    type: 'max',
+                                    name: '最大值'
+                                },
+                                    {
+                                        type: 'min',
+                                        name: '最小值'
+                                    }
+                                ],
+                                //注意设置itemStyle：不需要再加[]，相当于itemStyle中的noraml对象中的lable。。。
+                                itemStyle: {
+                                    normal: {
+                                        label: {
+                                            show: true,
+                                            textStyle: {
+                                                color: '#000080'
+                                            }
+                                        }
+                                    }
+
+                                }
+                                //								effect:show,
+                            },
+                            markLine: {
+                                data: [{
+                                    type: 'max',
+                                    name: '最大值'
+                                }, // 最大值水平线或垂直线
+//									{
+//										type: 'min',
+//										name: '最小值'
+//									}, // 最小值水平线或垂直线
+                                    {
+                                        type: 'average',
+                                        name: '平均值'
+                                    }
+                                ]
+                            },
                             label: {
                                 normal: {
                                     show: true

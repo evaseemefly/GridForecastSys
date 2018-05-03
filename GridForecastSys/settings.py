@@ -45,6 +45,10 @@ INSTALLED_APPS = [
     'Station',
     # django rest framework
     'rest_framework',
+    # 'xadmin',
+    'crispy_forms',
+    'reversion',
+
 ]
 
 MIDDLEWARE = [

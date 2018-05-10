@@ -1,5 +1,22 @@
+<div id="header" class="clearfix">
 
-<nav class="navbar navbar-default navbar-fixed-top navbar-inverse" style="margin-bottom: 0px;">
+    <div class="holder clearfix">
+
+        <div class="skipLink"><a href="#content" title="Skip to content">Skip to content</a></div>
+
+        <div id="title"><span><a href="http://47.93.39.48:88/index.html" title="Wook" rel="home">NMEFC FCST Portal</a></span></div>
+
+        <ul id="siteNav">
+            <li><a href="http://47.93.39.48:88/SAT.html">SAT</a></li>
+            <li class="selected"><a href="http://47.93.39.48:8081/forecast/home/">Grid</a></li>
+            <li ><a href="http://47.93.39.48:88/ATMS.html">ATMOS</a></li>
+            <li><a href="http://47.93.39.48:88/NW_PAC.html">NW Pacific</a></li>
+            <li><a href="http://47.93.39.48:88/Polar.html">POLAR</a></li>
+        </ul>
+    </div>
+
+</div>
+<nav class="navbar navbar-default navbar-inverse" style="margin-bottom: 0px;">
     <div class="navbar-header" id="my_navbar">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse">
             <span class="sr-only">Toggle navigation</span>
@@ -9,17 +26,18 @@
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul id="top_nav_ul" class="nav navbar-nav">
             <li v-for="item in items":class="{'active':item.code===selected.code}">
-{#                click:fillarea#}
-{#       v-on:click="selectarea(item.code,item)"     #}
+                {#                click:fillarea#}
+                {#       v-on:click="selectarea(item.code,item)"     #}
 
                 <a href="#" v-on:click="selectarea(item.code,item)">{% verbatim myblock %} {{item.message}}{% endverbatim myblock %} <span class="sr-only">(current)</span></a>
             </li>
         </ul>
         <form class="navbar-form navbar-left">
             <div class="form-group">
-                <input type="text" class="form-control" placeholder="网格编号">
+                <input id="search_code" type="text" class="form-control" placeholder="网格编号">
             </div>
-            <button type="submit" class="btn btn-default">搜索</button>
+{#            <button type="submit" class="btn btn-default">搜索</button>#}
+            <button onclick="my_onclick()" class="btn btn-default">搜索</button>
         </form>
     </div>
 </nav>

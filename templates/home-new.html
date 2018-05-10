@@ -106,6 +106,12 @@
          * 叠加shp文件，以geoJson的方式读取
          */
         function addShape(dict,data, feature, layer, map) {
+            //注意此处需要注意判断在featrues_arr中是否已经存在了指定的值（若存在则不添加）
+            $.each(data.features, function(index, obj) {
+                if($.inArray(obj,features_arr)<0){
+                    features_arr.push(obj);
+                }
+			});
             //!!!注意此处添加了shape文件后，由于是读取的geojson，文件，通过L.geoJSON后，需要将返回值赋值给geojson
             //此处的temp_geojson与geojson相同
             var temp_geojson=L.geoJSON(data, {
@@ -139,33 +145,33 @@
             return geojson;
             //上面使用addTo，现改为addLayer
 
-{#            geojson=map.addLayer(L.geoJSON(data, {#}
-{#                style: function(feature) {#}
-{#                    //获取到当前的对象的code#}
-{#                    var code = feature.properties.Code#}
-{#                    var temp_color = null;#}
-{#//							forecast_dict_test#}
-{#                    if(dict[code]) {#}
-{#                        temp_color = getColorbar(dict[code].HS_VALUE);#}
-{#                    }#}
-{##}
-{#                    return {#}
-{#                        //							注意此处的填充颜色及宽度的api可参见#}
-{##}
-{#                        fillColor: temp_color,#}
-{#                        weight: 2,#}
-{#                        opacity: 1,#}
-{#                        color: 'white',#}
-{#                        dashArray: '3',#}
-{#                        fillOpacity: 0.7#}
-{#                    };#}
-{#                },#}
-{#                //注意此处必须要将OnEachFeature放在里面才可以#}
-{#                onEachFeature: onEachFeature#}
-{#            }).bindPopup(function(layer) {#}
-{#                return layer.feature.properties.description;#}
-{#            }));#}
-{#            return geojson;#}
+            {#            geojson=map.addLayer(L.geoJSON(data, {#}
+            {#                style: function(feature) {#}
+            {#                    //获取到当前的对象的code#}
+            {#                    var code = feature.properties.Code#}
+            {#                    var temp_color = null;#}
+            {#//							forecast_dict_test#}
+            {#                    if(dict[code]) {#}
+            {#                        temp_color = getColorbar(dict[code].HS_VALUE);#}
+            {#                    }#}
+            {##}
+            {#                    return {#}
+            {#                        //							注意此处的填充颜色及宽度的api可参见#}
+            {##}
+            {#                        fillColor: temp_color,#}
+            {#                        weight: 2,#}
+            {#                        opacity: 1,#}
+            {#                        color: 'white',#}
+            {#                        dashArray: '3',#}
+            {#                        fillOpacity: 0.7#}
+            {#                    };#}
+            {#                },#}
+            {#                //注意此处必须要将OnEachFeature放在里面才可以#}
+            {#                onEachFeature: onEachFeature#}
+            {#            }).bindPopup(function(layer) {#}
+            {#                return layer.feature.properties.description;#}
+            {#            }));#}
+            {#            return geojson;#}
             {#return geo_layer;#}
         }
 
@@ -419,8 +425,50 @@
         info.addTo(mymap);
 
         //echarts控件相关
+        var point_marker=null;
+        var features_arr = [];
+        function my_onclick() {
+            var temp_code = $("#search_code").val();
+            showAndPointTargetArea(temp_code);
+        }
 
+        /*
+				 * 根据指定的code的key找到对应的code，并打点
+				 *
+				 */
+        function showAndPointTargetArea(code) {
+            //每次打点之前，需要先判断point_marker是否为空，为空需要先去掉
+            if(point_marker!=null){
+                mymap.removeLayer(point_marker);
+            }
 
+            var target_area = null;
+            $.each(features_arr, function(index, val) {
+                if(val.properties.Code == code) {
+
+                    target_area = val;
+                }
+                //						index;
+            })
+            if(target_area != null) {
+                var latlon_arr=target_area.geometry.bbox;
+                /*
+                 * 119.12344000000051
+                    25.263725000000193
+                    119.5140380859375
+                    25.621950149536133
+                 * lon：经度
+                 * lat：维度
+                 */
+                //计算中位点
+                var point_lat=(latlon_arr[1]+latlon_arr[3])/2;
+                var point_lon=(latlon_arr[0]+latlon_arr[2])/2;
+//						point_marker=L.marker([point_lon, point_lat]).addTo(mymap).bindPopup("I am a green leaf.");
+                point_marker = L.marker([point_lat, point_lon]).addTo(mymap).bindPopup("I am a green leaf.");
+                mymap.setView([point_lat, point_lon], 8);
+            }
+
+        }
 
         function initbar() {
             var myBar = echarts.init(document.getElementById('mybar'));

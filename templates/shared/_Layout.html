@@ -18,6 +18,9 @@
     <link rel="stylesheet" href="{% static 'css/style.css'%}" media="all" />
     <link rel="stylesheet" href="{% static 'css/bootstrap/bootstrap.css'%}">
     <link rel="stylesheet" href="{% static 'css/flatui/flat-ui.css'%}">
+    <link rel="stylesheet" href="{% static 'css/base/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/base/clearfix.css' %}">
+    <link rel="stylesheet" href="{% static 'css/base/dark.css' %}">
     {#        使用读取静态文件的方式读取js以及css文件#}
     <style type="text/css">
         /*对于使用了bootstrap的navbar并固定在顶部时下面的div填充满整个屏幕的解决办法*/
@@ -28,12 +31,12 @@
             margin: 0px;
             padding: 0px;
             background-color: #BBBBBB;
-            padding-top: 25px;
+            {#padding-top: 25px;#}
         }
 
         #main {
             position: absolute;
-            top:53px;
+            top:132px;
             bottom:0px;
             width:100%;
         }

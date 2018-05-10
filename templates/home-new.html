@@ -107,7 +107,8 @@
          */
         function addShape(dict,data, feature, layer, map) {
             //!!!注意此处添加了shape文件后，由于是读取的geojson，文件，通过L.geoJSON后，需要将返回值赋值给geojson
-            geojson= L.geoJSON(data, {
+            //此处的temp_geojson与geojson相同
+            var temp_geojson=L.geoJSON(data, {
                 style: function(feature) {
                     //获取到当前的对象的code
                     var code = feature.properties.Code
@@ -132,8 +133,39 @@
                 onEachFeature: onEachFeature
             }).bindPopup(function(layer) {
                 return layer.feature.properties.description;
-            }).addTo(map);
+            });
+
+            geojson= temp_geojson.addTo(map);
             return geojson;
+            //上面使用addTo，现改为addLayer
+
+{#            geojson=map.addLayer(L.geoJSON(data, {#}
+{#                style: function(feature) {#}
+{#                    //获取到当前的对象的code#}
+{#                    var code = feature.properties.Code#}
+{#                    var temp_color = null;#}
+{#//							forecast_dict_test#}
+{#                    if(dict[code]) {#}
+{#                        temp_color = getColorbar(dict[code].HS_VALUE);#}
+{#                    }#}
+{##}
+{#                    return {#}
+{#                        //							注意此处的填充颜色及宽度的api可参见#}
+{##}
+{#                        fillColor: temp_color,#}
+{#                        weight: 2,#}
+{#                        opacity: 1,#}
+{#                        color: 'white',#}
+{#                        dashArray: '3',#}
+{#                        fillOpacity: 0.7#}
+{#                    };#}
+{#                },#}
+{#                //注意此处必须要将OnEachFeature放在里面才可以#}
+{#                onEachFeature: onEachFeature#}
+{#            }).bindPopup(function(layer) {#}
+{#                return layer.feature.properties.description;#}
+{#            }));#}
+{#            return geojson;#}
             {#return geo_layer;#}
         }
 
@@ -181,6 +213,7 @@
         var geojson;
 
         var my_shp_layer;
+        var my_shp_layer_arr=[];
 
         function readShape(file, func) {
             shp("file").then(function(geojson) {
@@ -518,28 +551,28 @@
                     //缩放并定位到指定海区
                     mymap.setView([38.3,123],7);
                 {#new_layer= addshp("{% static 'files/north.zip'%}",dict_area,shp_layer);#}
-                    new_layer=addshp("{% static 'files/north.zip'%}",dict_area);
+                    new_layer=addshp("{% static 'files/north.zip'%}",dict_area,true);
                     break;
                 //东海
                 case 'e':
                     dict_area=loadAreaMaxData(date_str,area);
                     mymap.setView([28.6,125.35],6);
                 {#new_layer= addshp("{% static 'files/east.zip'%}",dict_area,shp_layer);#}
-                    new_layer=addshp("{% static 'files/east.zip'%}",dict_area);
+                    new_layer=addshp("{% static 'files/east.zip'%}",dict_area,true);
                     break;
                 //南海
                 case 's':
                     dict_area=loadAreaMaxData(date_str,area);
                     mymap.setView([20.2,113.04],7);
                 {#new_layer= addshp("{% static 'files/south.zip'%}",dict_area,shp_layer);#}
-                    new_layer=addshp("{% static 'files/south.zip'%}",dict_area);
+                    new_layer=addshp("{% static 'files/south.zip'%}",dict_area,true);
                     break;
                 //全国
                 case 'a':
                     dict_area=loadAreaMaxData(date_str,area);
-                    addshp("{% static 'files/north.zip'%}",dict_area);
-                    addshp("{% static 'files/east.zip'%}",dict_area);
-                    addshp("{% static 'files/south.zip'%}",dict_area);
+                    addshp("{% static 'files/north.zip'%}",dict_area,false);
+                    addshp("{% static 'files/east.zip'%}",dict_area,false);
+                    addshp("{% static 'files/south.zip'%}",dict_area,false);
                     break;
             }
             return [dict_area,new_layer];
@@ -553,23 +586,29 @@
             return dict_area;
         }
 
-        function addshp(shp_path,dict_area,shp_layer){
+        function addshp(shp_path,dict_area,isremoveLay){
             var shape_layer=null;
             //为当天地图添加图层
             //注意此处then是异步的，所以无法返回shape_layer;
             shp(shp_path).then(function(temp_geojson) {
                 geojson = temp_geojson;
                 //do something with your geojson
-                if(my_shp_layer!=null){
+                //当前图层不为空且删除图层的标记符为true都满足时，才清空当前图层
+                if(my_shp_layer!=null&isremoveLay){
+                    $.each(my_shp_layer_arr,function (index,value) {
+                        mymap.removeLayer(value);
+                    });
+                    my_shp_layer_arr=[];
                     mymap.removeLayer(my_shp_layer);
                 }
-                shp_layer=addShape(dict_area,temp_geojson, null, null, mymap);
+                var shp_layer=addShape(dict_area,temp_geojson, null, null, mymap);
 
                 //geojson = L.geoJson(temp_geojson, {
                 //    style: mystyle,
                 //    onEachFeature: onEachFeature
                 //}).addTo(mymap);
                 my_shp_layer= shp_layer;
+                my_shp_layer_arr.push(shp_layer);
             }).then(function(){
                 return shape_layer;
             });
@@ -593,11 +632,28 @@
                         {message:'东海',code:'e'},
                         {message:'南海',code:'s'},
                         {message:'全国',code:'a'}],
+                    //注意selected是items中的obj
                     selected:null,
                     out_shape_layer:null,
                 },
+                watch:{
+                    selected:function (new_data,old_data) {
+                        console.log('修改为：'+new_data);
+                        var self=this;
+                        self.fillarea(new_data.code,self.selected);
+                    }
+                },
                 methods:{
+                    selectarea:function(code,item){
+                        console.log('执行选中操作：'+code);
+                        var self=this;
+                        self.selected=item;
+                    },
+                    //注意加载页面时，需要执行加载全国的事件
                     fillarea:function(value,item){
+                        //此处的item是vm.data中的items
+                        //
+                        console.log("执行填充操作："+value);
                         this.selected=item;
                         text_index+=1;
                         //将字典转成arr
@@ -636,6 +692,11 @@
                     }
                 }
             });
+
+            //页面加载后执行填充全国海区
+            {#vm1.fillarea('a');#}
+            vm1.selected={message:'全国',code:'a'};
+
 
             {#var data_checkarea= load_targetAreaMaxData("20180314","S");#}
             {#var dict_south=json2dict(data_checkarea);#}

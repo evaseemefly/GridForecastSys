@@ -8,8 +8,11 @@
     </div>
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul id="top_nav_ul" class="nav navbar-nav">
-            <li v-for="item in items":class="{'active':item===selected}">
-                <a href="#" v-on:click="fillarea(item.code,item)">{% verbatim myblock %} {{item.message}}{% endverbatim myblock %} <span class="sr-only">(current)</span></a>
+            <li v-for="item in items":class="{'active':item.code===selected.code}">
+{#                click:fillarea#}
+{#       v-on:click="selectarea(item.code,item)"     #}
+
+                <a href="#" v-on:click="selectarea(item.code,item)">{% verbatim myblock %} {{item.message}}{% endverbatim myblock %} <span class="sr-only">(current)</span></a>
             </li>
         </ul>
         <form class="navbar-form navbar-left">

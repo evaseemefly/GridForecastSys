@@ -183,9 +183,9 @@ class ForecastDetailInfo(DataFrameInfo):
         #1.1 获取所有的columns
         cols = list(df)
         #1.2 获取'1'（factor）的所在位置，并移至第一列
-        cols.insert(0, cols.pop(cols.index('factor')))
+        cols.insert(0, cols.pop(cols.index('1')))
         # 2 设置0与1列为层次索引
-        read_date = df.set_index(['factor', 'code'])
+        read_date = df.set_index(['0', '1'])
         # 3 生成转换后的df（index为预报时间，columns为网格名称）
         df_convert = read_date.T['HS']
         return df_convert

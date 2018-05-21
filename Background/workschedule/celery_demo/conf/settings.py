@@ -13,12 +13,12 @@ CELERY_IMPORTS = (                                  # 指定导入的任务模�
 )
 
 # 指定的django项目的项目根目录
-TARGET_DJANGO_PROJ_PATH=r'D:\git仓库\GridForecastSys'
-TARGET_READ_TODAY_PATH=r'D:\git仓库\GridForecastSys\demo_data'
+TARGET_DJANGO_PROJ_PATH=r'D:\02git仓库\GridForecastSys'
+TARGET_READ_TODAY_PATH=r'D:\02git仓库\GridForecastSys\demo_data'
 
-TARGET_SAVE_PATH=r'D:\git仓库\GridForecastSys\result'
+TARGET_SAVE_PATH=r'D:\02git仓库\GridForecastSys\\result'
 
-TARGET_SAVE_MID_PATH=r'D:\git仓库\GridForecastSys\result'
+TARGET_SAVE_MID_PATH=r'D:\02git仓库\GridForecastSys\result'
 
 # 提供的每日数值预报产品的名字
 GRID_DAILY_SOURCE_FILENAME='BasicUnit_'

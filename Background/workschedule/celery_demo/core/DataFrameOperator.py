@@ -11,8 +11,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.types import NVARCHAR,VARCHAR
 import abc
 
-class DataFrameInfo(object):
-    __metaclass__==abc.ABCMeta
+class DataFrameInfo(metaclass=abc.ABCMeta):
+    # __metaclass__==abc.ABCMeta
+    df_base=None
+    def __init__(self,dt=datetime.datetime.now()):
+        self.now_dt=dt
+        self.now_str=dt.strftime('%Y%m%d')
+        self.mid_finialPath=None
 
     def writeInDb(self,df,db_name,table_name):
         # 4、连接数据库，并写入
@@ -25,8 +30,46 @@ class DataFrameInfo(object):
         }
         pd.io.sql.to_sql(df,table_name,engine,schema=db_name, if_exists='append',index=False,dtype=dtypedict)
 
+    def toCSV(self,midPath,filename,fileEXT):
+        finialpath=os.path.join(midPath,filename+self.now_str+fileEXT)
+        self.df_base.to_csv(finialpath)
+        return finialpath
+
+    def readcsv(self,sourcepath,filename,fileEXT):
+        '''
+        读取原文件
+        :param path:
+        :return:
+        '''
+        # 1、读取转换好的结构化数据文件
+        midfilefullpath=os.path.join(sourcepath,filename+self.now_str+fileEXT)
+        with open(midfilefullpath,encoding='utf-8') as f:
+            '''
+                以下详细数据及尝试详见:
+                02-读取72小时预报文件-finial-精简版
+            '''
+            data = pd.read_table(f, sep='\t', encoding='utf-8', header=None, infer_datetime_format=True)
+            # 读取第一行
+            columns_date = data.iloc[0]
+            # 删除所有包含空值的列
+            columns_date_notnan = columns_date[columns_date.notnull()]
+            columns_date_notnan_convert = columns_date_notnan
+            # 读取除去第一行的其余数据
+            data = data[1:]
+            # 更改索引
+            data = data.set_index([0, 1])
+            # 修改head
+            data.columns = columns_date_notnan_convert
+            # read_date=pd.read_csv(f,',',encoding = "gbk")
+            # 设置第一列和第二列为层次化索引
+            # read_date=data.set_index(['0','1'])
+            data.index.names=['code','factor']
+        self.df_base=data
+        return data
+
+
     @abc.abstractclassmethod
-    def run(self,path):
+    def run(self,sourcepath,filename,fileEXT):
         '''
         需要由子类继承得执行方法
         :param path:
@@ -38,22 +81,22 @@ class DataFrameInfo(object):
 class ForecastDailyInfo(DataFrameInfo):
     db_name='gridforecast'
     table_name='gridforecast_forecastdailyinfo'
-    now_str='2018-03-14 00:00'
+    # now_str='2018-03-14 00:00'
 
-    def run(self,path):
-        df=self.__readcsv(path)
+    def __init__(self,dt):
+        super(ForecastDailyInfo, self).__init__(dt)
+        # self.now_str=dt.strftime('%Y-%m-%d')
+
+    def run(self,sourcepath,filename,fileEXT,midpath,midfilename,midEXT):
+        df=self.readcsv(sourcepath,filename,fileEXT)
         df_value=self.__getmaxvalue(df)
         df_date=self.__getmaxdate(df)
         df_finall=self.__df_concat(df_value,df_date,self.now_str)
         self.writeInDb(df_finall,self.db_name,self.table_name)
+        finialpath=self.toCSV(midpath,midfilename,midEXT)
+        return finialpath
 
-    def __readcsv(self,path):
-        # 1、读取转换好的结构化数据文件
-        read_date=pd.read_csv(path,',')
-        # 设置第一列和第二列为层次化索引
-        read_date=read_date.set_index(['0','1'])
-        read_date.index.names=['code','factor']
-        return read_date
+
 
     def __getmaxvalue(self,df):
         # 2-1、获取最大值的df
@@ -78,7 +121,7 @@ class ForecastDailyInfo(DataFrameInfo):
         # 3、两个df拼接
         # axis=1 横向拼接
         final_data=pd.concat([df_date,df_value],axis=1)
-        final_data['nowdate']=now_str
+        final_data['nowdate']=self.now_dt
         # 批量更改列的数据类型
         final_data['DIR_DATE']=final_data['DIR_DATE'].astype('datetime64[ns]')
         final_data['HS_DATE']=final_data['HS_DATE'].astype('datetime64[ns]')
@@ -106,10 +149,20 @@ class ForecastDetailInfo(DataFrameInfo):
     '''
     db_name = 'gridforecast'
     table_name = 'gridforecast_forecastdetailinfo'
-    now_str = '2018-03-14 00:00'
+    # now_str = '2018-03-14 00:00'
 
-    def run(self,path):
-        read_date = pd.read_csv(path, ',')
+    def __init__(self,dt):
+        super(ForecastDetailInfo, self).__init__(dt)
+
+    def run(self,sourcepath,filename,fileEXT):
+        with open(os.path.join(sourcepath,filename+self.now_str+fileEXT), encoding='utf-8') as f:
+
+
+            read_date=pd.read_csv(f, sep='\t', encoding='utf-8', header=None, infer_datetime_format=True)
+
+
+        # if self.df_base!=None:
+        #     read_date=self.df_base
         # 1 转换df
         df_convert=self.__convert_df(read_date)
         # 2生成要写入数据库的df
@@ -130,9 +183,9 @@ class ForecastDetailInfo(DataFrameInfo):
         #1.1 获取所有的columns
         cols = list(df)
         #1.2 获取'1'（factor）的所在位置，并移至第一列
-        cols.insert(0, cols.pop(cols.index('1')))
+        cols.insert(0, cols.pop(cols.index('factor')))
         # 2 设置0与1列为层次索引
-        read_date = df.set_index(['1', '0'])
+        read_date = df.set_index(['factor', 'code'])
         # 3 生成转换后的df（index为预报时间，columns为网格名称）
         df_convert = read_date.T['HS']
         return df_convert
@@ -155,6 +208,6 @@ class ForecastDetailInfo(DataFrameInfo):
         return df_new
 
 # grid= ForecastDailyInfo()
-grid= ForecastDetailInfo()
-grid.run('convert_date.csv')
+# grid= ForecastDetailInfo()
+# grid.run('convert_date.csv')
 

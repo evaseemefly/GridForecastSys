@@ -16,7 +16,7 @@ CELERY_IMPORTS = (                                  # 指定导入的任务模�
 TARGET_DJANGO_PROJ_PATH=r'D:\02git仓库\GridForecastSys'
 TARGET_READ_TODAY_PATH=r'D:\02git仓库\GridForecastSys\demo_data'
 
-TARGET_SAVE_PATH=r'D:\02git仓库\GridForecastSys\\result'
+TARGET_SAVE_PATH=r'D:\02git仓库\GridForecastSys\result'
 
 TARGET_SAVE_MID_PATH=r'D:\02git仓库\GridForecastSys\result'
 

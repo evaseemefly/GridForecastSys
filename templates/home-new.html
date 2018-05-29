@@ -203,7 +203,7 @@
             mymap.fitBounds(e.target.getBounds());
             //获取当前选定的网格的code
             var code= e.target.feature.properties.Code;
-            var target_date='20180314';
+            var target_date=getDateStr();
             //2 弹出modal框，加载
             loadForecastModal(code,target_date);
         }
@@ -220,6 +220,7 @@
 
         var my_shp_layer;
         var my_shp_layer_arr=[];
+        {#var #}
 
         function readShape(file, func) {
             shp("file").then(function(geojson) {
@@ -585,9 +586,22 @@
             bar.setOption(option_mybar);
         }
 
+        function getDateStr(){
+            var date=new Date();
+            var year=date.getFullYear();
+            var month=date.getMonth()+1;
+            var day=date.getDate()
+            if(month<10){
+                month='0'+month;
+            }
+            if(day<10){
+                day='0'+day;
+            }
+            return mydate_str=year+month+day;
+        }
 
         function fillarea(area){
-            var date_str="20180314";
+            var date_str=getDateStr();
             var dict_area=null;
             var new_layer=null;
             switch (area)

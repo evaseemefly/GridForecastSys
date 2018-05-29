@@ -24,7 +24,7 @@ class DataFrameInfo(metaclass=abc.ABCMeta):
         # '数据库类型+数据库驱动名称://用户名:口令@机器地址:端口号/数据库名'
         # 注意若使用mysql+mysqlconnector 默认使用的是mysql-python（此模块已不再更新py3的版本）
         # connect=create_engine('mysql+mysqlconnector://admin:admin123@localhost:3306/gridforecast')
-        engine = create_engine('mysql+mysqldb://admin:admin123@localhost:3306/gridforecast')
+        engine = create_engine('mysql+mysqldb://root:123456@localhost:3306/gridforecast')
         dtypedict={
             'str':VARCHAR(length=4),
         }
@@ -156,9 +156,7 @@ class ForecastDetailInfo(DataFrameInfo):
 
     def run(self,sourcepath,filename,fileEXT):
         with open(os.path.join(sourcepath,filename+self.now_str+fileEXT), encoding='utf-8') as f:
-
-
-            read_date=pd.read_csv(f, sep='\t', encoding='utf-8', header=None, infer_datetime_format=True)
+            read_date=pd.read_csv(f, sep=',', encoding='utf-8', infer_datetime_format=True)
 
 
         # if self.df_base!=None:
@@ -183,8 +181,10 @@ class ForecastDetailInfo(DataFrameInfo):
         #1.1 获取所有的columns
         cols = list(df)
         #1.2 获取'1'（factor）的所在位置，并移至第一列
+        # cols.insert(0, cols.pop(cols.index('1')))
         cols.insert(0, cols.pop(cols.index('factor')))
         # 2 设置0与1列为层次索引
+        # read_date = df.set_index(['0', '1'])
         read_date = df.set_index(['factor', 'code'])
         # 3 生成转换后的df（index为预报时间，columns为网格名称）
         df_convert = read_date.T['HS']

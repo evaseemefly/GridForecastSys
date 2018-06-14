@@ -91,8 +91,12 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         'NAME':'gridforecast',
+        # w540
         'USER':'root',
         'PASSWORD':'123456',
+        #单位台式机
+        # 'USER':'admin',
+        # 'PASSWORD':'admin123',
         'HOST':'127.0.0.1',
         # 'OPTIONS':{'init_command':'SET storage_engine=INNODB;'}
     }

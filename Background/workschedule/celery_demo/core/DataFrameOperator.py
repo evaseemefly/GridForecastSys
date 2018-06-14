@@ -24,7 +24,9 @@ class DataFrameInfo(metaclass=abc.ABCMeta):
         # '数据库类型+数据库驱动名称://用户名:口令@机器地址:端口号/数据库名'
         # 注意若使用mysql+mysqlconnector 默认使用的是mysql-python（此模块已不再更新py3的版本）
         # connect=create_engine('mysql+mysqlconnector://admin:admin123@localhost:3306/gridforecast')
-        engine = create_engine('mysql+mysqldb://root:123456@localhost:3306/gridforecast')
+        # engine = create_engine('mysql+mysqldb://root:123456@localhost:3306/gridforecast')
+        # aw配置
+        engine = create_engine('mysql+mysqldb://root:admin123@localhost:3306/gridforecast')
         dtypedict={
             'str':VARCHAR(length=4),
         }
@@ -43,6 +45,7 @@ class DataFrameInfo(metaclass=abc.ABCMeta):
         '''
         # 1、读取转换好的结构化数据文件
         midfilefullpath=os.path.join(sourcepath,filename+self.now_str+fileEXT)
+        print(midfilefullpath)
         with open(midfilefullpath,encoding='utf-8') as f:
             '''
                 以下详细数据及尝试详见:
@@ -79,6 +82,9 @@ class DataFrameInfo(metaclass=abc.ABCMeta):
 
 
 class ForecastDailyInfo(DataFrameInfo):
+    '''
+        每日预报的特征数据
+    '''
     db_name='gridforecast'
     table_name='gridforecast_forecastdailyinfo'
     # now_str='2018-03-14 00:00'
@@ -88,10 +94,27 @@ class ForecastDailyInfo(DataFrameInfo):
         # self.now_str=dt.strftime('%Y-%m-%d')
 
     def run(self,sourcepath,filename,fileEXT,midpath,midfilename,midEXT):
+        '''
+
+        :param sourcepath:
+        :param filename:
+        :param fileEXT:
+        :param midpath:
+        :param midfilename:
+        :param midEXT:
+        :return:
+        '''
+        # 读取csv源文件
         df=self.readcsv(sourcepath,filename,fileEXT)
+        print('%s-%s-%s'%(sourcepath,filename,fileEXT))
+        print(df)
+        # 获取最大值，df格式返回
         df_value=self.__getmaxvalue(df)
+        # 获取最大值所在的日期，df格式返回
         df_date=self.__getmaxdate(df)
+        # 将以上两个df拼接
         df_finall=self.__df_concat(df_value,df_date,self.now_str)
+        # 写入数据库
         self.writeInDb(df_finall,self.db_name,self.table_name)
         finialpath=self.toCSV(midpath,midfilename,midEXT)
         return finialpath
@@ -99,6 +122,7 @@ class ForecastDailyInfo(DataFrameInfo):
 
 
     def __getmaxvalue(self,df):
+
         # 2-1、获取最大值的df
         df_max_value=df.T.max().unstack()
         # 为最大值的columns赋name

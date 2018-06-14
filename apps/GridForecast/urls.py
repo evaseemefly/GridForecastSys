@@ -10,7 +10,7 @@ urlpatterns = [
     #获取指定日期的预报数据
     url(r'^daily/(?P<date>[0-9]{8})/(?P<area>\S*)/$', ForecastDailyInfoView.as_view(), name="forecast-get-dailyforecast"),
 
-url(r'^detial/(?P<date>[0-9]{8})/(?P<code>\S*)/$', ForecastDetialInfoView.as_view(), name="forecast-get-forecastdetial"),
+    url(r'^detial/(?P<date>[0-9]{8})/(?P<code>\S*)/$', ForecastDetialInfoView.as_view(), name="forecast-get-forecastdetial"),
 
     url(r'^home/$',ForecastHomeView.as_view() , name="forecast-home"),
 ]

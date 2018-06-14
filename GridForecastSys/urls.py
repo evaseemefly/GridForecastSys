@@ -18,16 +18,16 @@ from django.urls import path
 from django.conf.urls import url,include
 from django.views.generic import TemplateView
 # import xadmin
-from Station.views import Grid
+from Station.views import GridView
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    url('^gridinit/$',Grid.as_view(),name='init'),
-    url('^getgrid/(?P<forecastdate>[0-9]{8})/(?P<area>\S*)/$',Grid.as_view(),name='getgrid'),
+    url('^gridinit/$',GridView.as_view(),name='init'),
+    url('^getgrid/(?P<forecastdate>[0-9]{8})/(?P<area>\S*)/$',GridView.as_view(),name='getgrid'),
     # 获取预报数据，并指定命名空间
     url('^forecast/',include('GridForecast.urls', namespace='forecast')),
-
+    url('^grid/',include('Station.urls',namespace='station')),
     # url(r'^getgrid/(?P<forecastdate>[0-9]+)/$',Grid.as_view(),name='getgrid'),
 
     # django resut framework

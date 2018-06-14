@@ -24,18 +24,20 @@ def getgrid(request,num=1):
     num1=num
     pass
 
-class Grid(View):
+class GridView(View):
     def post(self,request):
-        self.initGrid()
+        # 2018-06-14 暂时注释掉
+        # self.initGrid()
+        pass
 
     def get(self,request, forecastdate=None, area=None):
-    # def get(self,request,num=1):
         '''
 
-        :param forecastdate:
-        :param area:
+        :param request:
+        :param code:
         :return:
         '''
+
         # date=num
         self.getarea(area)
         pass
@@ -90,5 +92,5 @@ class Grid(View):
         GridInfo.objects.bulk_create(grid_list)
         pass
 
-
+# class StationView(View):
 

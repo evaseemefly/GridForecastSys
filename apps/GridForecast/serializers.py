@@ -9,4 +9,4 @@ class ForecastDetailInfoSerializer(serializers.ModelSerializer):
     # 注意此处不要继承错了，不要继承：serializers.Serializer
      class Meta:
          model=ForecastDetailInfo
-         fields =('tdate','hs')
+         fields = ('tdate', 'hs')

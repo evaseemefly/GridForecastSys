@@ -11,11 +11,14 @@ from django.shortcuts import render
 from django.views.generic.base import View
 from django.http import HttpRequest,HttpResponse
 from django.core import serializers
+from rest_framework.response import Response
+from rest_framework.decorators import APIView
 
 import json
 
 from utils.file_readgrids import AreaNamesFileInfo
 from GridForecastSys import settings
+from .serializers import GridInfoSerializer
 # import GridForecastSys.settings
 
 from Station.models import GridInfo
@@ -55,10 +58,10 @@ class GridView(View):
             list_areas=list(targetAreas)
             data=serializers.serialize("json",targetAreas,ensure_ascii=False)
             # 用此种方法会报错：TypeError: Object of type 'GridInfo' is not JSON serializable
-            databyjson=json.dumps(list_areas)
+            # databyjson=json.dumps(list_areas)
         # data=
-        print(area)
-        print(databyjson)
+        # print(area)
+        # print(databyjson)
         return HttpResponse(data,content_type='application/json')
 
     def initGrid(self):
@@ -92,5 +95,20 @@ class GridView(View):
         GridInfo.objects.bulk_create(grid_list)
         pass
 
-# class StationView(View):
+class StationView(APIView):
+    def get(self,request, code):
+        '''
+
+        :param request:
+        :param code:
+        :return:
+        '''
+
+        # date=num
+        targetAreas = GridInfo.objects.filter(code=code)
+        # list_areas = list(targetAreas)
+        # data = serializers.serialize("json", targetAreas, ensure_ascii=False)
+        data=GridInfoSerializer(targetAreas,many=True)
+        return Response(data.data)
+        # return HttpResponse(data, content_type='application/json')
 

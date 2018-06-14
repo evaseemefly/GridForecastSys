@@ -288,7 +288,14 @@
                             show: true
                         },
                         legend: {
-                            data: ['波浪']
+                            //题注样式修改
+                            //2018 06 14
+                            orient:'horizontal',
+							x:'center',
+							y:'top',
+							textStyle: {color: 'white',fontWeigth:'normal',fontSize:16},
+							borderWidth:2,
+							data: ['波浪']
                         },
                         xAxis: [{
                             type: 'category',
@@ -397,7 +404,9 @@
                     var myChart = echarts.init(document.getElementById('wave_data'));
                     // 为echarts对象加载数据
                     myChart.setOption(option);
-
+                    //2018 06 14
+                    //修改modal框的题目
+                    $("#mymsgtitle").text("当前网格编号："+code);
                     //显示modal框
                     $("#errorModal").modal();
                 }

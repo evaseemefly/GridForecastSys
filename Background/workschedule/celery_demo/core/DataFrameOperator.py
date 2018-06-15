@@ -24,9 +24,10 @@ class DataFrameInfo(metaclass=abc.ABCMeta):
         # '数据库类型+数据库驱动名称://用户名:口令@机器地址:端口号/数据库名'
         # 注意若使用mysql+mysqlconnector 默认使用的是mysql-python（此模块已不再更新py3的版本）
         # connect=create_engine('mysql+mysqlconnector://admin:admin123@localhost:3306/gridforecast')
-        # engine = create_engine('mysql+mysqldb://root:123456@localhost:3306/gridforecast')
+        # 单位台式机配置
+        engine = create_engine('mysql+mysqldb://admin:admin123@localhost:3306/gridforecast')
         # aw配置
-        engine = create_engine('mysql+mysqldb://root:admin123@localhost:3306/gridforecast')
+        # engine = create_engine('mysql+mysqldb://root:admin123@localhost:3306/gridforecast')
         dtypedict={
             'str':VARCHAR(length=4),
         }

@@ -111,7 +111,7 @@
                 if($.inArray(obj,features_arr)<0){
                     features_arr.push(obj);
                 }
-			});
+            });
             //!!!注意此处添加了shape文件后，由于是读取的geojson，文件，通过L.geoJSON后，需要将返回值赋值给geojson
             //此处的temp_geojson与geojson相同
             var temp_geojson=L.geoJSON(data, {
@@ -268,6 +268,26 @@
             url_arr.push(code);
             targetUrl+=url_arr.join("/");
             targetUrl+="/";
+            var targetUrl_code="/";
+            var url_arr_code=new Array();
+            url_arr_code.push("grid");
+            url_arr_code.push("station");
+            url_arr_code.push(code);
+            targetUrl_code+=url_arr_code.join("/");
+            targetUrl_code+="/";
+            //获取该code对应的名字
+            $.ajax({
+                url: targetUrl_code, //json文件位置
+                type: "GET", //请求方式为get
+                dataType: "json", //返回数据格式为json
+                async:false,
+                success: function (res) {
+                    //2018 06 14
+                    //修改modal框的题目
+                    $("#mymsgtitle").text("当前网格："+res[0].name);
+                }
+            });
+
             $.ajax({
                 url: targetUrl, //json文件位置
                 type: "GET", //请求方式为get
@@ -291,11 +311,11 @@
                             //题注样式修改
                             //2018 06 14
                             orient:'horizontal',
-							x:'center',
-							y:'top',
-							textStyle: {color: 'white',fontWeigth:'normal',fontSize:16},
-							borderWidth:2,
-							data: ['波浪']
+                            x:'center',
+                            y:'top',
+                            textStyle: {color: 'white',fontWeigth:'normal',fontSize:16},
+                            borderWidth:2,
+                            data: ['波浪']
                         },
                         xAxis: [{
                             type: 'category',
@@ -404,9 +424,6 @@
                     var myChart = echarts.init(document.getElementById('wave_data'));
                     // 为echarts对象加载数据
                     myChart.setOption(option);
-                    //2018 06 14
-                    //修改modal框的题目
-                    $("#mymsgtitle").text("当前网格编号："+code);
                     //显示modal框
                     $("#errorModal").modal();
                 }

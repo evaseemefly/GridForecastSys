@@ -121,7 +121,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+REST_FRAMEWORK = {
+    'DATETIME_FORMAT': "%m-%d %H",
+}
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 

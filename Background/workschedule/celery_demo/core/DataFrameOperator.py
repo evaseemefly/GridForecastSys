@@ -58,6 +58,7 @@ class DataFrameInfo(metaclass=abc.ABCMeta):
             # 删除所有包含空值的列
             columns_date_notnan = columns_date[columns_date.notnull()]
             columns_date_notnan_convert = columns_date_notnan
+            source_data=data
             # 读取除去第一行的其余数据
             data = data[1:]
             # 更改索引
@@ -105,14 +106,26 @@ class ForecastDailyInfo(DataFrameInfo):
         :param midEXT:
         :return:
         '''
+
+        def merageToCSV(df):
+            targetfilename = "convert_date.csv"
+            final_path = os.path.join(targetfilename)
+            df.to_csv(final_path)
+        def readCSV():
+            read_data = pd.read_csv('convert_date.csv')
+            return read_data
+
         # 读取csv源文件
         df=self.readcsv(sourcepath,filename,fileEXT)
+        merageToCSV(df)
+        df_temp= readCSV()
         print('%s-%s-%s'%(sourcepath,filename,fileEXT))
-        print(df)
+        # print(df_temp)
+        df_temp=df_temp.set_index(['code','factor'])
         # 获取最大值，df格式返回
-        df_value=self.__getmaxvalue(df)
+        df_value=self.__getmaxvalue(df_temp)
         # 获取最大值所在的日期，df格式返回
-        df_date=self.__getmaxdate(df)
+        df_date=self.__getmaxdate(df_temp)
         # 将以上两个df拼接
         df_finall=self.__df_concat(df_value,df_date,self.now_str)
         # 写入数据库
@@ -131,6 +144,8 @@ class ForecastDailyInfo(DataFrameInfo):
         # 去掉index的name
         df_max_value.index=df_max_value.index.values
         return df_max_value
+
+
 
     def __getmaxdate(self,df):
 

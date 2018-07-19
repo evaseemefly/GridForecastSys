@@ -710,17 +710,21 @@
 
         function loadAreaMaxData_byDate(date,area){
             //从后台获取指定时间，指定海区的极值数据，并以dict的方式返回
-            var data_checkarea=[]
-            do{
-                var date_str= getDateStr(date);
+            var data_checkarea=[];
 
+            while(data_checkarea.length<1)
+            {
+                var date_str= getDateStr(date);
+                alert(date_str);
                 data_checkarea= load_targetAreaMaxData(date_str,area);
 
                 //讲当前日期往前推一天
                 date=getYesterday(date);
-            }while(data_checkarea.length==0);
-
-            var data_checkarea= load_targetAreaMaxData(date_str,area);
+                if(data_checkarea!=0){
+                    break;
+                }
+            }
+            {#var data_checkarea= load_targetAreaMaxData(date_str,area);#}
             var dict_area=json2dict(data_checkarea);
             return dict_area;
         }

@@ -44,11 +44,15 @@
                     async:false,    //同步请求时页面锁死
                     success:function (data) {
                         {#console.log(data);#}
+                        //此处需要判断data是否为空
+
                         data_checkarea= data
                         {#data_checkarea=data;#}
                     },
                     {#dataType: dataType#}
+
                 });
+
                 return data_checkarea;
             }
 
@@ -616,8 +620,22 @@
             bar.setOption(option_mybar);
         }
 
-        function getDateStr(){
-            var date=new Date();
+
+        {#function getDateStr(){#}
+        {#    var date=new Date();#}
+        {#    var year=date.getFullYear();#}
+        {#    var month=date.getMonth()+1;#}
+        {#    var day=date.getDate()#}
+        {#    if(month<10){#}
+        {#        month='0'+month;#}
+        {#    }#}
+        {#    if(day<10){#}
+        {#        day='0'+day;#}
+        {#    }#}
+        {#    return mydate_str=year+month+day;#}
+        {##}
+
+        function getDateStr(date){
             var year=date.getFullYear();
             var month=date.getMonth()+1;
             var day=date.getDate()
@@ -630,8 +648,16 @@
             return mydate_str=year+month+day;
         }
 
+        //获取当前日期的前一天
+        function getYesterday(date){
+            {#var date=new Date();#}
+            date.setDate( date.getDate() -1 );
+            return date;
+        }
+
         function fillarea(area){
-            var date_str=getDateStr();
+            var date=new Date();
+            {#var date_str=getDateStr();#}
             var dict_area=null;
             var new_layer=null;
             switch (area)
@@ -639,7 +665,8 @@
 
                 //北海
                 case 'n':
-                    dict_area=loadAreaMaxData(date_str,area);
+                    {#dict_area=loadAreaMaxData(date_str,area);#}
+                    dict_area=loadAreaMaxData_byDate(date,area);
                     //缩放并定位到指定海区
                     mymap.setView([38.3,123],7);
                 {#new_layer= addshp("{% static 'files/north.zip'%}",dict_area,shp_layer);#}
@@ -647,21 +674,24 @@
                     break;
                 //东海
                 case 'e':
-                    dict_area=loadAreaMaxData(date_str,area);
+                    {#dict_area=loadAreaMaxData(date_str,area);#}
+                    dict_area=loadAreaMaxData_byDate(date,area);
                     mymap.setView([28.6,125.35],6);
                 {#new_layer= addshp("{% static 'files/east.zip'%}",dict_area,shp_layer);#}
                     new_layer=addshp("{% static 'files/east.zip'%}",dict_area,true);
                     break;
                 //南海
                 case 's':
-                    dict_area=loadAreaMaxData(date_str,area);
+                    {#dict_area=loadAreaMaxData(date_str,area);#}
+                     dict_area=loadAreaMaxData_byDate(date,area);
                     mymap.setView([20.2,113.04],7);
                 {#new_layer= addshp("{% static 'files/south.zip'%}",dict_area,shp_layer);#}
                     new_layer=addshp("{% static 'files/south.zip'%}",dict_area,true);
                     break;
                 //全国
                 case 'a':
-                    dict_area=loadAreaMaxData(date_str,area);
+                    {#dict_area=loadAreaMaxData(date_str,area);#}
+                    dict_area=loadAreaMaxData_byDate(date,area);
                     addshp("{% static 'files/north.zip'%}",dict_area,false);
                     addshp("{% static 'files/east.zip'%}",dict_area,false);
                     addshp("{% static 'files/south.zip'%}",dict_area,false);
@@ -673,6 +703,23 @@
 
         function loadAreaMaxData(date_str,area){
             //从后台获取指定时间，指定海区的极值数据，并以dict的方式返回
+            var data_checkarea= load_targetAreaMaxData(date_str,area);
+            var dict_area=json2dict(data_checkarea);
+            return dict_area;
+        }
+
+        function loadAreaMaxData_byDate(date,area){
+            //从后台获取指定时间，指定海区的极值数据，并以dict的方式返回
+            var data_checkarea=[]
+            do{
+                var date_str= getDateStr(date);
+
+                data_checkarea= load_targetAreaMaxData(date_str,area);
+
+                //讲当前日期往前推一天
+                date=getYesterday(date);
+            }while(data_checkarea.length==0);
+
             var data_checkarea= load_targetAreaMaxData(date_str,area);
             var dict_area=json2dict(data_checkarea);
             return dict_area;

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'GridForecast',
     'Station',
+    'StormTide',
     # django rest framework
     'rest_framework',
     # 'xadmin',

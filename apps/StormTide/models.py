@@ -37,7 +37,7 @@ class StormTideDailyInfo(models.Model):
     Tide_DATE = models.DateTimeField(default=datetime.now)
     nowdate = models.DateField(default=datetime.now)
     Surge_VALUE = models.FloatField(default=999.0)
-    TideS_VALUE = models.FloatField(default=999.0)
+    Tide_VALUE = models.FloatField(default=999.0)
     CODE = models.CharField(default='ERROR', max_length=6)
     class Meta:
         verbose_name=u"每日预报风暴潮及增水极值及时间"

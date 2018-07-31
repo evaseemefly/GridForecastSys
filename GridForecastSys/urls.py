@@ -28,6 +28,7 @@ urlpatterns = [
     # 获取预报数据，并指定命名空间
     url('^forecast/',include('GridForecast.urls', namespace='forecast')),
     url('^grid/',include('Station.urls',namespace='station')),
+    url('^storm/',include('StormTide.urls',namespace='storm')),
     # url(r'^getgrid/(?P<forecastdate>[0-9]+)/$',Grid.as_view(),name='getgrid'),
 
     # django resut framework

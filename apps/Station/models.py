@@ -24,7 +24,8 @@ class StationInfo(models.Model):
     name=models.CharField(max_length=50,verbose_name=u"海洋站名称")
     code=models.CharField(max_length=6,verbose_name=u"海洋站站代码")
     area=models.CharField(max_length=2,choices=(("n","北海"),("e","东海"),("s","南海")),verbose_name="所属区域")
-
+    Lon=models.FloatField(max_length=6,verbose_name="经度")
+    Lat=models.FloatField(max_length=6,verbose_name="维度")
     class Meta:
         verbose_name=u"海洋站信息"
         verbose_name_plural=verbose_name

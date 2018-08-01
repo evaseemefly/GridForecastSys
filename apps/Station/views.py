@@ -18,7 +18,8 @@ import json
 
 from utils.file_readgrids import AreaNamesFileInfo
 from GridForecastSys import settings
-from .serializers import GridInfoSerializer
+from .serializers import GridInfoSerializer,StationSerializer
+from .models import StationInfo,GridInfo
 # import GridForecastSys.settings
 
 from Station.models import GridInfo
@@ -96,6 +97,9 @@ class GridView(View):
         pass
 
 class StationView(APIView):
+    '''
+        返回全部网格信息
+    '''
     def get(self,request, code):
         '''
 
@@ -111,4 +115,19 @@ class StationView(APIView):
         data=GridInfoSerializer(targetAreas,many=True)
         return Response(data.data)
         # return HttpResponse(data, content_type='application/json')
+
+class StationAllView(APIView):
+    '''
+        全部海洋站信息
+    '''
+    def get(self,request):
+        '''
+            返回全部海洋站信息
+        :param request:
+        :return:
+        '''
+        list_station=StationInfo.objects.all()
+        json_data=StationSerializer(list_station,many=True)
+        return Response(json_data.data)
+
 

@@ -9,3 +9,8 @@ class StormTideDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model=StormTideDailyInfo
         fields=('__all__')
+
+class StormTideSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=StormTideInfo
+        fields=('__all__')

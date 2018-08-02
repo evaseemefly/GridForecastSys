@@ -16,7 +16,7 @@ class StormTideInfo(models.Model):
     id = models.AutoField(primary_key=True)
     # CASCADE为默认的级联删除
     date=models.DateField(default=datetime.now)
-    tdate=models.DateField(default=datetime.now)
+    tdate=models.DateTimeField(default=datetime.now)
     # 增水
     surge=models.FloatField(default=-999.0)
     # 潮位

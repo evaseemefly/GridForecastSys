@@ -6,8 +6,7 @@
                 <div class="container-fluid">
                     <!-- Brand and toggle get grouped for better mobile display -->
                     <div class="navbar-header">
-                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
-                            aria-expanded="false">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
                             <span class="sr-only">Toggle navigation</span>
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
@@ -16,14 +15,25 @@
                         <a class="navbar-brand" href="#">位置</a>
                     </div>
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                        <!-- 顶部切换不同图层 -->
-							<ul id="top_select_ul" class="nav navbar-nav">
-								<li v-for="item in items" class="{'active':item.code==selected.code}">
-									<a href="#" v-on:click="selectlayer(item.code,item)">{% verbatim myblock %} {{item.message}}{% endverbatim myblock %}
-										<span class="sr-only">(current)</span>
-									</a>
-								</li>
-							</ul>
+                        <ul class="nav navbar-nav">
+                            <li class="active">
+                                <a href="#">
+                                    <span class="glyphicon glyphicon-map-marker "></span>全图
+                                    <span class="sr-only">(current)</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <span class="glyphicon glyphicon-screenshot"></span>漫游</a>
+                            </li>
+                            <li>
+                                <a href="#">东海海区</a>
+                            </li>
+                            </li>
+                            <li>
+                                <a href="#">南海海区</a>
+                            </li>
+                        </ul>
                         <ul class="nav navbar-nav navbar-right">
                             <li>
                                 <a href="#">
@@ -48,10 +58,8 @@
                 <div class="leaflet-control-container">
                     <div class="leaflet-top leaflet-left">
                         <div class="leaflet-control-zoom leaflet-bar leaflet-control">
-                            <a class="leaflet-control-zoom-in" href="http://leafletjs.com/examples/choropleth/example.html#" title="Zoom in" role="button"
-                                aria-label="Zoom in">+</a>
-                            <a class="leaflet-control-zoom-out" href="http://leafletjs.com/examples/choropleth/example.html#" title="Zoom out" role="button"
-                                aria-label="Zoom out">−</a>
+                            <a class="leaflet-control-zoom-in" href="http://leafletjs.com/examples/choropleth/example.html#" title="Zoom in" role="button" aria-label="Zoom in">+</a>
+                            <a class="leaflet-control-zoom-out" href="http://leafletjs.com/examples/choropleth/example.html#" title="Zoom out" role="button" aria-label="Zoom out">−</a>
                         </div>
                     </div>
                     <div class="leaflet-top leaflet-right">

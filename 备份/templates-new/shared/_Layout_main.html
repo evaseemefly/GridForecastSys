@@ -17,13 +17,13 @@
                     </div>
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                         <!-- 顶部切换不同图层 -->
-							<ul id="top_select_ul" class="nav navbar-nav">
-								<li v-for="item in items" class="{'active':item.code==selected.code}">
-									<a href="#" v-on:click="selectlayer(item.code,item)">{% verbatim myblock %} {{item.message}}{% endverbatim myblock %}
-										<span class="sr-only">(current)</span>
-									</a>
-								</li>
-							</ul>
+                        <ul id="top_select_ul" class="nav navbar-nav">
+                            <li v-for="item in items" class="{'active':item.code==selected.code}">
+                                <a href="#" v-on:click="selectlayer(item.code,item)">{{item.message}}
+                                    <span class="sr-only">(current)</span>
+                                </a>
+                            </li>
+                        </ul>
                         <ul class="nav navbar-nav navbar-right">
                             <li>
                                 <a href="#">

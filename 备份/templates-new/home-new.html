@@ -26,33 +26,14 @@
             targetUrl += "/";
             console.log(targetUrl)
             //根据传入的area请求后返回字典
-            {
-                #$.ajax({ # }
-                { #    method: "GET", # }
-                { #    url: {% url 'forecast:forecast-get-dailyforecast'  %}, #}
-            { #    url: "127.0.0.1:8000/daily/20180314/S/", # }
-            { #    data: { "forecastdate": date, "area": area }, # }
-            { #    processData: true, # }
-            { #    dataType: "json", # }
-            {
-                #    success: function (data) { # }
-                { #        console.log(data); # }
-                { # } #
-            }
-            { #); # }
             var data_checkarea = null;
             $.ajax({
-                    { #url: "http://127.0.0.1:8000/daily/20180315/S/", # }
-                    { #data: data, # }
-                    { #                          url: {% url 'forecast:forecast-get-dailyforecast'  %}, #}
+
         url: targetUrl,
             async: false,    //同步请求时页面锁死
                 success: function (data) {
-                    { #console.log(data); # }
                     data_checkarea = data
-                    { #data_checkarea = data; # }
                 },
-        { #dataType: dataType# }
     });
     return data_checkarea;
             }
@@ -106,7 +87,7 @@
 
     //获取当前日期的前一天
     function getYesterday(date) {
-        { #var date = new Date(); # }
+
         date.setDate(date.getDate() - 1);
         return date;
     }
@@ -184,42 +165,6 @@
         geojson = temp_geojson.addTo(map);
         return geojson;
         //上面使用addTo，现改为addLayer
-
-        {
-            #            geojson = map.addLayer(L.geoJSON(data, { # }
-            { #                style: function (feature) { # }
-            { #                    //获取到当前的对象的code#}
-            { #                    var code = feature.properties.Code# }
-            { #                    var temp_color = null; # }
-            { #//							forecast_dict_test#}
-            { #                    if(dict[code]) { # }
-            { #                        temp_color = getColorbar(dict[code].HS_VALUE); # }
-            { # }#}
-        { ## }
-        {
-            #                    return { # }
-            {
-                #                        //							注意此处的填充颜色及宽度的api可参见#}
-                { ## }
-                { #                        fillColor: temp_color, # }
-                { #                        weight: 2, # }
-                { #                        opacity: 1, # }
-                { #                        color: 'white', # }
-                { #                        dashArray: '3', # }
-                { #                        fillOpacity: 0.7# }
-                { # }; #
-            }
-            { # }, #
-        }
-        {
-            #                //注意此处必须要将OnEachFeature放在里面才可以#}
-            { #                onEachFeature: onEachFeature# }
-            { # }).bindPopup(function (layer) { # }
-            { #                return layer.feature.properties.description; # }
-            { # })); #
-        }
-        { #            return geojson; # }
-        { #return geo_layer; # }
     }
 
     function highlightFeature(e) {
@@ -355,9 +300,9 @@
                 $.each(data, function (index, value) {
                     //						console.log(index+value);
                     hs_values.push(value.hs);
-                    { #console.log(value.hs); # }
+
                     hs_date.push(value.tdate);
-                    { #console.log(value.tdate); # }
+
                 });
                 //获取最大值与最小值
                 var hs_max = Math.max.apply(null, hs_values);
@@ -688,7 +633,7 @@
                 //dict_area=loadAreaMaxData(date_str,area);
                 //缩放并定位到指定海区
                 mymap.setView([38.3, 123], 7);
-                { #new_layer = addshp("{% static 'files/north.zip'%}", dict_area, shp_layer); # }
+
                 new_layer = addshp("{% static 'files/north.zip'%}", dict_area, true);
                 break;
             //东海
@@ -696,7 +641,7 @@
                 dict_area = loadAreaMaxData_byDate(date, area);
                 //    dict_area=loadAreaMaxData(date_str,area);
                 mymap.setView([28.6, 125.35], 6);
-                { #new_layer = addshp("{% static 'files/east.zip'%}", dict_area, shp_layer); # }
+
                 new_layer = addshp("{% static 'files/east.zip'%}", dict_area, true);
                 break;
             //南海
@@ -704,7 +649,7 @@
                 dict_area = loadAreaMaxData_byDate(date, area);
                 //dict_area=loadAreaMaxData(date_str,area);
                 mymap.setView([20.2, 113.04], 7);
-                { #new_layer = addshp("{% static 'files/south.zip'%}", dict_area, shp_layer); # }
+
                 new_layer = addshp("{% static 'files/south.zip'%}", dict_area, true);
                 break;
             //全国
@@ -717,7 +662,7 @@
                 break;
         }
         return [dict_area, new_layer];
-        { #return dict_area; # }
+
     }
 
     function loadStormLayer() {
@@ -842,7 +787,7 @@
         var dict_target = null;
         var text_index = 0;
         var out_geo_layer = null;
-        { #var out_shape_layer = null; # }
+
 
         var vm1 = new Vue({
             el: '#top_nav_ul',
@@ -881,7 +826,7 @@
                     var arr_values_forecastextreme = [];
                     var arr_obj_forecastextreme = [];
 
-                    { #dict_target = fillarea(value); # }
+
                     var info = fillarea(value);
                     dict_target = info[0];
                     out_geo_layer = info[1];
@@ -902,7 +847,7 @@
 
                         for (var i = 0; i < forecast_top10.length; i++) {
                             arr_keys_forecastextreme.push(forecast_top10[i].code);
-                            { #arr_obj_forecastextreme.push(forecast_top10[i].value); # }
+
                             arr_values_forecastextreme.push(forecast_top10[i].HS_VALUE);
                         }
 
@@ -945,15 +890,10 @@
         })
         vm2.mylayer = 'grid';
         //页面加载后执行填充全国海区
-        { #vm1.fillarea('a'); # }
+
         vm1.selected = { message: '全国', code: 'a' };
 
 
-        { #var data_checkarea = load_targetAreaMaxData("20180314", "S"); # }
-        { #var dict_south = json2dict(data_checkarea); # }
-        { ## }
-        { #var test_dic = forecast_dict_test; # }
-        { #loadWaveData(); # }
 
         //对forecast_dict进行排序
         //					var forecast_arr = dic2arr(forecast_dict_test);

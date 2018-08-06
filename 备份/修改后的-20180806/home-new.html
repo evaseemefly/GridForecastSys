@@ -175,6 +175,7 @@
             document.getElementById("mymsgtitle").innerHTML = title;
             //请求后台并填充echarts
             loadWaveData(target_date, code);
+            //				document.getElementById("mymsgcontent").innerHTML = msg;
 
         }
 
@@ -270,7 +271,6 @@
             return dict_area;
         }
 
-        //此处注意需要判断不能超过6日的数据
         function loadAreaMaxData_byDate(date, area) {
             //从后台获取指定时间，指定海区的极值数据，并以dict的方式返回
             var data_checkarea = [];
@@ -323,14 +323,14 @@
                 },
                 watch: {
                     selected: function (new_data, old_data) {
-                        //console.log('修改为：' + new_data);
+                        console.log('修改为：' + new_data);
                         var self = this;
                         self.fillarea(new_data.code, self.selected);
                     }
                 },
                 methods: {
                     selectarea: function (code, item) {
-                        //console.log('执行选中操作：' + code);
+                        console.log('执行选中操作：' + code);
                         var self = this;
                         self.selected = item;
                     },
@@ -338,7 +338,7 @@
                     fillarea: function (value, item) {
                         //此处的item是vm.data中的items
                         //
-                        //console.log("执行填充操作：" + value);
+                        console.log("执行填充操作：" + value);
                         this.selected = item;
                         text_index += 1;
                         //将字典转成arr
@@ -397,8 +397,7 @@
                             loadGridLayer();
                         }
                         else if (new_data === "storm") {
-                            var date=new Date();
-                            loadStormLayer(date);
+                            loadStormLayer();
                         }
                     }
                 },

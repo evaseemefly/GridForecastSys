@@ -15,6 +15,8 @@ import json
 from .models import StormTideDailyInfo,StormTideInfo
 from .serializers import StormTideDetailSerializer,StormTideSerializer
 
+from Common import convertdate
+
 '''
     1、根据指定时间获取该日的风暴潮、增水的极值及对应时间
 '''
@@ -32,6 +34,7 @@ class StormTideDailyView(APIView):
         # 获取请求中的时间
         # 此处应加入判断，若不存在应返回错误信息
         target_date=request.GET.get('targetdate')
+        target_date=convertdate.convertDate(target_date)
         list_stormtidedetail=StormTideDailyInfo.objects.filter(nowdate=target_date)
         json_data=StormTideDetailSerializer(list_stormtidedetail,many=True).data
         return Response(json_data)

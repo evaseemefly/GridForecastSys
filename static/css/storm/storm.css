@@ -1,0 +1,59 @@
+.myform {
+  width: 160px;
+  /* border: 2px solid white; */
+  /*display: inline-block;*/
+  background: rgba(0, 0, 255, 0.829);
+  text-align: center;
+  color: aliceblue;
+  /* box-shadow: 10px 10px 5px #888888; */
+  box-shadow: 0 0 5px whitesmoke;
+  /* 边角圆滑处理 */
+  border-radius: 5px;
+
+}
+
+/*去掉边框，且不知为何里面的td会加一个padding的距离，需去掉*/
+.myform table tbody tr td{
+  padding: 0px;
+  border: 0;
+}
+/*去掉边框*/
+.myform table{
+  border: 0;
+}
+
+.myform .mytable {
+  margin-bottom: 0px;
+}
+
+.surge {
+  background: yellow;
+  color: rgb(0, 80, 251);
+}
+
+.tide {
+  background: red;
+}
+
+.least {
+  background: blue;
+  color: white;
+}
+
+.icon_default {
+}
+
+.medium {
+  background: yellow;
+  color: rgb(0, 80, 251);
+}
+
+.more {
+  background: orange;
+  color: white;
+}
+
+.most {
+  background: red;
+  color: white;
+}

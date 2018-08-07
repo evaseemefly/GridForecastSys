@@ -1,8 +1,8 @@
 <template>
     <div>
         <sitemap></sitemap>
-        <centerarea></centerarea>
         <category></category>
+        <centerarea></centerarea>        
     </div>
 </template>
 

@@ -1,5 +1,5 @@
 <template>
-    <nav class="navbar navbar-default navbar-inverse" style="margin-bottom: 0px;">
+    <!-- <nav class="navbar navbar-default navbar-inverse" style="margin-bottom: 0px;">
         <div class="navbar-header" id="my_navbar">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse">
                 <span class="sr-only">Toggle navigation</span>
@@ -22,7 +22,46 @@
                 <button onclick="my_onclick()" class="btn btn-default">搜索</button>
             </form>
         </div>
-    </nav>
+    </nav> -->
+    <div class="col-md-12 mycol_disPadding">
+            <nav class="navbar navbar-default" style="margin-bottom: 0px;">
+                <div class="container-fluid">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
+                            aria-expanded="false">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="#">位置</a>
+                    </div>
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <!-- 顶部切换不同图层 -->
+                        <ul id="top_select_ul" class="nav navbar-nav">
+                            <li v-for="item in items" class="{'active':item.code==selected.code}">
+                                <a href="#" v-on:click="selectlayer(item.code,item)">{{item.message}}
+                                    <span class="sr-only">(current)</span>
+                                </a>
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li>
+                                <a href="#">
+                                    <span class="glyphicon glyphicon-zoom-in"></span>放大</a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    <span class="glyphicon glyphicon-zoom-out"></span>缩小</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- /.navbar-collapse -->
+                </div>
+                <!-- /.container-fluid -->
+            </nav>
+        </div>
 </template>
 
 <script>
@@ -49,6 +88,8 @@
                 //注意selected是items中的obj
                 selected: null,
                 out_shape_layer: null,
+                
+                mylayer: "",
             }
         },
         watch: {

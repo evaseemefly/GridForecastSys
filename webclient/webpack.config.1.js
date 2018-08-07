@@ -14,7 +14,7 @@ const config = {
 
     // },
     target:'web',
-    entry: path.join(__dirname, 'src/index.ts'),
+    entry: path.join(__dirname, 'src/index.js'),
     output: {
         filename: 'bundle.js',
         path: path.join(__dirname, 'dist')
@@ -36,21 +36,6 @@ const config = {
                 test: /\.vue$/,  //通过`vue-loader`工具，让 webpack 支持 .vue 文件的编译
                 loader: 'vue-loader'
             },
-            //ts
-            {
-                test: /\.ts$/,
-                exclude: /node_modules/,
-                enforce: 'pre',
-                loader: 'tslint-loader'
-              },
-              {
-                test: /\.tsx?$/,
-                loader: 'ts-loader',
-                exclude: /node_modules/,
-                options: {
-                  appendTsSuffixTo: [/\.vue$/],
-                }
-              },
             //加载 jsx 文件
             {
                 test: /\.jsx$/,

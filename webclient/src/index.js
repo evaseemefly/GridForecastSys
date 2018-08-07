@@ -19,6 +19,17 @@ import moment from 'moment'
 import './components/js/bootstrapExt/table/bootstrap-table.js'
 import './components/js/bootstrapExt/editable/bootstrap-editable.js'
 
+import './components/js/map/leaflet'
+import './components/js/map/leaflet.shpfile'
+import './components/js/map/shp'
+
+import './components/css/style.css'
+import './components/css/map/leaflet.css'
+import './components/css/flatui/flat-ui.css'
+import './components/css/base/base.css'
+import './components/css/base/clearfix.css'
+import './components/css/storm/storm.css'
+
 Vue.prototype.moment=moment
 Vue.config.devtools=true;
 Vue.use(VueRouter)

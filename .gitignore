@@ -1,1 +1,3 @@
 /webserver/static/mapfiles
+/webclient/dist
+/webclient/node_modules

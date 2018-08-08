@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import App from './app.vue';
 import VueRouter from 'vue-router'
+// import Routers from './router/router';
 import Routers from './router/router';
 
 import $ from 'jquery'
@@ -40,6 +41,7 @@ document.body.appendChild(root)
 const RouterConfig = {
     // 使用 HTML5 的 History 路由模式
     mode: 'history',
+    
     routes: Routers
 };
 

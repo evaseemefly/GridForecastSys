@@ -1,6 +1,7 @@
 <template>
     <div id="app">
         <topmain></topmain>
+        <router-view></router-view>
         <!-- <centerarea></centerarea> -->
     </div>
 </template>

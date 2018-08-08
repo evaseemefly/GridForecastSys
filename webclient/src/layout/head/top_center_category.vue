@@ -1,6 +1,6 @@
 <template>
     <div id="content" class="col-md-12 mycol_disPadding">
-        <!--中间的导航栏-->        
+        <!--中间的导航栏-->
         <nav class="navbar navbar-default navbar-inverse" style="margin-bottom: 0px;">
             <div class="navbar-header" id="my_navbar">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse">
@@ -28,6 +28,7 @@
 </template>
 
 <script>
+    import bus from '../../assets/eventBus.js'
     export default {
         data() {
             return {
@@ -49,15 +50,11 @@
         watch: {
             mylayer: function (new_data, old_data) {
                 var self = this;
-                this.selected= this.findTarget(new_data);
-                // self.fillarea(null,new_data);
-                // if (new_data === "grid") {
-                //     this.selected=items
-                //     // loadGridLayer();
-                // } else if (new_data === "storm") {
-                //     var date = new Date();
-                //     // loadStormLayer(date);
-                // }
+                this.selected = this.findTarget(new_data);
+            },
+            selected: function (new_val, old_val) {
+                console.log(new_val);
+                bus.$emit('on-area',new_val);
             }
         },
         methods: {
@@ -68,14 +65,14 @@
                 this.mylayer = value;
                 console.log(value, item);
             },
-            seleccategory:function(value,item){
+            seleccategory: function (value, item) {
                 // alert(item);
-                this.selected=item;
+                this.selected = item;
             },
-            findTarget:function(value){
-                var myself=this;
+            findTarget: function (value) {
+                var myself = this;
                 //根据当前的code找到items中的obj
-                var target_obj= this.items.find((obj)=>(obj.code==value));
+                var target_obj = this.items.find((obj) => (obj.code == value));
                 return target_obj;
             }
         },

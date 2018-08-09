@@ -34,12 +34,7 @@
         width: 100%;
     }
 
-    #mycontent {
-        position: absolute;
-        top: 53px;
-        bottom: 0px;
-        width: 100%;
-    }
+   
 
     #nav {
         height: 100%;

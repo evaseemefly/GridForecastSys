@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div id="topmain">
         <sitemap></sitemap>
         <category></category>
         <centerarea></centerarea>        

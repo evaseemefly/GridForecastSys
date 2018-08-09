@@ -1,3 +1,5 @@
 /webserver/static/mapfiles
 /webclient/dist
 /webclient/node_modules
+/webclient/src/assets/img/mapfiles
+/webclient/static/img/mapfiles

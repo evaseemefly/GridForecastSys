@@ -1,6 +1,6 @@
 import axios from 'axios'
 // import cookie from '../common/js/cookie';
-
+import loadStormData from '../../../layout/api/api'
 let host = 'http://127.0.0.1:8000'
 axios.defaults.withCredentials = true
 
@@ -223,11 +223,11 @@ function addDiv2Marker(storm_obj) {
 //     return storm_data;
 // }
 
-export function loadSotrmData(params) {
-    return axios.get(`${host}/storm/daily/`, {
-        targetdate: params
-    })
-}
+// export function loadStormData(params) {
+//     return axios.get(`${host}/storm/daily/`, {
+//         targetdate: params
+//     })
+// }
 
 export const getSotrmData = data => {
     return axios.get(`${host}/storm/daily/`, {

@@ -51,7 +51,7 @@ axios.defaults.headers = {
 //     return axios.post(`${host}/api-token-auth/`, params)
 // }
 
-export const loadSotrmData = params => {
+export const loadStormData = params => {
   return axios.get(`${host}/storm/daily/`, {
     targetdate: params
   })

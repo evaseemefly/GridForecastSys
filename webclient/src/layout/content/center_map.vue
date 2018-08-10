@@ -41,17 +41,17 @@
 </template>
 
 <script>
-import "../../components/js/map/leaflet";
-import "../../components/js/map/leaflet.shpfile";
-import "../../components/js/map/shp";
+import '../../components/js/map/leaflet'
+import '../../components/js/map/leaflet.shpfile'
+import '../../components/js/map/shp'
 // import {StormData,loadStormLayer,createStationIcon,getStormData,loadStationData,getAlarmLevel,addDiv2Marker,loadStormData} "../../comppnents/js/map/storm.js";
 // import {loadStormData} from "../../comppnents/js/map/storm";
 // import {area} from "../../components/js/map/mytest";
-import { loadStormData,getSotrmData } from "../../components/js/map/storm";
+import { loadStormData, getSotrmData } from '../../components/js/map/storm'
 // import maptiles from "../../components/js/map/maptiles"
 
 export default {
-  data() {
+  data () {
     return {
       // forecast_dict:[],
       station_arr: [],
@@ -62,51 +62,51 @@ export default {
       mymap: null,
       my_shp_layer: null,
       info: null
-    };
+    }
   },
   methods: {
-    clearLayer: function() {
-      var myself = this;
-      $.each(myself.my_shp_layer_arr, function(index, value) {
-        myself.mymap.removeLayer(value);
-      });
-      myself.my_shp_layer_arr = [];
-      myself.mymap.removeLayer(myself.my_shp_layer);
+    clearLayer: function () {
+      var myself = this
+      $.each(myself.my_shp_layer_arr, function (index, value) {
+        myself.mymap.removeLayer(value)
+      })
+      myself.my_shp_layer_arr = []
+      myself.mymap.removeLayer(myself.my_shp_layer)
     },
 
-    //grid.js中的代码移至此处
-    random_forecast: function(key, count, max) {
-      var forecast_dict = {};
+    // grid.js中的代码移至此处
+    random_forecast: function (key, count, max) {
+      var forecast_dict = {}
       for (var i = 0; i < count; i++) {
-        var dict_key = key;
+        var dict_key = key
         if (i < 10) {
-          dict_key += "0" + i;
+          dict_key += '0' + i
         } else {
-          dict_key += i;
+          dict_key += i
         }
 
         //						forecast_dict_test[dict_key] = parseInt(Math.random() * max, 10) + 1;
-        forecast_dict[dict_key] = parseInt(Math.random() * max, 10) + 1;
+        forecast_dict[dict_key] = parseInt(Math.random() * max, 10) + 1
       }
-      return forecast_dict;
+      return forecast_dict
     },
 
     /*
 			 * 根据设定好的色带根据传入的值返回对应的rgb颜色的值
 			 */
-    getColorbar: function(value) {
-      //根据传入的数值（int类型），判断其所属的区件并获取区件的颜色
-      var value_color;
+    getColorbar: function (value) {
+      // 根据传入的数值（int类型），判断其所属的区件并获取区件的颜色
+      var value_color
       if (value >= 2 && value < 4) {
-        value_color = "rgb(0,0,255)";
+        value_color = 'rgb(0,0,255)'
       } else if (value >= 4 && value < 8) {
-        value_color = "rgb(255,242,0)";
+        value_color = 'rgb(255,242,0)'
       } else if (value >= 8 && value < 12) {
-        value_color = "rgb(255,127,19)";
+        value_color = 'rgb(255,127,19)'
       } else if (value >= 12) {
-        value_color = "rgb(255,0,0)";
+        value_color = 'rgb(255,0,0)'
       }
-      return value_color;
+      return value_color
     },
 
     /*
@@ -114,60 +114,60 @@ export default {
 			 * data是读取的geoJson数据
 			 * 此处已重新修改 2018-08-06
 			 */
-    addShape: function(dict, data, feature, layer, map) {
-      //注意此处需要注意判断在featrues_arr中是否已经存在了指定的值（若存在则不添加）
-      $.each(data.features, function(index, obj) {
+    addShape: function (dict, data, feature, layer, map) {
+      // 注意此处需要注意判断在featrues_arr中是否已经存在了指定的值（若存在则不添加）
+      $.each(data.features, function (index, obj) {
         if ($.inArray(obj, features_arr) < 0) {
-          features_arr.push(obj);
+          features_arr.push(obj)
         }
-      });
-      //!!!注意此处添加了shape文件后，由于是读取的geojson，文件，通过L.geoJSON后，需要将返回值赋值给geojson
-      //此处的temp_geojson与geojson相同
+      })
+      //! !!注意此处添加了shape文件后，由于是读取的geojson，文件，通过L.geoJSON后，需要将返回值赋值给geojson
+      // 此处的temp_geojson与geojson相同
       var temp_geojson = L.geoJSON(data, {
-        style: function(feature) {
-          //获取到当前的对象的code
-          var code = feature.properties.Code;
-          var temp_color = null;
+        style: function (feature) {
+          // 获取到当前的对象的code
+          var code = feature.properties.Code
+          var temp_color = null
           //							forecast_dict_test
           if (dict[code]) {
-            temp_color = this.getColorbar(dict[code].HS_VALUE);
+            temp_color = this.getColorbar(dict[code].HS_VALUE)
           }
           return {
-            //注意此处的填充颜色及宽度的api可参见
+            // 注意此处的填充颜色及宽度的api可参见
             fillColor: temp_color,
             weight: 2,
             opacity: 1,
-            color: "white",
-            dashArray: "3",
+            color: 'white',
+            dashArray: '3',
             fillOpacity: 0.7
-          };
+          }
         },
-        //注意此处必须要将OnEachFeature放在里面才可以
+        // 注意此处必须要将OnEachFeature放在里面才可以
         onEachFeature: onEachFeature
-      }).bindPopup(function(layer) {
-        return layer.feature.properties.description;
-      });
+      }).bindPopup(function (layer) {
+        return layer.feature.properties.description
+      })
 
-      geojson = temp_geojson.addTo(map);
-      return geojson;
+      geojson = temp_geojson.addTo(map)
+      return geojson
     },
 
-    addshp: function(shp_path, dict_area, isremoveLay) {
-      var shape_layer = null;
-      var myself = this;
-      //为当天地图添加图层
-      //注意此处then是异步的，所以无法返回shape_layer;
+    addshp: function (shp_path, dict_area, isremoveLay) {
+      var shape_layer = null
+      var myself = this
+      // 为当天地图添加图层
+      // 注意此处then是异步的，所以无法返回shape_layer;
       shp(shp_path)
-        .then(function(temp_geojson) {
-          geojson = temp_geojson;
-          //do something with your geojson
-          //当前图层不为空且删除图层的标记符为true都满足时，才清空当前图层
+        .then(function (temp_geojson) {
+          geojson = temp_geojson
+          // do something with your geojson
+          // 当前图层不为空且删除图层的标记符为true都满足时，才清空当前图层
           if ((myself.my_shp_layer != null) & isremoveLay) {
-            $.each(myself.my_shp_layer_arr, function(index, value) {
-              myself.mymap.removeLayer(value);
-            });
-            myself.my_shp_layer_arr = [];
-            myself.mymap.removeLayer(myself.my_shp_layer);
+            $.each(myself.my_shp_layer_arr, function (index, value) {
+              myself.mymap.removeLayer(value)
+            })
+            myself.my_shp_layer_arr = []
+            myself.mymap.removeLayer(myself.my_shp_layer)
           }
           var shp_layer = addShape(
             dict_area,
@@ -175,107 +175,107 @@ export default {
             null,
             null,
             myself.mymap
-          );
+          )
 
-          //geojson = L.geoJson(temp_geojson, {
+          // geojson = L.geoJson(temp_geojson, {
           //    style: mystyle,
           //    onEachFeature: onEachFeature
-          //}).addTo(mymap);
-          myself.my_shp_layer = shp_layer;
-          myself.my_shp_layer_arr.push(shp_layer);
+          // }).addTo(mymap);
+          myself.my_shp_layer = shp_layer
+          myself.my_shp_layer_arr.push(shp_layer)
         })
-        .then(function() {
-          return shape_layer;
-        });
-      return shape_layer;
+        .then(function () {
+          return shape_layer
+        })
+      return shape_layer
     },
 
-    highlightFeature: function(e) {
-      var layer = e.target;
+    highlightFeature: function (e) {
+      var layer = e.target
 
       layer.setStyle({
         weight: 5,
-        color: "#666",
-        dashArray: "",
+        color: '#666',
+        dashArray: '',
         fillOpacity: 0.7
-      });
+      })
 
       if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-        layer.bringToFront();
+        layer.bringToFront()
       }
 
-      info.update(layer.feature.properties);
+      info.update(layer.feature.properties)
     },
 
-    readShape: function(file, func) {
-      shp("file").then(function(geojson) {
-        //do something with your geojson
-        func(geojson);
-      });
+    readShape: function (file, func) {
+      shp('file').then(function (geojson) {
+        // do something with your geojson
+        func(geojson)
+      })
     },
 
-    mystyle: function(feature) {
+    mystyle: function (feature) {
       return {
         weight: 2,
         opacity: 1,
-        color: "white",
-        dashArray: "3",
+        color: 'white',
+        dashArray: '3',
         fillOpacity: 0.7,
         fillColor: getColor(feature.properties.density)
-      };
+      }
     },
 
-    //注意加载页面时，需要执行加载全国的事件
-    fillarea: function(value, item) {
-      //此处的item是vm.data中的items
+    // 注意加载页面时，需要执行加载全国的事件
+    fillarea: function (value, item) {
+      // 此处的item是vm.data中的items
       //
-      //console.log("执行填充操作：" + value);
-      this.selected = item;
-      text_index += 1;
-      //将字典转成arr
-      var arr_keys_forecastextreme = [];
-      var arr_values_forecastextreme = [];
-      var arr_obj_forecastextreme = [];
+      // console.log("执行填充操作：" + value);
+      this.selected = item
+      text_index += 1
+      // 将字典转成arr
+      var arr_keys_forecastextreme = []
+      var arr_values_forecastextreme = []
+      var arr_obj_forecastextreme = []
 
-      var info = fillarea(value);
-      dict_target = info[0];
-      out_geo_layer = info[1];
-      //从当前地图中删除当前海区的layer，前提是当前海区的layer不为null，否则会报错
+      var info = fillarea(value)
+      dict_target = info[0]
+      out_geo_layer = info[1]
+      // 从当前地图中删除当前海区的layer，前提是当前海区的layer不为null，否则会报错
       if (dict_target != null) {
-        var forecast_arr = dic2arr(dict_target);
-        var forecast_arr_obj = [];
-        $.each(forecast_arr, function(index, obj) {
+        var forecast_arr = dic2arr(dict_target)
+        var forecast_arr_obj = []
+        $.each(forecast_arr, function (index, obj) {
           forecast_arr_obj.push({
             code: obj.value.CODE,
             HS_VALUE: obj.value.HS_VALUE
-          });
-        });
-        forecast_arr = forecast_arr_obj.sort(compare_forecast("HS_VALUE"));
-        //从数组中取出前10个值
-        var forecast_top10 = forecast_arr.slice(0, 15);
+          })
+        })
+        forecast_arr = forecast_arr_obj.sort(compare_forecast('HS_VALUE'))
+        // 从数组中取出前10个值
+        var forecast_top10 = forecast_arr.slice(0, 15)
 
         for (var i = 0; i < forecast_top10.length; i++) {
-          arr_keys_forecastextreme.push(forecast_top10[i].code);
+          arr_keys_forecastextreme.push(forecast_top10[i].code)
 
-          arr_values_forecastextreme.push(forecast_top10[i].HS_VALUE);
+          arr_values_forecastextreme.push(forecast_top10[i].HS_VALUE)
         }
 
-        var bar = initbar();
-        loadbar(bar, arr_keys_forecastextreme, arr_values_forecastextreme);
+        var bar = initbar()
+        loadbar(bar, arr_keys_forecastextreme, arr_values_forecastextreme)
       }
     },
-    initMap: function() {
-      var mymap = L.map("basemap").setView([30.09, 127.75], 5);
+    initMap: function () {
+      var mymap = L.map('basemap').setView([30.09, 127.75], 5)
       // var mymap = L.map('basemap').setView([51.505, -0.09], 13)
       // mapLink = "../static/mapfiles/";
 
-      L.tileLayer("../../static/img/mapfiles/{z}/{x}/{y}.jpg", {
-        attribution: "",
+      L.tileLayer('../../static/img/mapfiles/{z}/{x}/{y}.jpg', {
+        attribution: '',
         maxZoom: 8,
         minZoom: 2
-      }).addTo(mymap);
-      var status = 0;
-      var popup = L.popup();
+      }).addTo(mymap)
+      var status = 0
+      var popup = L.popup()
 
       var rectangleMeasure = {
         startPoint: null,
@@ -283,58 +283,56 @@ export default {
         rectangle: null,
         tips: null,
         layer: L.layerGroup(),
-        color: "#0D82D7",
-        addRectangle: function() {
-          rectangleMeasure.destory();
-          var bounds = [];
-          bounds.push(rectangleMeasure.startPoint);
-          bounds.push(rectangleMeasure.endPoint);
+        color: '#0D82D7',
+        addRectangle: function () {
+          rectangleMeasure.destory()
+          var bounds = []
+          bounds.push(rectangleMeasure.startPoint)
+          bounds.push(rectangleMeasure.endPoint)
           rectangleMeasure.rectangle = L.rectangle(bounds, {
             color: rectangleMeasure.color,
             weight: 1
-          });
-          rectangleMeasure.rectangle.addTo(rectangleMeasure.layer);
+          })
+          rectangleMeasure.rectangle.addTo(rectangleMeasure.layer)
 
           var northWestPoint = rectangleMeasure.rectangle
               .getBounds()
               .getNorthWest(),
             southEastPoint = rectangleMeasure.rectangle
               .getBounds()
-              .getSouthEast();
-          rectangleMeasure.layer.addTo(map);
+              .getSouthEast()
+          rectangleMeasure.layer.addTo(map)
         },
-        mousedown: function(e) {
-          rectangleMeasure.rectangle = null;
-          rectangleMeasure.tips = null;
-          map.dragging.disable();
-          rectangleMeasure.startPoint = e.latlng;
-          map.on("mousemove", rectangleMeasure.mousemove);
+        mousedown: function (e) {
+          rectangleMeasure.rectangle = null
+          rectangleMeasure.tips = null
+          map.dragging.disable()
+          rectangleMeasure.startPoint = e.latlng
+          map.on('mousemove', rectangleMeasure.mousemove)
         },
-        mousemove: function(e) {
-          rectangleMeasure.endPoint = e.latlng;
-          rectangleMeasure.addRectangle();
+        mousemove: function (e) {
+          rectangleMeasure.endPoint = e.latlng
+          rectangleMeasure.addRectangle()
           map
-            .off("mousedown ", rectangleMeasure.mousedown)
-            .on("mouseup", rectangleMeasure.mouseup);
+            .off('mousedown ', rectangleMeasure.mousedown)
+            .on('mouseup', rectangleMeasure.mouseup)
         },
-        mouseup: function(e) {
-          map.dragging.enable();
+        mouseup: function (e) {
+          map.dragging.enable()
           map
-            .off("mousemove", rectangleMeasure.mousemove)
-            .off("mouseup", rectangleMeasure.mouseup)
-            .off("mousedown", rectangleMeasure.mousedown);
+            .off('mousemove', rectangleMeasure.mousemove)
+            .off('mouseup', rectangleMeasure.mouseup)
+            .off('mousedown', rectangleMeasure.mousedown)
         },
-        destory: function() {
-          if (rectangleMeasure.rectangle)
-            rectangleMeasure.layer.removeLayer(rectangleMeasure.rectangle);
-          if (rectangleMeasure.tips)
-            rectangleMeasure.layer.removeLayer(rectangleMeasure.tips);
+        destory: function () {
+          if (rectangleMeasure.rectangle) { rectangleMeasure.layer.removeLayer(rectangleMeasure.rectangle) }
+          if (rectangleMeasure.tips) { rectangleMeasure.layer.removeLayer(rectangleMeasure.tips) }
         }
-      };
+      }
     }
   },
-  mounted: function() {
-    this.initMap();
+  mounted: function () {
+    this.initMap()
     // var index= area(123123);
     // alert(index);
     // var storm_data= getstorm('2018-08-02');
@@ -342,8 +340,9 @@ export default {
     // loadStormData("2018-08-02").then(function(res) {
     //   console.log(res);
     // });
-    getSotrmData({targetdate:"20180802"}).thren(function(res){
-      console.log(res);
+    getSotrmData({targetdate: '20180807'})
+    .then(function (res) {
+      console.log(res)
     })
 
     // alert(get_data);
@@ -363,7 +362,7 @@ export default {
     // //此处有个问题
     // this.info.addTo(myself.mymap);
   }
-};
+}
 </script>
 
 <style>

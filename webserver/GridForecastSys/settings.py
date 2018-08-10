@@ -96,8 +96,11 @@ DATABASES = {
         # 'USER':'root',
         # 'PASSWORD':'123456',
         #单位台式机
-        'USER':'admin',
-        'PASSWORD':'admin123',
+        #'USER':'admin',
+        #'PASSWORD':'admin123',
+        # p52s
+        'USER':'root',
+        'PASSWORD':'123456',
         'HOST':'127.0.0.1',
         # 'OPTIONS':{'init_command':'SET storage_engine=INNODB;'}
     }

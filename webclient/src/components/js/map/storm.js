@@ -1,27 +1,33 @@
-function StormData(
-    code,
-    name,
-    lat,
-    lon,
-    area,
-    surge_val,
-    surge_dt,
-    tide_val,
-    tide_dt,
-    nowdate
-) {
-    this.code = code;
-    this.name = name;
-    this.lat = lat;
-    this.lon = lon;
-    this.area = area;
-    this.surge_val = surge_val;
-    this.surge_dt = surge_dt;
-    this.tide_val = tide_val;
-    this.tide_dt = tide_dt;
-}
+import axios from 'axios'
+// import cookie from '../common/js/cookie';
 
-function loadStormLayer(target_date) {
+let host = 'http://127.0.0.1:8000'
+axios.defaults.withCredentials = true
+
+// function StormData(
+//     code,
+//     name,
+//     lat,
+//     lon,
+//     area,
+//     surge_val,
+//     surge_dt,
+//     tide_val,
+//     tide_dt,
+//     nowdate
+// ) {
+//     this.code = code;
+//     this.name = name;
+//     this.lat = lat;
+//     this.lon = lon;
+//     this.area = area;
+//     this.surge_val = surge_val;
+//     this.surge_dt = surge_dt;
+//     this.tide_val = tide_val;
+//     this.tide_dt = tide_dt;
+// }
+
+export function loadStormLayer(target_date) {
     //加载海洋站格点
     /*
        ** 经测试此种方式可行：
@@ -34,16 +40,16 @@ function loadStormLayer(target_date) {
 
     //1 先加载station list
     station_arr = loadStationData();
-    $.each(station_arr, function(index, val) {
+    $.each(station_arr, function (index, val) {
         // console.log(val);
         station_dict[val.code] = val;
     });
     //2 获取返回的当日极值数据
-    var date_str=getDateStr(target_date);
+    var date_str = getDateStr(target_date);
     storm_arr = loadStormData(date_str);
 
     //3 生成storm对象
-    $.each(storm_arr, function(index, val) {
+    $.each(storm_arr, function (index, val) {
         var station_temp = null;
         if (val.CODE in station_dict) {
             station_temp = station_dict[val.CODE];
@@ -64,7 +70,7 @@ function loadStormLayer(target_date) {
         }
     });
     // add2Marker();
-    $.each(storm_obj_arr, function(index, val) {
+    $.each(storm_obj_arr, function (index, val) {
         addDiv2Marker(val);
     });
     // alert("我是外部方法test2");
@@ -97,7 +103,7 @@ function createStationIcon(name, surge, surge_dt, tide, tide_dt) {
           橙色：4-8   3rd
           红色：8-12  4th
       */
-    this.toStr = function() {
+    this.toStr = function () {
         var html_str = '<div class="myform"><table ><tr><td width="100" rowspan="2">{0}</td><td class="{1}" width="100">{2}</td><td class="{3}" width="100">{4} </td></tr><tr><td class="{5}" width="100">{6}</td><td class="{7}">{8}</td></tr></table></div>'.format(
             this.name,
             this.surge_cls,
@@ -118,7 +124,7 @@ function getStormData() {
         url: "./data/storm_data.json",
         type: "GET",
         dataType: "json",
-        success: function(data) {
+        success: function (data) {
             console.log(data);
             return data;
         }
@@ -128,13 +134,13 @@ function getStormData() {
 function loadStationData() {
     //获取全部海洋站信息
     var station_data = null;
-    var station_url="/station/list/";
+    var station_url = "/station/list/";
     $.ajax({
         url: station_url,
         type: "GET",
         dataType: "json",
         async: false,
-        success: function(data) {
+        success: function (data) {
             // console.log(data);
             station_data = data;
         }
@@ -197,22 +203,49 @@ function addDiv2Marker(storm_obj) {
     }).addTo(mymap);
 }
 
-function loadStormData(get_data) {
-    var storm_data = [];
-    var storm_url="/storm/daily/";
-    //获取当日的风暴潮预报值
-    $.ajax({
-        url: storm_url,
-        type: "GET",
-        dataType: "json",
-        data:{targetdate:get_data},
-        async: false,
-        success: function(data) {
-            // console.log(data);
-            storm_data = data;
-        }
-    });
-    return storm_data;
+// export function loadStormData(get_data) {
+//     var storm_data = [];
+//     var storm_url = "/storm/daily/";
+//     //获取当日的风暴潮预报值
+//     $.ajax({
+//         url: storm_url,
+//         type: "GET",
+//         dataType: "json",
+//         data: {
+//             targetdate: get_data
+//         },
+//         async: false,
+//         success: function (data) {
+//             // console.log(data);
+//             storm_data = data;
+//         }
+//     });
+//     return storm_data;
+// }
+
+export function loadSotrmData(params) {
+    return axios.get(`${host}/storm/daily/`, {
+        targetdate: params
+    })
 }
 
+export const getSotrmData = data => {
+    return axios.get(`${host}/storm/daily/`, {
+        params: data
+    });
+}
 
+// export const getstorm = data => {
+//     return axios.get(`${host}/storm/daily/`, { params: data });
+//   }
+
+// export {
+//     StormData,
+//     loadStormLayer,
+//     createStationIcon,
+//     getStormData,
+//     loadStationData,
+//     getAlarmLevel,
+//     addDiv2Marker,
+//     loadStormData
+// }

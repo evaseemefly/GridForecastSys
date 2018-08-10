@@ -44,6 +44,10 @@
 import "../../components/js/map/leaflet";
 import "../../components/js/map/leaflet.shpfile";
 import "../../components/js/map/shp";
+// import {StormData,loadStormLayer,createStationIcon,getStormData,loadStationData,getAlarmLevel,addDiv2Marker,loadStormData} "../../comppnents/js/map/storm.js";
+// import {loadStormData} from "../../comppnents/js/map/storm";
+// import {area} from "../../components/js/map/mytest";
+import { loadStormData,getSotrmData } from "../../components/js/map/storm";
 // import maptiles from "../../components/js/map/maptiles"
 
 export default {
@@ -128,10 +132,8 @@ export default {
           if (dict[code]) {
             temp_color = this.getColorbar(dict[code].HS_VALUE);
           }
-
           return {
-            //							注意此处的填充颜色及宽度的api可参见
-
+            //注意此处的填充颜色及宽度的api可参见
             fillColor: temp_color,
             weight: 2,
             opacity: 1,
@@ -266,7 +268,7 @@ export default {
       var mymap = L.map("basemap").setView([30.09, 127.75], 5);
       // var mymap = L.map('basemap').setView([51.505, -0.09], 13)
       // mapLink = "../static/mapfiles/";
-      
+
       L.tileLayer("../../static/img/mapfiles/{z}/{x}/{y}.jpg", {
         attribution: "",
         maxZoom: 8,
@@ -333,6 +335,18 @@ export default {
   },
   mounted: function() {
     this.initMap();
+    // var index= area(123123);
+    // alert(index);
+    // var storm_data= getstorm('2018-08-02');
+
+    // loadStormData("2018-08-02").then(function(res) {
+    //   console.log(res);
+    // });
+    getSotrmData({targetdate:"20180802"}).thren(function(res){
+      console.log(res);
+    })
+
+    // alert(get_data);
     // var myself = this;
     // this.info = L.control();
     // info.onAdd = function(map) {

@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import App from './app.vue'
 import VueRouter from 'vue-router'
-import Routers from './router/router';
+import Routers from './router/router'
 
 import $ from 'jquery'
 import 'bootstrap/dist/css/bootstrap.css'
@@ -19,9 +19,9 @@ import moment from 'moment'
 import './components/js/bootstrapExt/table/bootstrap-table.js'
 import './components/js/bootstrapExt/editable/bootstrap-editable.js'
 
-import './components/js/map/leaflet'
-import './components/js/map/leaflet.shpfile'
-import './components/js/map/shp'
+// import './components/js/map/leaflet'
+// import './components/js/map/leaflet.shpfile'
+// import './components/js/map/shp'
 
 import './components/css/style.css'
 import './components/css/map/leaflet.css'

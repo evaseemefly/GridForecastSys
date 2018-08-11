@@ -283,6 +283,21 @@ export default {
       }
     },
 
+    fillStorm: function (code) {
+      /*
+        新写的方法：
+          加载风暴潮及增水的相关操作（入口方法）
+          根据传入的code：
+            1）聚焦到指定海区
+            2）
+          remark：
+            第一次加载该页面时，已经加载了全部的海洋站信息（statinInfo）
+            以及
+            风暴潮及增水的极值数据（stormData）
+            所以此处先只执行zoom操作
+      */
+      this.zoomView(code)
+    },
     loadStationInfo: function () {
       let myself = this
       let stationInfo = loadStation()
@@ -350,15 +365,15 @@ export default {
       .addTo(myself.mymap)
       .bindPopup('')
 
-      var obj1 = new CreateStationIcon(
+      let obj1 = new CreateStationIcon(
     stormObj.name,
     stormObj.surge_val,
     stormObj.surge_dt,
     stormObj.tide_val,
     stormObj.tide_dt
-  )
+      )
 
-      var busIcon1 = L.divIcon({
+      let busIcon1 = L.divIcon({
         className: 'icon_default',
         html: obj1.toStr(),
     // 坐标，[相对于原点的水平位置（左加右减），相对原点的垂直位置（上加下减）]
@@ -369,6 +384,23 @@ export default {
       L.marker([stormObj.lat, stormObj.lon], {
         icon: busIcon1
       }).addTo(myself.mymap)
+    },
+
+    zoomView: function (code) {
+      // 根据传入的code缩放至指定区域
+      switch (code) {
+        case 'n':
+          // 北海
+          this.mymap.setView([38.3, 123], 7)
+          break
+        case 'e':
+          // 东海
+          this.mymap.setView([28.6, 125.35], 6)
+          break
+        case 's':
+          // 南海
+          this.mymap.setView([20.2, 113.04], 7)
+      }
     },
 
     initMap: function () {
@@ -443,15 +475,30 @@ export default {
       }
     }
   },
-  mounted: function () {
-    this.initMap()
-    // var index= area(123123);
-    // alert(index);
-    // var storm_data= getstorm('2018-08-02');
 
-    // loadStormData("2018-08-02").then(function(res) {
-    //   console.log(res);
-    // });
+  watch: {
+    '$route' (to, from) {
+      // 当每次路由发生变化时，route会发生变化
+      console.log(`to:${to},from:${from}`)
+      console.log(`${to.params}`)
+      // 执行加载风暴潮的相关操作
+      this.fillStorm(to.params.code)
+    }
+
+  },
+  created: function () {
+    console.log('view created')
+  },
+  // created () {
+  //   console.log('view created')
+  // },
+  mounted: function () {
+    let code = this.$route.params.code
+    // 初始化地图引擎
+    this.initMap()
+    // 缩放至指定海区
+    this.zoomView(code)
+
     let par = { targetdate: '20180807' }
     getStormData(par)
     this.loadStormLayer()

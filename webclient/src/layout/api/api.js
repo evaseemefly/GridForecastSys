@@ -6,70 +6,52 @@ let host = 'http://127.0.0.1:8000'
 axios.defaults.withCredentials = true
 
 axios.defaults.headers = {
-  'Access-Control-Allow-Headers': 'Authorization,Origin, X-Requested-With, Content-Type, Accept',
-  'Content-Type': 'application/x-www-form-urlencoded',
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE'
+  // 'Access-Control-Allow-Headers': 'Authorization,Origin, X-Requested-With, Content-Type, Accept,access-control-allow-methods,access-control-allow-origin',
+  // 'Access-Control-Allow-Headers': 'Content-Type',
+  // 'Content-Type': 'application/json;charset=UTF-8',
+  // 'Content-Type': 'application/x-www-form-urlencoded',
+  // 'Access-Control-Allow-Origin': '*',
+  // 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE'
 }
-// http request 拦截器
-// axios.interceptors.request.use(
-//   config => {
-//     let token = cookie.getCookie('token')
-//     console.log(token)
-//     if (token) {  // 判断是否存在token，如果存在的话，则每个http header都加上token
-//       config.headers.authorization = `JWT ${token}`
-//     }
-//     return config
-//   },
-//   err => {
-//     return Promise.reject(err)
-//   })
 
-// http response 拦截器
-// 暂时去掉登陆拦截器
-// axios.interceptors.response.use(
-//   response => {
-//     return response;
-//   },
-//   error => {
-//     if (error.response) {
-//       switch (error.response.status) {
-//         case 401:
-//           // 返回 401 清除token信息并跳转到登录页面
-//           router.replace({
-//             path: '/login'
-//           });
-//       }
-//     }
-//     return Promise.reject(error.response.data);   // 返回接口返回的错误信息
-//   });
-//   Vue.prototype.$http = axios;
-// axios.defaults.withCredentials = true;
+export const loadStormData = par => {
+  // 获取指定日期的风暴潮及增水的极值
 
-// 登录
-// export const login = params => {
-//     return axios.post(`${host}/api-token-auth/`, params)
-// }
+  // var storm_data = []
+  let stormUrl = `${host}/storm/daily/`
+  // 获取当日的风暴潮预报值
+  // $.ajax({
+  //   url: storm_url,
+  //   type: "GET",
+  //   dataType: "json",
+  //   data: params,
+  //   async: false,
+  //   success: function (data) {
+  //     // console.log(data);
+  //     storm_data = data;
+  //   }
+  // });
+  // axios.get(`${host}/storm/daily/`, {
+  //   targetdate: params
+  // })
+  // axios.get(`${host}/storm/daily/`, params).then(function (res) {
+  //   console.log(res)
+  // })
 
-export const loadStormData = params => {
-  return axios.get(`${host}/storm/daily/`, {
-    targetdate: params
+  // 以下此种方式可行
+  // axios.get(`${host}/storm/daily/`, {
+  //   params: par
+  // }).then(function (res) {
+  //   console.log(res)
+  // })
+  // 降axios.get对象返回
+  return axios.get(stormUrl, {
+    params: par
   })
 }
 
-export
-/**
- *根据查询条件获取指定月份的全部值班信息
- *
- * @param {*} data
- * @returns
- */
-const getScheduleList = data => {
-  return axios.get(`${host}/duty/schedulelist/`, {
-    params: data
-  })
-}
-
-export const addSchedule = data => {
-  return axios.post(`${host}/duty/schedulelist/creat/`, data)
+export const loadStationData = par => {
+  // 获取海洋站相关信息
+  let statinUrl = `${host}/station/list/`
+  return axios.get(statinUrl)
 }

@@ -44,20 +44,37 @@
 import '../../components/js/map/leaflet'
 import '../../components/js/map/leaflet.shpfile'
 import '../../components/js/map/shp'
-// import {StormData,loadStormLayer,createStationIcon,getStormData,loadStationData,getAlarmLevel,addDiv2Marker,loadStormData} "../../comppnents/js/map/storm.js";
+// import {
+//   StormData,
+//   loadStormLayer,
+//   createStationIcon,
+//   getStormData,
+//   loadStationData,
+//   getAlarmLevel,
+//   addDiv2Marker,
+//   loadStormData
+// } from '../../comppnents/js/map/storm.js'
 // import {loadStormData} from "../../comppnents/js/map/storm";
 // import {area} from "../../components/js/map/mytest";
-import { loadStormData, getSotrmData } from '../../components/js/map/storm'
+import {
+  loadStation,
+  getStormData,
+  loadStormLayer,
+  StormData,
+  CreateStationIcon
+} from '../../components/js/map/storm'
+
+import {getDateStr} from '../api/moment_api'
 // import maptiles from "../../components/js/map/maptiles"
 
 export default {
   data () {
     return {
       // forecast_dict:[],
-      station_arr: [],
-      station_dict: [],
-      storm_arr: [],
-      storm_obj_arr: [],
+      stationArr: [],
+      stationDict: {},
+      stormArr: {},
+      stormObjArr: [],
       my_shp_layer_arr: [],
       mymap: null,
       my_shp_layer: null,
@@ -94,6 +111,7 @@ export default {
     /*
 			 * 根据设定好的色带根据传入的值返回对应的rgb颜色的值
 			 */
+
     getColorbar: function (value) {
       // 根据传入的数值（int类型），判断其所属的区件并获取区件的颜色
       var value_color
@@ -264,8 +282,98 @@ export default {
         loadbar(bar, arr_keys_forecastextreme, arr_values_forecastextreme)
       }
     },
+
+    loadStationInfo: function () {
+      let myself = this
+      let stationInfo = loadStation()
+      stationInfo.then(res => {
+        console.log(res.data)
+        myself.stationArr = res.data
+      })
+    },
+
+    loadStormLayer: function () {
+      // 加载风暴潮图层
+      var myself = this
+      // var date = new Date()
+      // 1 加载station info 存入data的stationArr中
+      // this.loadStationInfo()
+      let stationInfo = loadStation()
+      stationInfo.then(res => {
+        console.log(res.data)
+        myself.stationArr = res.data
+
+        $.each(myself.stationArr, function (index, val) {
+          myself.stationDict[val.code] = val
+        })
+
+        // 2 获取返回当日的极值数据
+        let nowDate = new Date()
+        let dateStr = getDateStr(nowDate)
+        // 由于测试，此处的时间暂时改为"20180807"
+        let par = { targetdate: '20180807' }
+        myself.stormArr = getStormData(par).then(res => {
+          myself.stormArr = res.data
+          // 3 生成storm对象
+          $.each(myself.stormArr, function (index, val) {
+            let stationTemp = null
+            if (val.CODE in myself.stationDict) {
+              stationTemp = myself.stationDict[val.CODE]
+            }
+            if (stationTemp != null) {
+              var obj = new StormData(
+                val.CODE,
+                stationTemp.name,
+                stationTemp.Lat,
+                stationTemp.Lon,
+                stationTemp.area,
+                val.Surge_VALUE,
+                val.Surge_DATE,
+                val.Tide_VALUE,
+                val.Tide_DATE
+            )
+              myself.stormObjArr.push(obj)
+            }
+          })
+
+          // 4 加入地图中
+          $.each(myself.stormObjArr, function (index, val) {
+            myself.addDiv2Marker(val)
+          })
+        })
+      })
+    },
+
+    addDiv2Marker (stormObj) {
+      let myself = this
+      L.marker([stormObj.lat, stormObj.lon])
+      .addTo(myself.mymap)
+      .bindPopup('')
+
+      var obj1 = new CreateStationIcon(
+    stormObj.name,
+    stormObj.surge_val,
+    stormObj.surge_dt,
+    stormObj.tide_val,
+    stormObj.tide_dt
+  )
+
+      var busIcon1 = L.divIcon({
+        className: 'icon_default',
+        html: obj1.toStr(),
+    // 坐标，[相对于原点的水平位置（左加右减），相对原点的垂直位置（上加下减）]
+        iconAnchor: [-20, 30]
+      })
+
+  // 秀英
+      L.marker([stormObj.lat, stormObj.lon], {
+        icon: busIcon1
+      }).addTo(myself.mymap)
+    },
+
     initMap: function () {
-      var mymap = L.map('basemap').setView([30.09, 127.75], 5)
+      var myself = this
+      myself.mymap = L.map('basemap').setView([30.09, 127.75], 5)
       // var mymap = L.map('basemap').setView([51.505, -0.09], 13)
       // mapLink = "../static/mapfiles/";
 
@@ -273,7 +381,7 @@ export default {
         attribution: '',
         maxZoom: 8,
         minZoom: 2
-      }).addTo(mymap)
+      }).addTo(myself.mymap)
       var status = 0
       var popup = L.popup()
 
@@ -325,8 +433,12 @@ export default {
             .off('mousedown', rectangleMeasure.mousedown)
         },
         destory: function () {
-          if (rectangleMeasure.rectangle) { rectangleMeasure.layer.removeLayer(rectangleMeasure.rectangle) }
-          if (rectangleMeasure.tips) { rectangleMeasure.layer.removeLayer(rectangleMeasure.tips) }
+          if (rectangleMeasure.rectangle) {
+            rectangleMeasure.layer.removeLayer(rectangleMeasure.rectangle)
+          }
+          if (rectangleMeasure.tips) {
+            rectangleMeasure.layer.removeLayer(rectangleMeasure.tips)
+          }
         }
       }
     }
@@ -340,10 +452,12 @@ export default {
     // loadStormData("2018-08-02").then(function(res) {
     //   console.log(res);
     // });
-    getSotrmData({targetdate: '20180807'})
-    .then(function (res) {
-      console.log(res)
-    })
+    let par = { targetdate: '20180807' }
+    getStormData(par)
+    this.loadStormLayer()
+    // .then(function (res) {
+    //   console.log(res)
+    // })
 
     // alert(get_data);
     // var myself = this;

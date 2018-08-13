@@ -7,12 +7,12 @@
 </template>
 
 <script>
-    import topmain from "../head/top_main.vue";
-    import centerarea from "../head/top_center_area.vue";
-    export default {
-        components:{
-            topmain
-        }
+    import topmain from '../head/top_main.vue'
+import centerarea from '../head/top_center_area.vue'
+export default {
+      components: {
+        topmain
+      }
     }
 </script>
 

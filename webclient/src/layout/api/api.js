@@ -55,3 +55,39 @@ export const loadStationData = par => {
   let statinUrl = `${host}/station/list/`
   return axios.get(statinUrl)
 }
+
+export const loadTargetAreaMaxData = (date, area) => {
+  if (area != null) {
+    let targetUrl = `${host}/forecast/daily/${date}/${area}/`
+    // 使用上面的方式替代下面的方式
+    // var targetUrl = '/'
+    // var url_arr = new Array()
+    // url_arr.push('forecast')
+    // url_arr.push('daily')
+    // url_arr.push(date)
+    // url_arr.push(area)
+    // targetUrl += url_arr.join('/')
+    // targetUrl += '/'
+    console.log(targetUrl)
+    // 根据传入的area请求后返回字典
+    let dataCheckarea = null
+    let result = null
+    // return new Promise(function (resolve, reject) {
+    //   axios.get(targetUrl).then((res) => {
+    //     result = res
+    //     resolve(result)
+    //   })
+    // })
+    // return result
+
+    // 以下内容用上面的代码实现
+    $.ajax({
+      url: targetUrl,
+      async: false,    // 同步请求时页面锁死
+      success: function (data) {
+        result = data
+      }
+    })
+    return result
+  }
+}

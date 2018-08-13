@@ -41,15 +41,9 @@
 </template>
 
 <script>
-// import '../../components/js/map/leaflet'
-// import '../../components/js/map/shp.js'
-// import '../../components/js/map/leaflet.shpfile'
-
-// import '../../components/js/map/maptiles.js'
-// import '../../components/js/map/shp'
-// import 'shpjs'
-// import 'shp.js'
-import '_shpjs@3.4.2@shpjs'
+import '../../components/js/map/leaflet'
+import '../../components/js/map/leaflet.shpfile'
+import '../../components/js/map/shp'
 // import {
 //   StormData,
 //   loadStormLayer,
@@ -69,10 +63,6 @@ import {
   StormData,
   CreateStationIcon
 } from '../../components/js/map/storm'
-
-import {
-  addshp, loadAreaMaxDataByDate
-} from '../../components/js/map/grid'
 
 import {getDateStr} from '../api/moment_api'
 // import maptiles from "../../components/js/map/maptiles"
@@ -254,20 +244,18 @@ export default {
     },
 
     // 注意加载页面时，需要执行加载全国的事件
-    fillGrid: function (value, item) {
+    fillarea: function (value, item) {
       // 此处的item是vm.data中的items
       //
       // console.log("执行填充操作：" + value);
       this.selected = item
-      let textIndex = 1
-      textIndex += 1
-
+      text_index += 1
       // 将字典转成arr
-      var arrKeysForecastextreme = []
-      var arrValuesForecastextreme = []
-      var arrObjForecastextreme = []
+      var arr_keys_forecastextreme = []
+      var arr_values_forecastextreme = []
+      var arr_obj_forecastextreme = []
 
-      var info = this.fillarea(value)
+      var info = fillarea(value)
       dict_target = info[0]
       out_geo_layer = info[1]
       // 从当前地图中删除当前海区的layer，前提是当前海区的layer不为null，否则会报错
@@ -285,189 +273,15 @@ export default {
         var forecast_top10 = forecast_arr.slice(0, 15)
 
         for (var i = 0; i < forecast_top10.length; i++) {
-          arrKeysForecastextreme.push(forecast_top10[i].code)
+          arr_keys_forecastextreme.push(forecast_top10[i].code)
 
-          arrValuesForecastextreme.push(forecast_top10[i].HS_VALUE)
+          arr_values_forecastextreme.push(forecast_top10[i].HS_VALUE)
         }
 
         var bar = initbar()
-        loadbar(bar, arrKeysForecastextreme, arrValuesForecastextreme)
+        loadbar(bar, arr_keys_forecastextreme, arr_values_forecastextreme)
       }
     },
-
-    addshp: function (shp_path, dict_area, isremoveLay) {
-      var shape_layer = null
-    // 为当天地图添加图层
-    // 注意此处then是异步的，所以无法返回shape_layer;
-      shp(shp_path).then(function (temp_geojson) {
-        geojson = temp_geojson
-        // do something with your geojson
-        // 当前图层不为空且删除图层的标记符为true都满足时，才清空当前图层
-        if (my_shp_layer != null & isremoveLay) {
-          $.each(my_shp_layer_arr, function (index, value) {
-            mymap.removeLayer(value)
-          })
-          my_shp_layer_arr = []
-          mymap.removeLayer(my_shp_layer)
-        }
-        var shp_layer = addShape(dict_area, temp_geojson, null, null, mymap)
-
-        // geojson = L.geoJson(temp_geojson, {
-        //    style: mystyle,
-        //    onEachFeature: onEachFeature
-        // }).addTo(mymap);
-        my_shp_layer = shp_layer
-        my_shp_layer_arr.push(shp_layer)
-      }).then(function () {
-        return shape_layer
-      })
-      return shape_layer
-    },
-    fillarea: function (area) {
-      var date = new Date()
-            // var date_str=getDateStr();
-      var dictArea = null
-      var newLayer = null
-      let staticUrl = '../../../static/files/'
-      switch (area) {
-
-                // 北海
-        case 'n':
-          // dictArea = loadAreaMaxData_byDate(date, area)
-          dictArea = loadAreaMaxDataByDate(date, area)
-                    // 缩放并定位到指定海区
-          mymap.setView([38.3, 123], 7)
-
-          newLayer = this.addshp(`${staticUrl}north.zip`, dictArea, true)
-          break
-                // 东海
-        case 'e':
-          dictArea = loadAreaMaxDataByDate(date, area)
-          this.mymap.setView([28.6, 125.35], 6)
-
-          newLayer = this.addshp(`${staticUrl}east.zip`, dictArea, true)
-          break
-                // 南海
-        case 's':
-          dictArea = loadAreaMaxDataByDate(date, area)
-          this.mymap.setView([20.2, 113.04], 7)
-
-          newLayer = this.addshp(`${staticUrl}south.zip`, dictArea, true)
-          break
-                // 全国
-        case 'a':
-          dictArea = loadAreaMaxDataByDate(date, area)
-          addshp(`${staticUrl}north.zip`, dictArea, false)
-          addshp(`${staticUrl}east.zip`, dictArea, false)
-          addshp(`${staticUrl}south.zip`, dictArea, false)
-          break
-      }
-      return [dictArea, newLayer]
-    },
-
-    fillStorm: function (code) {
-      /*
-        新写的方法：
-          加载风暴潮及增水的相关操作（入口方法）
-          根据传入的code：
-            1）聚焦到指定海区
-            2）
-          remark：
-            第一次加载该页面时，已经加载了全部的海洋站信息（statinInfo）
-            以及
-            风暴潮及增水的极值数据（stormData）
-            所以此处先只执行zoom操作
-      */
-      this.zoomView(code)
-    },
-    loadStationInfo: function () {
-      let myself = this
-      let stationInfo = loadStation()
-      stationInfo.then(res => {
-        console.log(res.data)
-        myself.stationArr = res.data
-      })
-    },
-
-    loadStormLayer: function () {
-      // 加载风暴潮图层
-      var myself = this
-      // var date = new Date()
-      // 1 加载station info 存入data的stationArr中
-      // this.loadStationInfo()
-      let stationInfo = loadStation()
-      stationInfo.then(res => {
-        console.log(res.data)
-        myself.stationArr = res.data
-
-        $.each(myself.stationArr, function (index, val) {
-          myself.stationDict[val.code] = val
-        })
-
-        // 2 获取返回当日的极值数据
-        let nowDate = new Date()
-        let dateStr = getDateStr(nowDate)
-        // 由于测试，此处的时间暂时改为"20180807"
-        let par = { targetdate: '20180807' }
-        myself.stormArr = getStormData(par).then(res => {
-          myself.stormArr = res.data
-          // 3 生成storm对象
-          $.each(myself.stormArr, function (index, val) {
-            let stationTemp = null
-            if (val.CODE in myself.stationDict) {
-              stationTemp = myself.stationDict[val.CODE]
-            }
-            if (stationTemp != null) {
-              var obj = new StormData(
-                val.CODE,
-                stationTemp.name,
-                stationTemp.Lat,
-                stationTemp.Lon,
-                stationTemp.area,
-                val.Surge_VALUE,
-                val.Surge_DATE,
-                val.Tide_VALUE,
-                val.Tide_DATE
-            )
-              myself.stormObjArr.push(obj)
-            }
-          })
-
-          // 4 加入地图中
-          $.each(myself.stormObjArr, function (index, val) {
-            myself.addDiv2Marker(val)
-          })
-        })
-      })
-    },
-
-    addDiv2Marker (stormObj) {
-      let myself = this
-      L.marker([stormObj.lat, stormObj.lon])
-      .addTo(myself.mymap)
-      .bindPopup('')
-
-      let obj1 = new CreateStationIcon(
-    stormObj.name,
-    stormObj.surge_val,
-    stormObj.surge_dt,
-    stormObj.tide_val,
-    stormObj.tide_dt
-      )
-
-      let busIcon1 = L.divIcon({
-        className: 'icon_default',
-        html: obj1.toStr(),
-    // 坐标，[相对于原点的水平位置（左加右减），相对原点的垂直位置（上加下减）]
-        iconAnchor: [-20, 30]
-      })
-
-  // 秀英
-      L.marker([stormObj.lat, stormObj.lon], {
-        icon: busIcon1
-      }).addTo(myself.mymap)
-    },
-
     zoomView: function (code) {
       // 根据传入的code缩放至指定区域
       switch (code) {
@@ -564,18 +378,7 @@ export default {
       console.log(`to:${to},from:${from}`)
       console.log(`${to.params}`)
       // 执行加载风暴潮的相关操作
-      // 此处需要判断要执行的加载内容
-      let category = to.params.category
-      switch (category) {
-        case 'storm':
-          console.log('storm')
-          this.fillStorm(to.params.code)
-          break
-        case 'grid':
-          console.log('grid')
-          this.fillGrid(to.params.code)
-          break
-      }
+      this.fillStorm(to.params.code)
     }
 
   },

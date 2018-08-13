@@ -12,3 +12,7 @@ export function getDateStr (date) {
   mydataStr = year + month + day
   return mydataStr
 }
+export function getYesterday (date) {
+  date.setDate(date.getDate() - 1)
+  return date
+}

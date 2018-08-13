@@ -13,9 +13,9 @@ import './components/css/datetimepicker/bootstrap-datetimepicker.min.css'
 import './components/js/datetimepicker/bootstrap-datetimepicker.js'
 import './components/js/datetimepicker/bootstrap-datetimepicker.zh-CN.js'
 
-import './components/js/map/leaflet'
-import './components/js/map/shp.js'
-import './components/js/map/leaflet.shpfile.js'
+// import './components/js/map/leaflet'
+// import './components/js/map/shp.js'
+// import './components/js/map/leaflet.shpfile.js'
 // 下面两个暂时去掉
 import moment from 'moment'
 

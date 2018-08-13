@@ -41,6 +41,7 @@
 </template>
 
 <script>
+
 // import '../../components/js/map/leaflet'
 // import '../../components/js/map/shp.js'
 // import '../../components/js/map/leaflet.shpfile'
@@ -49,7 +50,9 @@
 // import '../../components/js/map/shp'
 // import 'shpjs'
 // import 'shp.js'
-import '_shpjs@3.4.2@shpjs'
+import 'leaflet'
+import shp from 'shpjs'
+// import '_shpjs@3.4.2@shpjs'
 // import {
 //   StormData,
 //   loadStormLayer,
@@ -180,14 +183,14 @@ export default {
       return geojson
     },
 
-    addshp: function (shp_path, dict_area, isremoveLay) {
+    addshp: function (shpPath, dictArea, isremoveLay) {
       var shape_layer = null
       var myself = this
       // 为当天地图添加图层
       // 注意此处then是异步的，所以无法返回shape_layer;
-      shp(shp_path)
+      shp(shpPath)
         .then(function (temp_geojson) {
-          geojson = temp_geojson
+          // geojson = temp_geojson
           // do something with your geojson
           // 当前图层不为空且删除图层的标记符为true都满足时，才清空当前图层
           if ((myself.my_shp_layer != null) & isremoveLay) {
@@ -198,7 +201,7 @@ export default {
             myself.mymap.removeLayer(myself.my_shp_layer)
           }
           var shp_layer = addShape(
-            dict_area,
+            dictArea,
             temp_geojson,
             null,
             null,
@@ -295,34 +298,34 @@ export default {
       }
     },
 
-    addshp: function (shp_path, dict_area, isremoveLay) {
-      var shape_layer = null
-    // 为当天地图添加图层
-    // 注意此处then是异步的，所以无法返回shape_layer;
-      shp(shp_path).then(function (temp_geojson) {
-        geojson = temp_geojson
-        // do something with your geojson
-        // 当前图层不为空且删除图层的标记符为true都满足时，才清空当前图层
-        if (my_shp_layer != null & isremoveLay) {
-          $.each(my_shp_layer_arr, function (index, value) {
-            mymap.removeLayer(value)
-          })
-          my_shp_layer_arr = []
-          mymap.removeLayer(my_shp_layer)
-        }
-        var shp_layer = addShape(dict_area, temp_geojson, null, null, mymap)
+    // addshp: function (shpPath, dict_area, isremoveLay) {
+    //   let shapeLayer = null
+    // // 为当天地图添加图层
+    // // 注意此处then是异步的，所以无法返回shape_layer;
+    //   shp(shpPath).then(function (tempGeojson) {
+    //     // geojson = temp_geojson
+    //     // do something with your geojson
+    //     // 当前图层不为空且删除图层的标记符为true都满足时，才清空当前图层
+    //     if (my_shp_layer != null & isremoveLay) {
+    //       $.each(my_shp_layer_arr, function (index, value) {
+    //         mymap.removeLayer(value)
+    //       })
+    //       my_shp_layer_arr = []
+    //       mymap.removeLayer(my_shp_layer)
+    //     }
+    //     var shp_layer = addShape(dict_area, tempGeojson, null, null, mymap)
 
-        // geojson = L.geoJson(temp_geojson, {
-        //    style: mystyle,
-        //    onEachFeature: onEachFeature
-        // }).addTo(mymap);
-        my_shp_layer = shp_layer
-        my_shp_layer_arr.push(shp_layer)
-      }).then(function () {
-        return shape_layer
-      })
-      return shape_layer
-    },
+    //     // geojson = L.geoJson(temp_geojson, {
+    //     //    style: mystyle,
+    //     //    onEachFeature: onEachFeature
+    //     // }).addTo(mymap);
+    //     my_shp_layer = shp_layer
+    //     my_shp_layer_arr.push(shp_layer)
+    //   }).then(function () {
+    //     return shapeLayer
+    //   })
+    //   return shape_layer
+    // },
     fillarea: function (area) {
       var date = new Date()
             // var date_str=getDateStr();
@@ -336,7 +339,7 @@ export default {
           // dictArea = loadAreaMaxData_byDate(date, area)
           dictArea = loadAreaMaxDataByDate(date, area)
                     // 缩放并定位到指定海区
-          mymap.setView([38.3, 123], 7)
+          this.mymap.setView([38.3, 123], 7)
 
           newLayer = this.addshp(`${staticUrl}north.zip`, dictArea, true)
           break

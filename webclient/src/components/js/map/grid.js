@@ -48,7 +48,7 @@ function getColorbar (value) {
 			 * data是读取的geoJson数据
 			 * 此处已重新修改 2018-08-06
 			 */
-function addShape (dict, data, feature, layer, map) {
+export function addShape (dict, data, feature, layer, map) {
     // 注意此处需要注意判断在featrues_arr中是否已经存在了指定的值（若存在则不添加）
   $.each(data.features, function (index, obj) {
     if ($.inArray(obj, features_arr) < 0) {
@@ -86,6 +86,24 @@ function addShape (dict, data, feature, layer, map) {
 
   geojson = temp_geojson.addTo(map)
   return geojson
+}
+export function compareForecast (prop) {
+  return function (a, b) {
+    var valueA = a[prop]
+    var valueB = b[prop]
+    return valueB - valueA
+  }
+}
+// 将字典转为arr
+export function dic2arr (dict) {
+  var arr = []
+  for (temp in dict) {
+    arr.push({
+      code: temp,
+      value: dict[temp]
+    })
+  }
+  return arr
 }
 
 export function loadAreaMaxDataByDate (date, area) {

@@ -52,6 +52,14 @@
 // import 'shp.js'
 import 'leaflet'
 import shp from 'shpjs'
+// import echarts from 'echarts'
+// 引入 ECharts 主模块
+var echarts = require('echarts/lib/echarts')
+// 引入柱状图
+require('echarts/lib/chart/bar')
+// 引入提示框和标题组件
+require('echarts/lib/component/tooltip')
+require('echarts/lib/component/title')
 // import '_shpjs@3.4.2@shpjs'
 // import {
 //   StormData,
@@ -74,7 +82,11 @@ import {
 } from '../../components/js/map/storm'
 
 import {
-  addshp, loadAreaMaxDataByDate
+  addshp,
+  loadAreaMaxDataByDate,
+  // addShape,
+  dic2arr,
+  compareForecast
 } from '../../components/js/map/grid'
 
 import {getDateStr} from '../api/moment_api'
@@ -88,7 +100,10 @@ export default {
       stationDict: {},
       stormArr: {},
       stormObjArr: [],
+      forecastArr: [],
+      // info: null,
       my_shp_layer_arr: [],
+      features_arr: [],
       mymap: null,
       my_shp_layer: null,
       info: null
@@ -140,32 +155,34 @@ export default {
       return value_color
     },
 
-    /*
-			 * 叠加shp文件，以geoJson的方式读取
+    addShape: function (dict, data, feature, layer, map) {
+      /* 叠加shp文件，以geoJson的方式读取
 			 * data是读取的geoJson数据
 			 * 此处已重新修改 2018-08-06
-			 */
-    addShape: function (dict, data, feature, layer, map) {
+       */
       // 注意此处需要注意判断在featrues_arr中是否已经存在了指定的值（若存在则不添加）
+      let myself = this
       $.each(data.features, function (index, obj) {
-        if ($.inArray(obj, features_arr) < 0) {
-          features_arr.push(obj)
+        if ($.inArray(obj, myself.features_arr) < 0) {
+          myself.features_arr.push(obj)
         }
       })
       //! !!注意此处添加了shape文件后，由于是读取的geojson，文件，通过L.geoJSON后，需要将返回值赋值给geojson
       // 此处的temp_geojson与geojson相同
-      var temp_geojson = L.geoJSON(data, {
+      var tempGeoJson = L.geoJSON(data, {
         style: function (feature) {
           // 获取到当前的对象的code
+
           var code = feature.properties.Code
-          var temp_color = null
-          //							forecast_dict_test
+          console.log(`color:${code}`)
+          let tempColor = null
+
           if (dict[code]) {
-            temp_color = this.getColorbar(dict[code].HS_VALUE)
+            tempColor = myself.getColorbar(dict[code].HS_VALUE)
           }
           return {
             // 注意此处的填充颜色及宽度的api可参见
-            fillColor: temp_color,
+            fillColor: tempColor,
             weight: 2,
             opacity: 1,
             color: 'white',
@@ -174,15 +191,22 @@ export default {
           }
         },
         // 注意此处必须要将OnEachFeature放在里面才可以
-        onEachFeature: onEachFeature
+        onEachFeature: myself.onEachFeature
       }).bindPopup(function (layer) {
         return layer.feature.properties.description
       })
 
-      geojson = temp_geojson.addTo(map)
-      return geojson
+      let geoJson = tempGeoJson.addTo(map)
+      return geoJson
     },
-
+    onEachFeature: function (feature, layer) {
+      let myself = this
+      layer.on({
+        mouseover: myself.highlightFeature,
+        mouseout: myself.resetHighlight,
+        click: myself.zoomToFeature
+      })
+    },
     addshp: function (shpPath, dictArea, isremoveLay) {
       var shape_layer = null
       var myself = this
@@ -200,7 +224,7 @@ export default {
             myself.my_shp_layer_arr = []
             myself.mymap.removeLayer(myself.my_shp_layer)
           }
-          var shp_layer = addShape(
+          var shp_layer = myself.addShape(
             dictArea,
             temp_geojson,
             null,
@@ -235,7 +259,7 @@ export default {
         layer.bringToFront()
       }
 
-      info.update(layer.feature.properties)
+      this.info.update(layer.feature.properties)
     },
 
     readShape: function (file, func) {
@@ -271,8 +295,8 @@ export default {
       var arrObjForecastextreme = []
 
       var info = this.fillarea(value)
-      dict_target = info[0]
-      out_geo_layer = info[1]
+      let dict_target = info[0]
+      let out_geo_layer = info[1]
       // 从当前地图中删除当前海区的layer，前提是当前海区的layer不为null，否则会报错
       if (dict_target != null) {
         var forecast_arr = dic2arr(dict_target)
@@ -283,21 +307,113 @@ export default {
             HS_VALUE: obj.value.HS_VALUE
           })
         })
-        forecast_arr = forecast_arr_obj.sort(compare_forecast('HS_VALUE'))
+        this.forecastArr = forecast_arr_obj.sort(compareForecast('HS_VALUE'))
         // 从数组中取出前10个值
-        var forecast_top10 = forecast_arr.slice(0, 15)
+        let forecastTop10 = forecast_arr.slice(0, 15)
 
-        for (var i = 0; i < forecast_top10.length; i++) {
-          arrKeysForecastextreme.push(forecast_top10[i].code)
+        for (var i = 0; i < forecastTop10.length; i++) {
+          arrKeysForecastextreme.push(forecastTop10[i].code)
 
-          arrValuesForecastextreme.push(forecast_top10[i].HS_VALUE)
+          arrValuesForecastextreme.push(forecastTop10[i].HS_VALUE)
         }
 
-        var bar = initbar()
-        loadbar(bar, arrKeysForecastextreme, arrValuesForecastextreme)
+        var bar = this.initbar()
+        this.loadbar(bar, arrKeysForecastextreme, arrValuesForecastextreme)
       }
     },
+    // 加载右侧的柱状图top15
+    loadbar: function (bar, keys_arr, values_arr) {
+      let option_mybar = {
+        title: {
+          text: '波浪72小时预报',
+          subtext: '测试数据',
+          textStyle: {
+            fontWeight: 'bolder',
+            color: '#FFFFFF'
+          }
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          }
+        },
+        legend: {
+          data: ['波浪']
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'value',
+          boundaryGap: [0, 0.01],
+          axisLabel: {
+            interval: 0,
+            textStyle: {
+              color: '#ddd'
+            }
+          },
+          axisLine: {
+            show: false,
+            lineStyle: {
+              color: '#ddd'
+            }
+          },
+          splitLine: {
+            show: false // 不显示网格线
+          }
+        },
+        yAxis: {
+          type: 'category',
+          splitLine: {
+            show: false // 不显示网格线
+          },
+          axisLabel: {
+            interval: 0,
+            textStyle: {
+              color: '#FFFFFF',
+              fontWeight: 'bold'
+            }
+          },
+          data: keys_arr
+        },
+        series: [
+          {
+            name: '波浪',
+            type: 'bar',
+            data: values_arr,
+            itemStyle: {
+          // 通常情况下：
+              normal: {
+            //	color: '#EEC900'
+            // 每个柱子的颜色即为colorList数组里的每一项，如果柱子数目多于colorList的长度，则柱子颜色循环使用该数组
+                color: function (params) {
+                  var mycolor = this.getColorbar(params.data)
 
+                  return mycolor
+                }
+              },
+          // 鼠标悬停时：
+              emphasis: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)'
+              }
+            }
+          }
+        ]
+      }
+  // 为echarts对象加载数据
+      bar.setOption(option_mybar)
+    },
+
+    initbar: function () {
+      var myBar = echarts.init(document.getElementById('mybar'))
+      return myBar
+    },
     // addshp: function (shpPath, dict_area, isremoveLay) {
     //   let shapeLayer = null
     // // 为当天地图添加图层
@@ -360,9 +476,9 @@ export default {
                 // 全国
         case 'a':
           dictArea = loadAreaMaxDataByDate(date, area)
-          addshp(`${staticUrl}north.zip`, dictArea, false)
-          addshp(`${staticUrl}east.zip`, dictArea, false)
-          addshp(`${staticUrl}south.zip`, dictArea, false)
+          this.addshp(`${staticUrl}north.zip`, dictArea, false)
+          this.addshp(`${staticUrl}east.zip`, dictArea, false)
+          this.addshp(`${staticUrl}south.zip`, dictArea, false)
           break
       }
       return [dictArea, newLayer]
@@ -470,7 +586,23 @@ export default {
         icon: busIcon1
       }).addTo(myself.mymap)
     },
+    infoInit: function () {
+    // 右上角的消息显示区域初始化
+      this.info = L.control()
+      this.info.onAdd = function (map) {
+        this._div = L.DomUtil.create('div', 'info') // create a div with a class "info"
+        this.update()
+        return this._div
+      }
 
+        // method that we will use to update the control based on feature properties passed
+      this.info.update = function (props) {
+            // 此处使用了三元表达式
+        this._div.innerHTML = '<h4>网格概述</h4>' + (props
+                ? '<b>网格编号：</b><br />' + props.Code
+                : '未选中')
+      }
+    },
     zoomView: function (code) {
       // 根据传入的code缩放至指定区域
       switch (code) {
@@ -582,6 +714,7 @@ export default {
     }
 
   },
+
   created: function () {
     console.log('view created')
   },
@@ -594,7 +727,8 @@ export default {
     this.initMap()
     // 缩放至指定海区
     this.zoomView(code)
-
+    // 对info初始化
+    this.infoInit()
     let par = { targetdate: '20180807' }
     getStormData(par)
     this.loadStormLayer()

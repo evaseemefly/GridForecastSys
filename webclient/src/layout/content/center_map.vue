@@ -106,7 +106,8 @@ export default {
       features_arr: [],
       mymap: null,
       my_shp_layer: null,
-      info: null
+      info: null,
+      geojson: null
     }
   },
   methods: {
@@ -244,7 +245,10 @@ export default {
         })
       return shape_layer
     },
-
+    resetHighlight: function (e) {
+      this.geojson.resetStyle(e.target)
+      this.info.update()
+    },
     highlightFeature: function (e) {
       var layer = e.target
 
@@ -588,20 +592,29 @@ export default {
     },
     infoInit: function () {
     // 右上角的消息显示区域初始化
+      let myself = this
       this.info = L.control()
       this.info.onAdd = function (map) {
+        // myself._div = L.DomUtil.create('div', 'info') // create a div with a class "info"
+        // myself.update()
         this._div = L.DomUtil.create('div', 'info') // create a div with a class "info"
         this.update()
-        return this._div
+        return myself._div
       }
-
         // method that we will use to update the control based on feature properties passed
       this.info.update = function (props) {
             // 此处使用了三元表达式
+            /*
+              由于使用了vue，此处的this应该为info
+            */
+        // myself.info._div.innerHTML = '<h4>网格概述</h4>' + (props
+        //         ? '<b>网格编号：</b><br />' + props.Code
+        //         : '未选中')
         this._div.innerHTML = '<h4>网格概述</h4>' + (props
                 ? '<b>网格编号：</b><br />' + props.Code
                 : '未选中')
       }
+      this.info.addTo(myself.mymap)
     },
     zoomView: function (code) {
       // 根据传入的code缩放至指定区域

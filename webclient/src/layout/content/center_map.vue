@@ -170,7 +170,8 @@ export default {
       })
       //! !!注意此处添加了shape文件后，由于是读取的geojson，文件，通过L.geoJSON后，需要将返回值赋值给geojson
       // 此处的temp_geojson与geojson相同
-      var tempGeoJson = L.geoJSON(data, {
+      // myself.geojson
+      let tempGeoJson = L.geoJSON(data, {
         style: function (feature) {
           // 获取到当前的对象的code
 
@@ -196,8 +197,10 @@ export default {
       }).bindPopup(function (layer) {
         return layer.feature.properties.description
       })
-
+      // 此处v1版本已经不确定geoJson是否为外侧的geoJson
       let geoJson = tempGeoJson.addTo(map)
+      // 需要将genJson赋值给全局geojson
+      myself.geojson = geoJson
       return geoJson
     },
     onEachFeature: function (feature, layer) {
@@ -209,13 +212,13 @@ export default {
       })
     },
     addshp: function (shpPath, dictArea, isremoveLay) {
-      var shape_layer = null
+      var shapeLayer = null
       var myself = this
       // 为当天地图添加图层
       // 注意此处then是异步的，所以无法返回shape_layer;
       shp(shpPath)
-        .then(function (temp_geojson) {
-          // geojson = temp_geojson
+        .then(function (tempGeojson) {
+          myself.geojson = tempGeojson
           // do something with your geojson
           // 当前图层不为空且删除图层的标记符为true都满足时，才清空当前图层
           if ((myself.my_shp_layer != null) & isremoveLay) {
@@ -225,9 +228,9 @@ export default {
             myself.my_shp_layer_arr = []
             myself.mymap.removeLayer(myself.my_shp_layer)
           }
-          var shp_layer = myself.addShape(
+          var shpLayer = myself.addShape(
             dictArea,
-            temp_geojson,
+            tempGeojson,
             null,
             null,
             myself.mymap
@@ -237,13 +240,13 @@ export default {
           //    style: mystyle,
           //    onEachFeature: onEachFeature
           // }).addTo(mymap);
-          myself.my_shp_layer = shp_layer
-          myself.my_shp_layer_arr.push(shp_layer)
+          myself.my_shp_layer = shpLayer
+          myself.my_shp_layer_arr.push(shpLayer)
         })
         .then(function () {
-          return shape_layer
+          return shapeLayer
         })
-      return shape_layer
+      return shapeLayer
     },
     resetHighlight: function (e) {
       this.geojson.resetStyle(e.target)
@@ -599,7 +602,7 @@ export default {
         // myself.update()
         this._div = L.DomUtil.create('div', 'info') // create a div with a class "info"
         this.update()
-        return myself._div
+        return this._div
       }
         // method that we will use to update the control based on feature properties passed
       this.info.update = function (props) {

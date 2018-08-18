@@ -35,8 +35,12 @@
           </div>
         </div>
       </div>
-      <div id="mybar" style="height:400px"></div>
+      
     </div>
+    <!-- 由下边的rightBar组件替代 -->
+      <!-- <div id="mybar" style="height:400px"></div> -->
+      
+    <rightBar ref="rightBar" :arrValuesForecastextreme="arrValuesForecastextreme" :arrKeysForecastextreme="arrKeysForecastextreme"></rightBar>
   </div>
 </template>
 
@@ -82,6 +86,10 @@ import {
 } from '../../components/js/map/storm'
 
 import {
+  getColorbar
+  } from '../api/api'
+
+import {
   addshp,
   loadAreaMaxDataByDate,
   // addShape,
@@ -91,6 +99,7 @@ import {
 
 import {getDateStr} from '../api/moment_api'
 // import maptiles from "../../components/js/map/maptiles"
+import rightBar from './right_bar.vue'
 
 export default {
   data () {
@@ -107,8 +116,15 @@ export default {
       mymap: null,
       my_shp_layer: null,
       info: null,
-      geojson: null
+      geojson: null,
+      // 将forecast_top10字典转成数组的keys
+      arrKeysForecastextreme: [],
+      // 将forecast_top10字典转成数组的values
+      arrValuesForecastextreme: []
     }
+  },
+  components: {
+    rightBar
   },
   methods: {
     clearLayer: function () {
@@ -141,20 +157,20 @@ export default {
 			 * 根据设定好的色带根据传入的值返回对应的rgb颜色的值
 			 */
 
-    getColorbar: function (value) {
-      // 根据传入的数值（int类型），判断其所属的区件并获取区件的颜色
-      var value_color
-      if (value >= 2 && value < 4) {
-        value_color = 'rgb(0,0,255)'
-      } else if (value >= 4 && value < 8) {
-        value_color = 'rgb(255,242,0)'
-      } else if (value >= 8 && value < 12) {
-        value_color = 'rgb(255,127,19)'
-      } else if (value >= 12) {
-        value_color = 'rgb(255,0,0)'
-      }
-      return value_color
-    },
+    // getColorbar: function (value) {
+    //   // 根据传入的数值（int类型），判断其所属的区件并获取区件的颜色
+    //   var value_color
+    //   if (value >= 2 && value < 4) {
+    //     value_color = 'rgb(0,0,255)'
+    //   } else if (value >= 4 && value < 8) {
+    //     value_color = 'rgb(255,242,0)'
+    //   } else if (value >= 8 && value < 12) {
+    //     value_color = 'rgb(255,127,19)'
+    //   } else if (value >= 12) {
+    //     value_color = 'rgb(255,0,0)'
+    //   }
+    //   return value_color
+    // },
 
     addShape: function (dict, data, feature, layer, map) {
       /* 叠加shp文件，以geoJson的方式读取
@@ -176,11 +192,11 @@ export default {
           // 获取到当前的对象的code
 
           var code = feature.properties.Code
-          console.log(`color:${code}`)
+          // console.log(`color:${code}`)
           let tempColor = null
 
           if (dict[code]) {
-            tempColor = myself.getColorbar(dict[code].HS_VALUE)
+            tempColor = getColorbar(dict[code].HS_VALUE)
           }
           return {
             // 注意此处的填充颜色及宽度的api可参见
@@ -297,130 +313,133 @@ export default {
       textIndex += 1
 
       // 将字典转成arr
-      var arrKeysForecastextreme = []
-      var arrValuesForecastextreme = []
-      var arrObjForecastextreme = []
+      this.arrKeysForecastextreme = []
+      this.arrValuesForecastextreme = []
+      // var arrObjForecastextreme = []
 
       var info = this.fillarea(value)
-      let dict_target = info[0]
-      let out_geo_layer = info[1]
+      let dictTarget = info[0]
+      // let outGeoLayer = info[1]
       // 从当前地图中删除当前海区的layer，前提是当前海区的layer不为null，否则会报错
-      if (dict_target != null) {
-        var forecast_arr = dic2arr(dict_target)
-        var forecast_arr_obj = []
-        $.each(forecast_arr, function (index, obj) {
-          forecast_arr_obj.push({
+      if (dictTarget != null) {
+        var forecastArr = dic2arr(dictTarget)
+        var forecastArrObj = []
+        $.each(forecastArr, function (index, obj) {
+          forecastArrObj.push({
             code: obj.value.CODE,
             HS_VALUE: obj.value.HS_VALUE
           })
         })
-        this.forecastArr = forecast_arr_obj.sort(compareForecast('HS_VALUE'))
+        this.forecastArr = forecastArrObj.sort(compareForecast('HS_VALUE'))
         // 从数组中取出前10个值
-        let forecastTop10 = forecast_arr.slice(0, 15)
+        let forecastTop10 = forecastArr.slice(0, 15)
 
         for (var i = 0; i < forecastTop10.length; i++) {
-          arrKeysForecastextreme.push(forecastTop10[i].code)
+          this.arrKeysForecastextreme.push(forecastTop10[i].code)
 
-          arrValuesForecastextreme.push(forecastTop10[i].HS_VALUE)
+          this.arrValuesForecastextreme.push(forecastTop10[i].value.HS_VALUE)
         }
 
-        var bar = this.initbar()
-        this.loadbar(bar, arrKeysForecastextreme, arrValuesForecastextreme)
+        // var bar = this.initbar()
+        // this.loadbar(bar, this.arrKeysForecastextreme, this.arrValuesForecastextreme)
       }
+      // 传递给子组件
+      this.$refs.rightBar.load(this.arrKeysForecastextreme, this.arrValuesForecastextreme)
     },
+
     // 加载右侧的柱状图top15
-    loadbar: function (bar, keys_arr, values_arr) {
-      let option_mybar = {
-        title: {
-          text: '波浪72小时预报',
-          subtext: '测试数据',
-          textStyle: {
-            fontWeight: 'bolder',
-            color: '#FFFFFF'
-          }
-        },
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'shadow'
-          }
-        },
-        legend: {
-          data: ['波浪']
-        },
-        grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
-          containLabel: true
-        },
-        xAxis: {
-          type: 'value',
-          boundaryGap: [0, 0.01],
-          axisLabel: {
-            interval: 0,
-            textStyle: {
-              color: '#ddd'
-            }
-          },
-          axisLine: {
-            show: false,
-            lineStyle: {
-              color: '#ddd'
-            }
-          },
-          splitLine: {
-            show: false // 不显示网格线
-          }
-        },
-        yAxis: {
-          type: 'category',
-          splitLine: {
-            show: false // 不显示网格线
-          },
-          axisLabel: {
-            interval: 0,
-            textStyle: {
-              color: '#FFFFFF',
-              fontWeight: 'bold'
-            }
-          },
-          data: keys_arr
-        },
-        series: [
-          {
-            name: '波浪',
-            type: 'bar',
-            data: values_arr,
-            itemStyle: {
-          // 通常情况下：
-              normal: {
-            //	color: '#EEC900'
-            // 每个柱子的颜色即为colorList数组里的每一项，如果柱子数目多于colorList的长度，则柱子颜色循环使用该数组
-                color: function (params) {
-                  var mycolor = this.getColorbar(params.data)
+  //   loadbar: function (bar, keys_arr, values_arr) {
+  //     let option_mybar = {
+  //       title: {
+  //         text: '波浪72小时预报',
+  //         subtext: '测试数据',
+  //         textStyle: {
+  //           fontWeight: 'bolder',
+  //           color: '#FFFFFF'
+  //         }
+  //       },
+  //       tooltip: {
+  //         trigger: 'axis',
+  //         axisPointer: {
+  //           type: 'shadow'
+  //         }
+  //       },
+  //       legend: {
+  //         data: ['波浪']
+  //       },
+  //       grid: {
+  //         left: '3%',
+  //         right: '4%',
+  //         bottom: '3%',
+  //         containLabel: true
+  //       },
+  //       xAxis: {
+  //         type: 'value',
+  //         boundaryGap: [0, 0.01],
+  //         axisLabel: {
+  //           interval: 0,
+  //           textStyle: {
+  //             color: '#ddd'
+  //           }
+  //         },
+  //         axisLine: {
+  //           show: false,
+  //           lineStyle: {
+  //             color: '#ddd'
+  //           }
+  //         },
+  //         splitLine: {
+  //           show: false // 不显示网格线
+  //         }
+  //       },
+  //       yAxis: {
+  //         type: 'category',
+  //         splitLine: {
+  //           show: false // 不显示网格线
+  //         },
+  //         axisLabel: {
+  //           interval: 0,
+  //           textStyle: {
+  //             color: '#FFFFFF',
+  //             fontWeight: 'bold'
+  //           }
+  //         },
+  //         data: keys_arr
+  //       },
+  //       series: [
+  //         {
+  //           name: '波浪',
+  //           type: 'bar',
+  //           data: values_arr,
+  //           itemStyle: {
+  //         // 通常情况下：
+  //             normal: {
+  //           //	color: '#EEC900'
+  //           // 每个柱子的颜色即为colorList数组里的每一项，如果柱子数目多于colorList的长度，则柱子颜色循环使用该数组
+  //               color: function (params) {
+  //                 var mycolor = this.getColorbar(params.data)
 
-                  return mycolor
-                }
-              },
-          // 鼠标悬停时：
-              emphasis: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
-              }
-            }
-          }
-        ]
-      }
-  // 为echarts对象加载数据
-      bar.setOption(option_mybar)
-    },
+  //                 return mycolor
+  //               }
+  //             },
+  //         // 鼠标悬停时：
+  //             emphasis: {
+  //               shadowBlur: 10,
+  //               shadowOffsetX: 0,
+  //               shadowColor: 'rgba(0, 0, 0, 0.5)'
+  //             }
+  //           }
+  //         }
+  //       ]
+  //     }
+  // // 为echarts对象加载数据
+  //     bar.setOption(option_mybar)
+  //   },
 
-    initbar: function () {
-      var myBar = echarts.init(document.getElementById('mybar'))
-      return myBar
-    },
+  //   initbar: function () {
+  //     var myBar = echarts.init(document.getElementById('mybar'))
+  //     return myBar
+  //   },
     // addshp: function (shpPath, dict_area, isremoveLay) {
     //   let shapeLayer = null
     // // 为当天地图添加图层
@@ -778,5 +797,6 @@ export default {
   top: 188px;
   bottom: 0px;
   width: 100%;
+  overflow: hidden;
 }
 </style>

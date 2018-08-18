@@ -91,3 +91,21 @@ export const loadTargetAreaMaxData = (date, area) => {
     return result
   }
 }
+
+/*
+			 * 根据设定好的色带根据传入的值返回对应的rgb颜色的值
+			 */
+export const getColorbar = (value) => {
+  // 根据传入的数值（int类型），判断其所属的区件并获取区件的颜色
+  var valueColor = ''
+  if (value >= 2 && value < 4) {
+    valueColor = 'rgb(0,0,255)'
+  } else if (value >= 4 && value < 8) {
+    valueColor = 'rgb(255,242,0)'
+  } else if (value >= 8 && value < 12) {
+    valueColor = 'rgb(255,127,19)'
+  } else if (value >= 12) {
+    valueColor = 'rgb(255,0,0)'
+  }
+  return valueColor
+}

@@ -97,7 +97,7 @@ export function compareForecast (prop) {
 // 将字典转为arr
 export function dic2arr (dict) {
   var arr = []
-  for (temp in dict) {
+  for (var temp in dict) {
     arr.push({
       code: temp,
       value: dict[temp]

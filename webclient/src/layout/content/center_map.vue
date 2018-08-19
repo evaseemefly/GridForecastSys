@@ -10,9 +10,6 @@
           </div>
         </div>
         <div class="leaflet-top leaflet-right">
-          <!--<div class="info leaflet-control">
-                            <h4>网格概述</h4>未选择网格
-                        </div>-->
         </div>
         <div class="leaflet-bottom leaflet-left"></div>
         <div class="leaflet-bottom leaflet-right">
@@ -27,9 +24,6 @@
             <br>
           </div>
           <div class="leaflet-control-attribution leaflet-control">
-            <!--<a href="http://leafletjs.com/" title="A JS library for interactive maps">Leaflet</a> | Map data ©
-                            <a href="http://openstreetmap.org/">OpenStreetMap</a> contributors,
-                            <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery ©-->
             <a href="http://nmefc.com/">nmefc</a>版权所有 ©
             <a href="http://nmefc.com/">nmefc&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
           </div>
@@ -45,7 +39,6 @@
 </template>
 
 <script>
-
 // import '../../components/js/map/leaflet'
 // import '../../components/js/map/shp.js'
 // import '../../components/js/map/leaflet.shpfile'
@@ -85,9 +78,7 @@ import {
   CreateStationIcon
 } from '../../components/js/map/storm'
 
-import {
-  getColorbar
-  } from '../api/api'
+import { getColorbar } from '../api/api'
 
 import {
   addshp,
@@ -97,7 +88,7 @@ import {
   compareForecast
 } from '../../components/js/map/grid'
 
-import {getDateStr} from '../api/moment_api'
+import { getDateStr } from '../api/moment_api'
 // import maptiles from "../../components/js/map/maptiles"
 import rightBar from './right_bar.vue'
 
@@ -344,102 +335,105 @@ export default {
         // this.loadbar(bar, this.arrKeysForecastextreme, this.arrValuesForecastextreme)
       }
       // 传递给子组件
-      this.$refs.rightBar.load(this.arrKeysForecastextreme, this.arrValuesForecastextreme)
+      this.$refs.rightBar.load(
+        this.arrKeysForecastextreme,
+        this.arrValuesForecastextreme
+      )
     },
 
     // 加载右侧的柱状图top15
-  //   loadbar: function (bar, keys_arr, values_arr) {
-  //     let option_mybar = {
-  //       title: {
-  //         text: '波浪72小时预报',
-  //         subtext: '测试数据',
-  //         textStyle: {
-  //           fontWeight: 'bolder',
-  //           color: '#FFFFFF'
-  //         }
-  //       },
-  //       tooltip: {
-  //         trigger: 'axis',
-  //         axisPointer: {
-  //           type: 'shadow'
-  //         }
-  //       },
-  //       legend: {
-  //         data: ['波浪']
-  //       },
-  //       grid: {
-  //         left: '3%',
-  //         right: '4%',
-  //         bottom: '3%',
-  //         containLabel: true
-  //       },
-  //       xAxis: {
-  //         type: 'value',
-  //         boundaryGap: [0, 0.01],
-  //         axisLabel: {
-  //           interval: 0,
-  //           textStyle: {
-  //             color: '#ddd'
-  //           }
-  //         },
-  //         axisLine: {
-  //           show: false,
-  //           lineStyle: {
-  //             color: '#ddd'
-  //           }
-  //         },
-  //         splitLine: {
-  //           show: false // 不显示网格线
-  //         }
-  //       },
-  //       yAxis: {
-  //         type: 'category',
-  //         splitLine: {
-  //           show: false // 不显示网格线
-  //         },
-  //         axisLabel: {
-  //           interval: 0,
-  //           textStyle: {
-  //             color: '#FFFFFF',
-  //             fontWeight: 'bold'
-  //           }
-  //         },
-  //         data: keys_arr
-  //       },
-  //       series: [
-  //         {
-  //           name: '波浪',
-  //           type: 'bar',
-  //           data: values_arr,
-  //           itemStyle: {
-  //         // 通常情况下：
-  //             normal: {
-  //           //	color: '#EEC900'
-  //           // 每个柱子的颜色即为colorList数组里的每一项，如果柱子数目多于colorList的长度，则柱子颜色循环使用该数组
-  //               color: function (params) {
-  //                 var mycolor = this.getColorbar(params.data)
+    //   loadbar: function (bar, keys_arr, values_arr) {
+    //     let option_mybar = {
+    //       title: {
+    //         text: '波浪72小时预报',
+    //         subtext: '测试数据',
+    //         textStyle: {
+    //           fontWeight: 'bolder',
+    //           color: '#FFFFFF'
+    //         }
+    //       },
+    //       tooltip: {
+    //         trigger: 'axis',
+    //         axisPointer: {
+    //           type: 'shadow'
+    //         }
+    //       },
+    //       legend: {
+    //         data: ['波浪']
+    //       },
+    //       grid: {
+    //         left: '3%',
+    //         right: '4%',
+    //         bottom: '3%',
+    //         containLabel: true
+    //       },
+    //       xAxis: {
+    //         type: 'value',
+    //         boundaryGap: [0, 0.01],
+    //         axisLabel: {
+    //           interval: 0,
+    //           textStyle: {
+    //             color: '#ddd'
+    //           }
+    //         },
+    //         axisLine: {
+    //           show: false,
+    //           lineStyle: {
+    //             color: '#ddd'
+    //           }
+    //         },
+    //         splitLine: {
+    //           show: false // 不显示网格线
+    //         }
+    //       },
+    //       yAxis: {
+    //         type: 'category',
+    //         splitLine: {
+    //           show: false // 不显示网格线
+    //         },
+    //         axisLabel: {
+    //           interval: 0,
+    //           textStyle: {
+    //             color: '#FFFFFF',
+    //             fontWeight: 'bold'
+    //           }
+    //         },
+    //         data: keys_arr
+    //       },
+    //       series: [
+    //         {
+    //           name: '波浪',
+    //           type: 'bar',
+    //           data: values_arr,
+    //           itemStyle: {
+    //         // 通常情况下：
+    //             normal: {
+    //           //	color: '#EEC900'
+    //           // 每个柱子的颜色即为colorList数组里的每一项，如果柱子数目多于colorList的长度，则柱子颜色循环使用该数组
+    //               color: function (params) {
+    //                 var mycolor = this.getColorbar(params.data)
 
-  //                 return mycolor
-  //               }
-  //             },
-  //         // 鼠标悬停时：
-  //             emphasis: {
-  //               shadowBlur: 10,
-  //               shadowOffsetX: 0,
-  //               shadowColor: 'rgba(0, 0, 0, 0.5)'
-  //             }
-  //           }
-  //         }
-  //       ]
-  //     }
-  // // 为echarts对象加载数据
-  //     bar.setOption(option_mybar)
-  //   },
+    //                 return mycolor
+    //               }
+    //             },
+    //         // 鼠标悬停时：
+    //             emphasis: {
+    //               shadowBlur: 10,
+    //               shadowOffsetX: 0,
+    //               shadowColor: 'rgba(0, 0, 0, 0.5)'
+    //             }
+    //           }
+    //         }
+    //       ]
+    //     }
+    // // 为echarts对象加载数据
+    //     bar.setOption(option_mybar)
+    //   },
 
-  //   initbar: function () {
-  //     var myBar = echarts.init(document.getElementById('mybar'))
-  //     return myBar
-  //   },
+    //   initbar: function () {
+    //     var myBar = echarts.init(document.getElementById('mybar'))
+    //     return myBar
+    //   },
     // addshp: function (shpPath, dict_area, isremoveLay) {
     //   let shapeLayer = null
     // // 为当天地图添加图层
@@ -470,36 +464,35 @@ export default {
     // },
     fillarea: function (area) {
       var date = new Date()
-            // var date_str=getDateStr();
+      // var date_str=getDateStr();
       var dictArea = null
       var newLayer = null
       let staticUrl = '../../../static/files/'
       switch (area) {
-
-                // 北海
+        // 北海
         case 'n':
           // dictArea = loadAreaMaxData_byDate(date, area)
           dictArea = loadAreaMaxDataByDate(date, area)
-                    // 缩放并定位到指定海区
+          // 缩放并定位到指定海区
           this.mymap.setView([38.3, 123], 7)
 
           newLayer = this.addshp(`${staticUrl}north.zip`, dictArea, true)
           break
-                // 东海
+        // 东海
         case 'e':
           dictArea = loadAreaMaxDataByDate(date, area)
           this.mymap.setView([28.6, 125.35], 6)
 
           newLayer = this.addshp(`${staticUrl}east.zip`, dictArea, true)
           break
-                // 南海
+        // 南海
         case 's':
           dictArea = loadAreaMaxDataByDate(date, area)
           this.mymap.setView([20.2, 113.04], 7)
 
           newLayer = this.addshp(`${staticUrl}south.zip`, dictArea, true)
           break
-                // 全国
+        // 全国
         case 'a':
           dictArea = loadAreaMaxDataByDate(date, area)
           this.addshp(`${staticUrl}north.zip`, dictArea, false)
@@ -573,7 +566,7 @@ export default {
                 val.Surge_DATE,
                 val.Tide_VALUE,
                 val.Tide_DATE
-            )
+              )
               myself.stormObjArr.push(obj)
             }
           })
@@ -589,31 +582,31 @@ export default {
     addDiv2Marker (stormObj) {
       let myself = this
       L.marker([stormObj.lat, stormObj.lon])
-      .addTo(myself.mymap)
-      .bindPopup('')
+        .addTo(myself.mymap)
+        .bindPopup('')
 
       let obj1 = new CreateStationIcon(
-    stormObj.name,
-    stormObj.surge_val,
-    stormObj.surge_dt,
-    stormObj.tide_val,
-    stormObj.tide_dt
+        stormObj.name,
+        stormObj.surge_val,
+        stormObj.surge_dt,
+        stormObj.tide_val,
+        stormObj.tide_dt
       )
 
       let busIcon1 = L.divIcon({
         className: 'icon_default',
         html: obj1.toStr(),
-    // 坐标，[相对于原点的水平位置（左加右减），相对原点的垂直位置（上加下减）]
+        // 坐标，[相对于原点的水平位置（左加右减），相对原点的垂直位置（上加下减）]
         iconAnchor: [-20, 30]
       })
 
-  // 秀英
+      // 秀英
       L.marker([stormObj.lat, stormObj.lon], {
         icon: busIcon1
       }).addTo(myself.mymap)
     },
     infoInit: function () {
-    // 右上角的消息显示区域初始化
+      // 右上角的消息显示区域初始化
       let myself = this
       this.info = L.control()
       this.info.onAdd = function (map) {
@@ -623,18 +616,18 @@ export default {
         this.update()
         return this._div
       }
-        // method that we will use to update the control based on feature properties passed
+      // method that we will use to update the control based on feature properties passed
       this.info.update = function (props) {
-            // 此处使用了三元表达式
-            /*
+        // 此处使用了三元表达式
+        /*
               由于使用了vue，此处的this应该为info
             */
         // myself.info._div.innerHTML = '<h4>网格概述</h4>' + (props
         //         ? '<b>网格编号：</b><br />' + props.Code
         //         : '未选中')
-        this._div.innerHTML = '<h4>网格概述</h4>' + (props
-                ? '<b>网格编号：</b><br />' + props.Code
-                : '未选中')
+        this._div.innerHTML =
+          '<h4>网格概述</h4>' +
+          (props ? '<b>网格编号：</b><br />' + props.Code : '未选中')
       }
       this.info.addTo(myself.mymap)
     },
@@ -729,7 +722,7 @@ export default {
   },
 
   watch: {
-    '$route' (to, from) {
+    $route (to, from) {
       // 当每次路由发生变化时，route会发生变化
       console.log(`to:${to},from:${from}`)
       console.log(`${to.params}`)
@@ -747,7 +740,6 @@ export default {
           break
       }
     }
-
   },
 
   created: function () {

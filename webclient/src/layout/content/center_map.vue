@@ -100,7 +100,9 @@ export default {
       stationDict: {},
       stormArr: {},
       stormObjArr: [],
+      // 海洋站的marker数组
       stormMarkerArr: [],
+      // 海洋站的IconDiv数组
       stormIconDivArr: [],
       forecastArr: [],
       // info: null,
@@ -120,6 +122,12 @@ export default {
     rightBar
   },
   methods: {
+    // 清除所有的底图
+    clear: function () {
+      this.clearLayer()
+      this.clearDivIcon()
+    },
+    // 清除grid的layer底图
     clearLayer: function () {
       var myself = this
       // 1 清除沿海基础网格底图
@@ -131,9 +139,12 @@ export default {
         myself.mymap.removeLayer(myself.my_shp_layer)
       }
     },
+
+    // 清除IconDiv以及Marker
     clearDivIcon: function () {
       var myself = this
       // myself.mymap.clearLayers()
+      // 注意清除时，需要分别清除marker与IconDiv
       $.each(myself.stormIconDivArr, function (index, val) {
         myself.mymap.removeLayer(val)
       })
@@ -600,13 +611,16 @@ data是读取的geoJson数据
       })
     },
 
+    // 创建海洋站的潮位数据的div显示框
     addDiv2Marker (stormObj) {
       let myself = this
+      // 1 添加marker至map
       var tempMarker = L.marker([stormObj.lat, stormObj.lon])
-
       tempMarker.addTo(myself.mymap)
         .bindPopup('')
       myself.stormMarkerArr.push(tempMarker)
+
+      // 2 创建Icon至map
       let obj1 = new CreateStationIcon(
         stormObj.name,
         stormObj.surge_val,
@@ -614,23 +628,20 @@ data是读取的geoJson数据
         stormObj.tide_val,
         stormObj.tide_dt
       )
-
       let busIcon1 = L.divIcon({
         className: 'icon_default',
         html: obj1.toStr(),
         // 坐标，[相对于原点的水平位置（左加右减），相对原点的垂直位置（上加下减）]
         iconAnchor: [-20, 30]
       })
-
       // 秀英
       var tempDivIcon = L.marker([stormObj.lat, stormObj.lon], {
         icon: busIcon1
       })
 
-      // 将当前divIcon存起来
-      myself.stormIconDivArr.push(tempDivIcon)
-
       tempDivIcon.addTo(myself.mymap)
+       // 将当前divIcon存起来
+      myself.stormIconDivArr.push(tempDivIcon)
     },
     infoInit: function () {
       // 右上角的消息显示区域初始化

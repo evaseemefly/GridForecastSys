@@ -29,11 +29,11 @@
           </div>
         </div>
       </div>
-      
+
     </div>
     <!-- 由下边的rightBar组件替代 -->
-      <!-- <div id="mybar" style="height:400px"></div> -->
-      
+    <!-- <div id="mybar" style="height:400px"></div> -->
+
     <rightBar ref="rightBar" :arrValuesForecastextreme="arrValuesForecastextreme" :arrKeysForecastextreme="arrKeysForecastextreme"></rightBar>
   </div>
 </template>
@@ -95,11 +95,13 @@ import rightBar from './right_bar.vue'
 export default {
   data () {
     return {
-      // forecast_dict:[],
+      // forecastDict:[],
       stationArr: [],
       stationDict: {},
       stormArr: {},
       stormObjArr: [],
+      stormMarkerArr: [],
+      stormIconDivArr: [],
       forecastArr: [],
       // info: null,
       my_shp_layer_arr: [],
@@ -120,33 +122,48 @@ export default {
   methods: {
     clearLayer: function () {
       var myself = this
+      // 1 清除沿海基础网格底图
       $.each(myself.my_shp_layer_arr, function (index, value) {
         myself.mymap.removeLayer(value)
       })
       myself.my_shp_layer_arr = []
-      myself.mymap.removeLayer(myself.my_shp_layer)
+      if (myself.my_shp_layer != null) {
+        myself.mymap.removeLayer(myself.my_shp_layer)
+      }
+    },
+    clearDivIcon: function () {
+      var myself = this
+      // myself.mymap.clearLayers()
+      $.each(myself.stormIconDivArr, function (index, val) {
+        myself.mymap.removeLayer(val)
+      })
+      $.each(myself.stormMarkerArr, function (index, val) {
+        myself.mymap.removeLayer(val)
+      })
+      // 2 清除海洋站信息
+      myself.stormObjArr = []
     },
 
     // grid.js中的代码移至此处
     random_forecast: function (key, count, max) {
-      var forecast_dict = {}
+      var forecastDict = {}
       for (var i = 0; i < count; i++) {
-        var dict_key = key
+        var dictKey = key
         if (i < 10) {
-          dict_key += '0' + i
+          dictKey += '0' + i
         } else {
-          dict_key += i
+          dictKey += i
         }
 
-        //						forecast_dict_test[dict_key] = parseInt(Math.random() * max, 10) + 1;
-        forecast_dict[dict_key] = parseInt(Math.random() * max, 10) + 1
+        // forecastDict_test[dictKey] = parseInt(Math.random() * max, 10) + 1;
+        forecastDict[dictKey] = parseInt(Math.random() * max, 10) + 1
       }
-      return forecast_dict
+      return forecastDict
     },
 
     /*
-			 * 根据设定好的色带根据传入的值返回对应的rgb颜色的值
-			 */
+根据设定好的色带根据传入的值返回对应的rgb颜色的值
+    */
 
     // getColorbar: function (value) {
     //   // 根据传入的数值（int类型），判断其所属的区件并获取区件的颜色
@@ -164,10 +181,11 @@ export default {
     // },
 
     addShape: function (dict, data, feature, layer, map) {
-      /* 叠加shp文件，以geoJson的方式读取
-			 * data是读取的geoJson数据
-			 * 此处已重新修改 2018-08-06
-       */
+      /*
+data是读取的geoJson数据
+此处已重新修改 2018-08-06
+      */
+
       // 注意此处需要注意判断在featrues_arr中是否已经存在了指定的值（若存在则不添加）
       let myself = this
       $.each(data.features, function (index, obj) {
@@ -516,6 +534,9 @@ export default {
             风暴潮及增水的极值数据（stormData）
             所以此处先只执行zoom操作
       */
+      let par = { targetdate: '20180807' }
+      getStormData(par)
+      this.loadStormLayer()
       this.zoomView(code)
     },
     loadStationInfo: function () {
@@ -581,10 +602,11 @@ export default {
 
     addDiv2Marker (stormObj) {
       let myself = this
-      L.marker([stormObj.lat, stormObj.lon])
-        .addTo(myself.mymap)
-        .bindPopup('')
+      var tempMarker = L.marker([stormObj.lat, stormObj.lon])
 
+      tempMarker.addTo(myself.mymap)
+        .bindPopup('')
+      myself.stormMarkerArr.push(tempMarker)
       let obj1 = new CreateStationIcon(
         stormObj.name,
         stormObj.surge_val,
@@ -601,9 +623,14 @@ export default {
       })
 
       // 秀英
-      L.marker([stormObj.lat, stormObj.lon], {
+      var tempDivIcon = L.marker([stormObj.lat, stormObj.lon], {
         icon: busIcon1
-      }).addTo(myself.mymap)
+      })
+
+      // 将当前divIcon存起来
+      myself.stormIconDivArr.push(tempDivIcon)
+
+      tempDivIcon.addTo(myself.mymap)
     },
     infoInit: function () {
       // 右上角的消息显示区域初始化
@@ -681,8 +708,8 @@ export default {
           rectangleMeasure.rectangle.addTo(rectangleMeasure.layer)
 
           var northWestPoint = rectangleMeasure.rectangle
-              .getBounds()
-              .getNorthWest(),
+            .getBounds()
+            .getNorthWest(),
             southEastPoint = rectangleMeasure.rectangle
               .getBounds()
               .getSouthEast()
@@ -726,17 +753,27 @@ export default {
       // 当每次路由发生变化时，route会发生变化
       console.log(`to:${to},from:${from}`)
       console.log(`${to.params}`)
-      // 执行加载风暴潮的相关操作
+      // 执行加载 风暴潮/站点 的相关操作
+      // 在加载之前，需要先清除当前的图层
       // 此处需要判断要执行的加载内容
       let category = to.params.category
       switch (category) {
         case 'storm':
           console.log('storm')
+          this.clearLayer()
+          this.clearDivIcon()
           this.fillStorm(to.params.code)
           break
         case 'grid':
           console.log('grid')
+          this.clearLayer()
+          this.clearDivIcon()
           this.fillGrid(to.params.code)
+          break
+        case 'all':
+          // 不用清除图层，加载全部图层
+          console.log('all')
+          // 待补充相应的操作
           break
       }
     }
@@ -756,9 +793,7 @@ export default {
     this.zoomView(code)
     // 对info初始化
     this.infoInit()
-    let par = { targetdate: '20180807' }
-    getStormData(par)
-    this.loadStormLayer()
+
     // .then(function (res) {
     //   console.log(res)
     // })

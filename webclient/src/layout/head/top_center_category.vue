@@ -53,13 +53,13 @@
         }
       },
       watch: {
-        mylayer: function (new_data, old_data) {
+        mylayer: function (newData, oldData) {
           var self = this
-          this.selected = this.findTarget(new_data)
+          this.selected = this.findTarget(newData)
         },
-        selected: function (new_val, old_val) {
-          console.log(new_val)
-          bus.$emit('on-area', new_val)
+        selected: function (newVal, oldVal) {
+          console.log(newVal)
+          bus.$emit('on-area', newVal)
         }
       },
       methods: {
@@ -75,10 +75,10 @@
           this.selected = item
         },
         findTarget: function (value) {
-          var myself = this
+        //   var myself = this
             // 根据当前的code找到items中的obj
-          var target_obj = this.items.find((obj) => (obj.code == value))
-          return target_obj
+          var targetObj = this.items.find((obj) => (obj.code === value))
+          return targetObj
         }
       },
       mounted: function () {

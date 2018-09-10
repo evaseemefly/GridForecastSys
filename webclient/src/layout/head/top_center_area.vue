@@ -117,6 +117,11 @@ export default {
       // 当切换预报种类是，切换区域
       console.log('由区域组件传过来的值为' + msg.code + ':' + msg.message)
       this.selected_category = msg.code
+
+      // 2018-09-10
+      // 在此处执行清除当前底图的操作
+      // 例如当前为网格，切换为站点，则清除网格的底图
+      // 清除底图的操作不写在此处了，写在center_map组件的route中
     })
   }
 }

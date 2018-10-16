@@ -140,7 +140,7 @@ export default {
       }
     },
 
-    // 清除IconDiv以及Marker
+    // 清除storm 的 IconDiv以及Marker
     clearDivIcon: function () {
       var myself = this
       // myself.mymap.clearLayers()
@@ -153,6 +153,10 @@ export default {
       })
       // 2 清除海洋站信息
       myself.stormObjArr = []
+
+      // 3 从mapper中清除后，还需要清空两个arr
+      myself.stormIconDivArr = []
+      myself.stormMarkerArr = []
     },
 
     // grid.js中的代码移至此处
@@ -247,6 +251,7 @@ data是读取的geoJson数据
         click: myself.zoomToFeature
       })
     },
+    // 加载网格化的shp格式文件
     addshp: function (shpPath, dictArea, isremoveLay) {
       var shapeLayer = null
       var myself = this
@@ -370,127 +375,6 @@ data是读取的geoJson数据
       )
     },
 
-    // 加载右侧的柱状图top15
-    //   loadbar: function (bar, keys_arr, values_arr) {
-    //     let option_mybar = {
-    //       title: {
-    //         text: '波浪72小时预报',
-    //         subtext: '测试数据',
-    //         textStyle: {
-    //           fontWeight: 'bolder',
-    //           color: '#FFFFFF'
-    //         }
-    //       },
-    //       tooltip: {
-    //         trigger: 'axis',
-    //         axisPointer: {
-    //           type: 'shadow'
-    //         }
-    //       },
-    //       legend: {
-    //         data: ['波浪']
-    //       },
-    //       grid: {
-    //         left: '3%',
-    //         right: '4%',
-    //         bottom: '3%',
-    //         containLabel: true
-    //       },
-    //       xAxis: {
-    //         type: 'value',
-    //         boundaryGap: [0, 0.01],
-    //         axisLabel: {
-    //           interval: 0,
-    //           textStyle: {
-    //             color: '#ddd'
-    //           }
-    //         },
-    //         axisLine: {
-    //           show: false,
-    //           lineStyle: {
-    //             color: '#ddd'
-    //           }
-    //         },
-    //         splitLine: {
-    //           show: false // 不显示网格线
-    //         }
-    //       },
-    //       yAxis: {
-    //         type: 'category',
-    //         splitLine: {
-    //           show: false // 不显示网格线
-    //         },
-    //         axisLabel: {
-    //           interval: 0,
-    //           textStyle: {
-    //             color: '#FFFFFF',
-    //             fontWeight: 'bold'
-    //           }
-    //         },
-    //         data: keys_arr
-    //       },
-    //       series: [
-    //         {
-    //           name: '波浪',
-    //           type: 'bar',
-    //           data: values_arr,
-    //           itemStyle: {
-    //         // 通常情况下：
-    //             normal: {
-    //           //	color: '#EEC900'
-    //           // 每个柱子的颜色即为colorList数组里的每一项，如果柱子数目多于colorList的长度，则柱子颜色循环使用该数组
-    //               color: function (params) {
-    //                 var mycolor = this.getColorbar(params.data)
-
-    //                 return mycolor
-    //               }
-    //             },
-    //         // 鼠标悬停时：
-    //             emphasis: {
-    //               shadowBlur: 10,
-    //               shadowOffsetX: 0,
-    //               shadowColor: 'rgba(0, 0, 0, 0.5)'
-    //             }
-    //           }
-    //         }
-    //       ]
-    //     }
-    // // 为echarts对象加载数据
-    //     bar.setOption(option_mybar)
-    //   },
-
-    //   initbar: function () {
-    //     var myBar = echarts.init(document.getElementById('mybar'))
-    //     return myBar
-    //   },
-    // addshp: function (shpPath, dict_area, isremoveLay) {
-    //   let shapeLayer = null
-    // // 为当天地图添加图层
-    // // 注意此处then是异步的，所以无法返回shape_layer;
-    //   shp(shpPath).then(function (tempGeojson) {
-    //     // geojson = temp_geojson
-    //     // do something with your geojson
-    //     // 当前图层不为空且删除图层的标记符为true都满足时，才清空当前图层
-    //     if (my_shp_layer != null & isremoveLay) {
-    //       $.each(my_shp_layer_arr, function (index, value) {
-    //         mymap.removeLayer(value)
-    //       })
-    //       my_shp_layer_arr = []
-    //       mymap.removeLayer(my_shp_layer)
-    //     }
-    //     var shp_layer = addShape(dict_area, tempGeojson, null, null, mymap)
-
-    //     // geojson = L.geoJson(temp_geojson, {
-    //     //    style: mystyle,
-    //     //    onEachFeature: onEachFeature
-    //     // }).addTo(mymap);
-    //     my_shp_layer = shp_layer
-    //     my_shp_layer_arr.push(shp_layer)
-    //   }).then(function () {
-    //     return shapeLayer
-    //   })
-    //   return shape_layer
-    // },
     fillarea: function (area) {
       var date = new Date()
       // var date_str=getDateStr();
@@ -532,6 +416,7 @@ data是读取的geoJson数据
       return [dictArea, newLayer]
     },
 
+    // 加载风暴潮及增水
     fillStorm: function (code) {
       /*
         新写的方法：
@@ -554,11 +439,12 @@ data是读取的geoJson数据
       let myself = this
       let stationInfo = loadStation()
       stationInfo.then(res => {
-        console.log(res.data)
+        // console.log(res.data)
         myself.stationArr = res.data
       })
     },
 
+    // 加载风暴潮增水图层
     loadStormLayer: function () {
       // 加载风暴潮图层
       var myself = this
@@ -617,7 +503,8 @@ data是读取的geoJson数据
       // 1 添加marker至map
       var tempMarker = L.marker([stormObj.lat, stormObj.lon])
       tempMarker.addTo(myself.mymap)
-        .bindPopup('')
+        // .bindPopup('')
+
       myself.stormMarkerArr.push(tempMarker)
 
       // 2 创建Icon至map
@@ -628,6 +515,27 @@ data是读取的geoJson数据
         stormObj.tide_val,
         stormObj.tide_dt
       )
+
+      // 2018-10-16 为点击marker添加点击事件
+      // 方式2
+      // 此种方式，可以让点击时，获取点击的当前obj
+      // 参考：https://blog.csdn.net/ShangQuan2012/article/details/72723734
+      // https://leafletjs.com/reference-1.2.0.html#evented中的addEventListener
+      // You can optionally specify the context of the listener (object the this keyword will point to)
+      // 您可以选择指定侦听器的上下文（这个关键字将指向）
+      tempMarker.addEventListener('click', function () {
+        console.log(obj1)
+        // 在此处实现弹出modal窗口，并获取预报曲线
+      }, this)
+
+      // 方式1 ：默认方式，只能传递默认的event进来
+      // tempMarker.on('click', (e) => {
+      //   console.log(e)
+      //   console.log(obj)
+
+      //   // alert('被点击了')
+      // }, obj1)
+
       let busIcon1 = L.divIcon({
         className: 'icon_default',
         html: obj1.toStr(),
@@ -759,6 +667,7 @@ data是读取的geoJson数据
     }
   },
 
+  // 监听路由的变化写在watch中，当路由发生变化时，判断传入的种类是风暴潮还是网格
   watch: {
     $route (to, from) {
       // 当每次路由发生变化时，route会发生变化
@@ -791,11 +700,9 @@ data是读取的geoJson数据
   },
 
   created: function () {
-    console.log('view created')
+    // console.log('view created')
   },
-  // created () {
-  //   console.log('view created')
-  // },
+
   mounted: function () {
     let code = this.$route.params.code
     // 初始化地图引擎
@@ -804,27 +711,6 @@ data是读取的geoJson数据
     this.zoomView(code)
     // 对info初始化
     this.infoInit()
-
-    // .then(function (res) {
-    //   console.log(res)
-    // })
-
-    // alert(get_data);
-    // var myself = this;
-    // this.info = L.control();
-    // info.onAdd = function(map) {
-    //   this._div = L.DomUtil.create("div", "info"); // create a div with a class "info"
-    //   this.update();
-    //   return this._div;
-    // };
-    // info.update = function(props) {
-    //   //此处使用了三元表达式
-    //   this._div.innerHTML =
-    //     "<h4>网格概述</h4>" +
-    //     (props ? "<b>网格编号：</b><br />" + props.Code : "未选中");
-    // };
-    // //此处有个问题
-    // this.info.addTo(myself.mymap);
   }
 }
 </script>

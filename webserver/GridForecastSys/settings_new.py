@@ -29,12 +29,8 @@ SECRET_KEY = 'n7cni@q7m4zbmtsd4z0%t31#czti=_2^^qelkq76p+(5uo3hu1'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# 加入跨域访问允许的端口
 ALLOWED_HOSTS = [
-    'localhost:8015',
-    '127.0.0.1:8015',
-    '127.0.0.1:8000',
-    '127.0.0.1'
+    '*'
 ]
 
 
@@ -44,72 +40,75 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
+
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #跨域的app
-    'corsheaders',
+
     'GridForecast',
     'Station',
     'StormTide',
-
     # django rest framework
     'rest_framework',
+    'corsheaders',
     # 'xadmin',
     'crispy_forms',
-    'reversion',
+    'reversion'
 
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    # 添加cors
-    'corsheaders.middleware.CorsMiddleware',
+
+
     'django.middleware.common.CommonMiddleware',
+
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-#跨域增加忽略
+# 跨域增加忽略
 CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_ALLOW_ALL = True
-# 白名单
-# CORS_ORIGIN_WHITELIST = (
-#     # '*'
-#     'localhost:8015',
-#     '127.0.0.'
-# )
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = (
+    'localhost:8015',
+    '127.0.0.1:8015',
+    '127.0.0.1:8000',
+    ' http://127.0.0.1:8000',
+    ' http://127.0.0.1:8015',
+    'http://localhost:8015',
+    'http://localhost:8000'
+    # '*'
+)
+CORS_ALLOW_METHODS = (
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+    'VIEW',
+)
 
-# CORS_ALLOW_METHODS = (
-#     'DELETE',
-#     'GET',
-#     'OPTIONS',
-#     'PATCH',
-#     'POST',
-#     'PUT',
-#     'VIEW',
-# )
+CORS_ALLOW_HEADERS = (
+    'XMLHttpRequest',
+    'X_FILENAME',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'Pragma',
+)
 
-# CORS_ALLOW_HEADERS = (
-#
-#     'accept',
-#     'accept-encoding',
-#     'authorization',
-#     'XMLHttpRequest',
-#     'X_FILENAME',
-#     'accept-encoding',
-#     'authorization',
-#     'content-type',
-#     'dnt',
-#     'origin',
-#     'user-agent',
-#     'x-csrftoken',
-#     'x-requested-with',
-#     'Pragma',
-# )
+
 
 ROOT_URLCONF = 'GridForecastSys.urls'
 
@@ -145,9 +144,8 @@ DATABASES = {
         # 'USER':'root',
         # 'PASSWORD':'123456',
         #单位台式机
-        # 'USER':'admin',
-        # 'PASSWORD':'admin123',
-        # 'HOST':'127.0.0.1',
+        #'USER':'admin',
+        #'PASSWORD':'admin123',
         # p52s
         'USER':'root',
         'PASSWORD':'123456',

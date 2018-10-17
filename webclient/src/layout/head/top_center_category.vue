@@ -1,6 +1,6 @@
 <template>
     <div id="content" class="col-md-12 mycol_disPadding">
-        <!--中间的导航栏-->        
+        <!--中间的导航栏-->
         <nav class="navbar navbar-default navbar-inverse" style="margin-bottom: 0px;">
             <div class="navbar-header" id="my_navbar">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse">
@@ -11,10 +11,15 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul id="top_nav_ul" class="nav navbar-nav">
                     <li v-for="item in items" :class="{'active':item.code===selected.code}">
-                        <a href="#" v-on:click="seleccategory(item.code,item)">{{item.message}}
+                        <a v-on:click="seleccategory(item.code,item)">{{item.message}}
                             <span class="sr-only">(current)</span>
                         </a>
                     </li>
+                    <!-- <li v-for="item in items" :class="{'active':item.code===selected.code}">
+                        {{item.message}}
+                            <span class="sr-only">(current)</span>
+                        
+                    </li> -->
                 </ul>
                 <form class="navbar-form navbar-left">
                     <div class="form-group">
@@ -28,60 +33,57 @@
 </template>
 
 <script>
+    import bus from '../../assets/eventBus.js'
     export default {
-        data() {
-            return {
-                items: [{
-                        message: '近岸技术单元',
-                        code: 'grid'
-                    },
-                    {
-                        message: '风暴潮及增水',
-                        code: 'storm'
-                    }
-                ],
-                //注意selected是items中的obj
-                selected: null,
-                out_shape_layer: null,
-                mylayer: "",
-            }
-        },
-        watch: {
-            mylayer: function (new_data, old_data) {
-                var self = this;
-                this.selected= this.findTarget(new_data);
-                // self.fillarea(null,new_data);
-                // if (new_data === "grid") {
-                //     this.selected=items
-                //     // loadGridLayer();
-                // } else if (new_data === "storm") {
-                //     var date = new Date();
-                //     // loadStormLayer(date);
-                // }
-            }
-        },
-        methods: {
-            //选择图层
-            selectlayer: function (value, item) {
-                // self.selected=
-                var self = this;
-                this.mylayer = value;
-                console.log(value, item);
-            },
-            seleccategory:function(value,item){
-                // alert(item);
-                this.selected=item;
-            },
-            findTarget:function(value){
-                var myself=this;
-                //根据当前的code找到items中的obj
-                var target_obj= this.items.find((obj)=>(obj.code==value));
-                return target_obj;
-            }
-        },
-        mounted: function () {
-            this.mylayer = 'grid';
+      data () {
+        return {
+          items: [{
+            message: '近岸技术单元',
+            code: 'grid'
+          },
+          {
+            message: '风暴潮及增水',
+            code: 'storm'
+          }
+          ],
+                // 注意selected是items中的obj
+          selected: null,
+          out_shape_layer: null,
+          mylayer: ''
         }
+      },
+      watch: {
+        mylayer: function (newData, oldData) {
+          var self = this
+          this.selected = this.findTarget(newData)
+        },
+        selected: function (newVal, oldVal) {
+          console.log(newVal)
+          bus.$emit('on-area', newVal)
+        }
+      },
+      methods: {
+            // 选择图层
+        selectlayer: function (value, item) {
+                // self.selected=
+          var self = this
+          this.mylayer = value
+          console.log(value, item)
+        },
+        seleccategory: function (value, item) {
+                // alert(item);
+          this.selected = item
+        },
+        findTarget: function (value) {
+        //   var myself = this
+            // 根据当前的code找到items中的obj
+          var targetObj = this.items.find((obj) => (obj.code === value))
+          return targetObj
+        }
+      },
+      mounted: function () {
+        this.mylayer = 'grid'
+      }
     }
 </script>
 

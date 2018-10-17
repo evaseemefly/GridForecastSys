@@ -54,5 +54,9 @@ class StormTideView(APIView):
         return Response(json_data)
 
 
+class MyTideView(APIView):
+    def get(self,request):
+        
+        return Response()
 
 

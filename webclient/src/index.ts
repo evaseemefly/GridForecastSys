@@ -1,7 +1,9 @@
 import Vue from 'vue'
 import App from './app.vue';
 import VueRouter from 'vue-router'
-import Routers from './router/router';
+// import Routers from './router/router';
+// import Routers from './router/router';
+import router from './router/router.ts';
 
 import $ from 'jquery'
 import 'bootstrap/dist/css/bootstrap.css'
@@ -37,13 +39,15 @@ const root=document.createElement("div")
 document.body.appendChild(root)
 
 // 路由配置
-const RouterConfig = {
-    // 使用 HTML5 的 History 路由模式
-    mode: 'history',
-    routes: Routers
-};
+//写在/src/router.ts中
+// const RouterConfig = {
+//     // 使用 HTML5 的 History 路由模式
+//     mode: 'history',
+    
+//     routes: Routers
+// };
 
-const router = new VueRouter(RouterConfig);
+// const router = new VueRouter(RouterConfig);
 
 new Vue({
     //使用箭头语法等同于下面的写法

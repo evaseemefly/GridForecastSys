@@ -1,17 +1,18 @@
 <template>
     <div id="app">
         <topmain></topmain>
+        <router-view></router-view>
         <!-- <centerarea></centerarea> -->
     </div>
 </template>
 
 <script>
-    import topmain from "../head/top_main.vue";
-    import centerarea from "../head/top_center_area.vue";
-    export default {
-        components:{
-            topmain
-        }
+    import topmain from '../head/top_main.vue'
+import centerarea from '../head/top_center_area.vue'
+export default {
+      components: {
+        topmain
+      }
     }
 </script>
 
@@ -33,12 +34,7 @@
         width: 100%;
     }
 
-    #mycontent {
-        position: absolute;
-        top: 53px;
-        bottom: 0px;
-        width: 100%;
-    }
+   
 
     #nav {
         height: 100%;

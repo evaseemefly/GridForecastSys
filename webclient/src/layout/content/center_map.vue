@@ -453,6 +453,21 @@ data是读取的geoJson数据
       console.log(wmsLayer)
       wmsLayer.addTo(myself.mymap)
     },
+
+    //初始化加入监听点击事件
+    InitOnClick: function() {
+      this.mymap.on('click', function(e) {
+        console.log(e)
+        // 获取经纬度对象
+        // var cornerStr=e.latlng.toBounds()
+
+        var latLng= L.latLng(e.latlng.lat,e.latlng.lng)
+        // var corner1=L.latlng(e.latlng.lat,e.latlng.lng)
+
+        // var cornerStr=corner1.toBBoxString()
+        console.log(cornerStr)
+      })
+    },
     loadStationInfo: function() {
       let myself = this
       let stationInfo = loadStation()
@@ -736,6 +751,8 @@ data是读取的geoJson数据
     this.zoomView(code)
     // 对info初始化
     this.infoInit()
+
+    this.InitOnClick()
   }
 }
 </script>

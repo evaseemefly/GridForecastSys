@@ -11,7 +11,11 @@ const store = new Vuex.Store({
     mymap: Object,
     latlng: Object
   },
-  getters: {},
+  getters: {
+    getlatlng: state => {
+      return state.latlng
+    }
+  },
   // 涉及改变数据的
   mutations: {
     clearDivIcon() {

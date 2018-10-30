@@ -37,7 +37,7 @@ export default {
       //需要加载的经纬度
       wms_latlng: null,
       // wms_lng,
-      latlng: this.$store.state.latlng
+      latlng: null
     }
   },
   components: {
@@ -46,10 +46,19 @@ export default {
   },
   computed: {
     ...mapGetters(['getlatlng']),
+
+    //当vuex中的latlng修改后，也修改此处的latlng
     getlatlngTest: function() {
       var myself = this
-      console.log('computed' + myself.$store.state.latlng)
-      return this.$store.state.latlng
+      // 第一次加载时，store.state.latlng中没有lat属性
+      // 此处需要加一个判断
+      if (myself.$store.state.latlng.hasOwnProperty('lat')) {
+        console.log('computed' + myself.$store.state.latlng)
+        this.latlng = this.$store.state.latlng
+        //经纬度改变后加载子组件2（modal）
+      }
+
+      // return this.$store.state.latlng
     }
   },
   methods: {
@@ -131,9 +140,7 @@ export default {
     getlatlng: function(newVal, oldVal) {
       console.log(oldVal, newVal)
     },
-    getlatlngTest: function(val) {
-      
-    }
+    getlatlngTest: function(val) {}
   },
 
   created: function() {
@@ -157,6 +164,7 @@ export default {
     this.$refs.baseMap.clear()
     // 填充数值预报
     this.fillWMS()
+    console.log('view mounted')
   }
 }
 </script>

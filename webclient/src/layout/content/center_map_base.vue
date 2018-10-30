@@ -94,29 +94,20 @@ import rightBar from './right_bar.vue'
 
 export default {
   data() {
-    return {
-      // forecastDict:[],
-      stationArr: [],
-      stationDict: {},
-      stormArr: {},
-      stormObjArr: [],
-      // 海洋站的marker数组
-      stormMarkerArr: [],
-      // 海洋站的IconDiv数组
-      stormIconDivArr: [],
+    return {      
       forecastArr: [],
       // info: null,
       my_shp_layer_arr: [],
-      features_arr: [],
-      mymap: null,
+      // mymap: null,
       my_shp_layer: null,
       info: null,
       geojson: null,
-      // 将forecast_top10字典转成数组的keys
-      arrKeysForecastextreme: [],
-      // 将forecast_top10字典转成数组的values
-      arrValuesForecastextreme: []
+      mymap:this.basemap,
+      latlng:null
     }
+  },
+  props:{
+      basemap: Object,
   },
   components: {
     rightBar
@@ -139,7 +130,6 @@ export default {
         myself.mymap.removeLayer(myself.my_shp_layer)
       }
     },
-
     // 清除storm 的 IconDiv以及Marker
     clearDivIcon: function() {
       var myself = this
@@ -158,165 +148,6 @@ export default {
       myself.stormIconDivArr = []
       myself.stormMarkerArr = []
     },
-
-    // grid.js中的代码移至此处
-    random_forecast: function(key, count, max) {
-      var forecastDict = {}
-      for (var i = 0; i < count; i++) {
-        var dictKey = key
-        if (i < 10) {
-          dictKey += '0' + i
-        } else {
-          dictKey += i
-        }
-
-        // forecastDict_test[dictKey] = parseInt(Math.random() * max, 10) + 1;
-        forecastDict[dictKey] = parseInt(Math.random() * max, 10) + 1
-      }
-      return forecastDict
-    },
-
-    /*
-根据设定好的色带根据传入的值返回对应的rgb颜色的值
-    */
-
-    // getColorbar: function (value) {
-    //   // 根据传入的数值（int类型），判断其所属的区件并获取区件的颜色
-    //   var value_color
-    //   if (value >= 2 && value < 4) {
-    //     value_color = 'rgb(0,0,255)'
-    //   } else if (value >= 4 && value < 8) {
-    //     value_color = 'rgb(255,242,0)'
-    //   } else if (value >= 8 && value < 12) {
-    //     value_color = 'rgb(255,127,19)'
-    //   } else if (value >= 12) {
-    //     value_color = 'rgb(255,0,0)'
-    //   }
-    //   return value_color
-    // },
-
-    addShape: function(dict, data, feature, layer, map) {
-      /*
-data是读取的geoJson数据
-此处已重新修改 2018-08-06
-      */
-
-      // 注意此处需要注意判断在featrues_arr中是否已经存在了指定的值（若存在则不添加）
-      let myself = this
-      $.each(data.features, function(index, obj) {
-        if ($.inArray(obj, myself.features_arr) < 0) {
-          myself.features_arr.push(obj)
-        }
-      })
-      //! !!注意此处添加了shape文件后，由于是读取的geojson，文件，通过L.geoJSON后，需要将返回值赋值给geojson
-      // 此处的temp_geojson与geojson相同
-      // myself.geojson
-      let tempGeoJson = L.geoJSON(data, {
-        style: function(feature) {
-          // 获取到当前的对象的code
-
-          var code = feature.properties.Code
-          // console.log(`color:${code}`)
-          let tempColor = null
-
-          if (dict[code]) {
-            tempColor = getColorbar(dict[code].HS_VALUE)
-          }
-          return {
-            // 注意此处的填充颜色及宽度的api可参见
-            fillColor: tempColor,
-            weight: 2,
-            opacity: 1,
-            color: 'white',
-            dashArray: '3',
-            fillOpacity: 0.7
-          }
-        },
-        // 注意此处必须要将OnEachFeature放在里面才可以
-        onEachFeature: myself.onEachFeature
-      }).bindPopup(function(layer) {
-        return layer.feature.properties.description
-      })
-      // 此处v1版本已经不确定geoJson是否为外侧的geoJson
-      let geoJson = tempGeoJson.addTo(map)
-      // 需要将genJson赋值给全局geojson
-      myself.geojson = geoJson
-      return geoJson
-    },
-    onEachFeature: function(feature, layer) {
-      let myself = this
-      layer.on({
-        mouseover: myself.highlightFeature,
-        mouseout: myself.resetHighlight,
-        click: myself.zoomToFeature
-      })
-    },
-    // 加载网格化的shp格式文件
-    addshp: function(shpPath, dictArea, isremoveLay) {
-      var shapeLayer = null
-      var myself = this
-      // 为当天地图添加图层
-      // 注意此处then是异步的，所以无法返回shape_layer;
-      shp(shpPath)
-        .then(function(tempGeojson) {
-          myself.geojson = tempGeojson
-          // do something with your geojson
-          // 当前图层不为空且删除图层的标记符为true都满足时，才清空当前图层
-          if ((myself.my_shp_layer != null) & isremoveLay) {
-            $.each(myself.my_shp_layer_arr, function(index, value) {
-              myself.mymap.removeLayer(value)
-            })
-            myself.my_shp_layer_arr = []
-            myself.mymap.removeLayer(myself.my_shp_layer)
-          }
-          var shpLayer = myself.addShape(
-            dictArea,
-            tempGeojson,
-            null,
-            null,
-            myself.mymap
-          )
-
-          // geojson = L.geoJson(temp_geojson, {
-          //    style: mystyle,
-          //    onEachFeature: onEachFeature
-          // }).addTo(mymap);
-          myself.my_shp_layer = shpLayer
-          myself.my_shp_layer_arr.push(shpLayer)
-        })
-        .then(function() {
-          return shapeLayer
-        })
-      return shapeLayer
-    },
-    resetHighlight: function(e) {
-      this.geojson.resetStyle(e.target)
-      this.info.update()
-    },
-    highlightFeature: function(e) {
-      var layer = e.target
-
-      layer.setStyle({
-        weight: 5,
-        color: '#666',
-        dashArray: '',
-        fillOpacity: 0.7
-      })
-
-      if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-        layer.bringToFront()
-      }
-
-      this.info.update(layer.feature.properties)
-    },
-
-    readShape: function(file, func) {
-      shp('file').then(function(geojson) {
-        // do something with your geojson
-        func(geojson)
-      })
-    },
-
     mystyle: function(feature) {
       return {
         weight: 2,
@@ -327,54 +158,6 @@ data是读取的geoJson数据
         fillColor: getColor(feature.properties.density)
       }
     },
-
-    // 注意加载页面时，需要执行加载全国的事件
-    fillGrid: function(value, item) {
-      // 此处的item是vm.data中的items
-      //
-      // console.log("执行填充操作：" + value);
-      this.selected = item
-      let textIndex = 1
-      textIndex += 1
-
-      // 将字典转成arr
-      this.arrKeysForecastextreme = []
-      this.arrValuesForecastextreme = []
-      // var arrObjForecastextreme = []
-
-      var info = this.fillarea(value)
-      let dictTarget = info[0]
-      // let outGeoLayer = info[1]
-      // 从当前地图中删除当前海区的layer，前提是当前海区的layer不为null，否则会报错
-      if (dictTarget != null) {
-        var forecastArr = dic2arr(dictTarget)
-        var forecastArrObj = []
-        $.each(forecastArr, function(index, obj) {
-          forecastArrObj.push({
-            code: obj.value.CODE,
-            HS_VALUE: obj.value.HS_VALUE
-          })
-        })
-        this.forecastArr = forecastArrObj.sort(compareForecast('HS_VALUE'))
-        // 从数组中取出前10个值
-        let forecastTop10 = forecastArr.slice(0, 15)
-
-        for (var i = 0; i < forecastTop10.length; i++) {
-          this.arrKeysForecastextreme.push(forecastTop10[i].code)
-
-          this.arrValuesForecastextreme.push(forecastTop10[i].value.HS_VALUE)
-        }
-
-        // var bar = this.initbar()
-        // this.loadbar(bar, this.arrKeysForecastextreme, this.arrValuesForecastextreme)
-      }
-      // 传递给子组件
-      this.$refs.rightBar.load(
-        this.arrKeysForecastextreme,
-        this.arrValuesForecastextreme
-      )
-    },
-
     fillarea: function(area) {
       var date = new Date()
       // var date_str=getDateStr();
@@ -415,27 +198,6 @@ data是读取的geoJson数据
       }
       return [dictArea, newLayer]
     },
-
-    // 加载风暴潮及增水
-    fillStorm: function(code) {
-      /*
-        新写的方法：
-          加载风暴潮及增水的相关操作（入口方法）
-          根据传入的code：
-            1）聚焦到指定海区
-            2）
-          remark：
-            第一次加载该页面时，已经加载了全部的海洋站信息（statinInfo）
-            以及
-            风暴潮及增水的极值数据（stormData）
-            所以此处先只执行zoom操作
-      */
-      let par = { targetdate: '20180807' }
-      getStormData(par)
-      this.loadStormLayer()
-      this.zoomView(code)
-    },
-
     //读取本地的netcdf文件，并加载
     fillWMS: function() {
       var myself = this
@@ -458,138 +220,22 @@ data是读取的geoJson数据
 
     //初始化加入监听点击事件
     InitOnClick: function() {
+      var myself=this
       this.mymap.on('click', function(e) {
-        console.log(e)
+        
         // 获取经纬度对象
         // var cornerStr=e.latlng.toBounds()
 
-        var latLng= L.latLng(e.latlng.lat,e.latlng.lng)
+        var latLng = L.latLng(e.latlng.lat, e.latlng.lng)
         // var corner1=L.latlng(e.latlng.lat,e.latlng.lng)
 
         // var cornerStr=corner1.toBBoxString()
-        console.log(cornerStr)
+        myself.$store.state.latlng=latLng
+        console.log(myself.$store.state.latlng)
+        // console.log(latLng)
       })
     },
-    loadStationInfo: function() {
-      let myself = this
-      let stationInfo = loadStation()
-      stationInfo.then(res => {
-        // console.log(res.data)
-        myself.stationArr = res.data
-      })
-    },
-
-    // 加载风暴潮增水图层
-    loadStormLayer: function() {
-      // 加载风暴潮图层
-      var myself = this
-      // var date = new Date()
-      // 1 加载station info 存入data的stationArr中
-      // this.loadStationInfo()
-      let stationInfo = loadStation()
-      stationInfo.then(res => {
-        console.log(res.data)
-        myself.stationArr = res.data
-
-        $.each(myself.stationArr, function(index, val) {
-          myself.stationDict[val.code] = val
-        })
-
-        // 2 获取返回当日的极值数据
-        let nowDate = new Date()
-        let dateStr = getDateStr(nowDate)
-        // 由于测试，此处的时间暂时改为"20180807"
-        let par = { targetdate: '20180807' }
-        myself.stormArr = getStormData(par).then(res => {
-          myself.stormArr = res.data
-          // 3 生成storm对象
-          $.each(myself.stormArr, function(index, val) {
-            let stationTemp = null
-            if (val.CODE in myself.stationDict) {
-              stationTemp = myself.stationDict[val.CODE]
-            }
-            if (stationTemp != null) {
-              var obj = new StormData(
-                val.CODE,
-                stationTemp.name,
-                stationTemp.Lat,
-                stationTemp.Lon,
-                stationTemp.area,
-                val.Surge_VALUE,
-                val.Surge_DATE,
-                val.Tide_VALUE,
-                val.Tide_DATE
-              )
-              myself.stormObjArr.push(obj)
-            }
-          })
-
-          // 4 加入地图中
-          $.each(myself.stormObjArr, function(index, val) {
-            myself.addDiv2Marker(val)
-          })
-        })
-      })
-    },
-
-    // 创建海洋站的潮位数据的div显示框
-    addDiv2Marker(stormObj) {
-      let myself = this
-      // 1 添加marker至map
-      var tempMarker = L.marker([stormObj.lat, stormObj.lon])
-      tempMarker.addTo(myself.mymap)
-      // .bindPopup('')
-
-      myself.stormMarkerArr.push(tempMarker)
-
-      // 2 创建Icon至map
-      let obj1 = new CreateStationIcon(
-        stormObj.name,
-        stormObj.surge_val,
-        stormObj.surge_dt,
-        stormObj.tide_val,
-        stormObj.tide_dt
-      )
-
-      // 2018-10-16 为点击marker添加点击事件
-      // 方式2
-      // 此种方式，可以让点击时，获取点击的当前obj
-      // 参考：https://blog.csdn.net/ShangQuan2012/article/details/72723734
-      // https://leafletjs.com/reference-1.2.0.html#evented中的addEventListener
-      // You can optionally specify the context of the listener (object the this keyword will point to)
-      // 您可以选择指定侦听器的上下文（这个关键字将指向）
-      tempMarker.addEventListener(
-        'click',
-        function() {
-          console.log(obj1)
-          // 在此处实现弹出modal窗口，并获取预报曲线
-        },
-        this
-      )
-
-      // 方式1 ：默认方式，只能传递默认的event进来
-      // tempMarker.on('click', (e) => {
-      //   console.log(e)
-      //   console.log(obj)
-
-      //   // alert('被点击了')
-      // }, obj1)
-
-      let busIcon1 = L.divIcon({
-        className: 'icon_default',
-        html: obj1.toStr(),
-        // 坐标，[相对于原点的水平位置（左加右减），相对原点的垂直位置（上加下减）]
-        iconAnchor: [-20, 30]
-      })
-      // 秀英
-      var tempDivIcon = L.marker([stormObj.lat, stormObj.lon], {
-        icon: busIcon1
-      })
-
-      tempDivIcon.addTo(myself.mymap)
-      // 将当前divIcon存起来
-      myself.stormIconDivArr.push(tempDivIcon)
-    },
+    
     infoInit: function() {
       // 右上角的消息显示区域初始化
       let myself = this
@@ -632,7 +278,8 @@ data是读取的geoJson数据
           this.mymap.setView([20.2, 113.04], 7)
       }
     },
-
+    
+    // 初始化地图
     initMap: function() {
       var myself = this
       myself.mymap = L.map('basemap').setView([30.09, 127.75], 5)
@@ -703,6 +350,8 @@ data是读取的geoJson数据
           }
         }
       }
+
+      this.$emit('update:basemap',myself.mymap)
     }
   },
 
@@ -747,11 +396,14 @@ data是读取的geoJson数据
           // 待补充相应的操作
           break
       }
+    },
+    mymap(newVal,oldVal){
+      this.$emit('update:basemap',newVal)
     }
   },
 
   created: function() {
-    // console.log('view created')
+    console.log('view created')
   },
 
   mounted: function() {

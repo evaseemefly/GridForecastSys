@@ -45,6 +45,11 @@
             message: '风暴潮及增水',
             code: 'storm'
           }
+          ,
+          {
+            message: '数值预报产品',
+            code: 'forecast'
+          }
           ],
                 // 注意selected是items中的obj
           selected: null,

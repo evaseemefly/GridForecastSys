@@ -4,6 +4,11 @@ import VueRouter from 'vue-router'
 import Routers from './router/router'
 
 import $ from 'jquery'
+
+// 引入vuex
+import Vuex from 'vuex'
+import store from './store/index'
+
 import 'bootstrap/dist/css/bootstrap.css'
 import './components/css/bootstrapExt/table/bootstrap-table.css'
 import './components/css/bootstrapExt/editable/bootstrap-editable.css'
@@ -36,12 +41,13 @@ import './components/css/storm/storm.css'
 Vue.prototype.moment = moment
 Vue.config.devtools = true
 Vue.use(VueRouter)
+// Vue.use(Vuex)
 const root = document.createElement('div')
 document.body.appendChild(root)
 
 // 路由配置
 const RouterConfig = {
-    // 使用 HTML5 的 History 路由模式
+  // 使用 HTML5 的 History 路由模式
   mode: 'history',
   routes: Routers
 }
@@ -49,7 +55,8 @@ const RouterConfig = {
 const router = new VueRouter(RouterConfig)
 
 new Vue({
-    // 使用箭头语法等同于下面的写法
-  render: (h) => h(App),
-  router: router
-}).$mount(root)     // $mount为vue中的手动挂载
+  // 使用箭头语法等同于下面的写法
+  render: h => h(App),
+  router: router,
+  store: store
+}).$mount(root) // $mount为vue中的手动挂载

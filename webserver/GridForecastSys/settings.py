@@ -209,3 +209,6 @@ STATICFILES_DIRS=[
 AreaNames_DIR=r'D:\git仓库\GridForecastSys\extra_data\grid_data'
 AreaNames_FilesName=['names_S','names_N','names_E']
 AreaNames_Dict={'n':'names_N','e':'names_E','s':'names_S'}
+
+NCReader_DIR=r'/Users/liusihan/Documents/01project/GridForecastSys/extra_data/nc_data'
+

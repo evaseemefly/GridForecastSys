@@ -1,4 +1,3 @@
-
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
@@ -9,26 +8,25 @@ const store = new Vuex.Store({
   state: {
     stormMarkerArr: [],
     stormIconDivArr: [],
-    mymap: Object
+    mymap: Object,
+    latlng: Object
   },
-  getters: {
-
-  },
+  getters: {},
   // 涉及改变数据的
   mutations: {
-    clearDivIcon () {
-      $.each(state.stormIconDivArr, function (index, val) {
+    clearDivIcon() {
+      $.each(state.stormIconDivArr, function(index, val) {
         state.mymap.removeLayer(val)
       })
-      $.each(state.stormMarkerArr, function (index, val) {
+      $.each(state.stormMarkerArr, function(index, val) {
         state.mymap.removeLayer(val)
       })
-          // 2 清除海洋站信息
+      // 2 清除海洋站信息
       state.stormObjArr = []
     },
-    clearLayer () {
-        // 1 清除沿海基础网格底图
-      $.each(state.my_shp_layer_arr, function (index, value) {
+    clearLayer() {
+      // 1 清除沿海基础网格底图
+      $.each(state.my_shp_layer_arr, function(index, value) {
         state.mymap.removeLayer(value)
       })
       state.my_shp_layer_arr = []
@@ -38,7 +36,7 @@ const store = new Vuex.Store({
     }
   },
   // 涉及业务逻辑的，以及异步操作
-  actions: {
-
-  }
+  actions: {}
 })
+
+export default store

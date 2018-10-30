@@ -24,15 +24,28 @@
                             {{item.message}}
                                 <span class="sr-only">(current)</span>
                             </router-link> -->
-                            <router-link :to="{name:'content',path:'content',params:{code:item.code,category:selected_category}}"
+                            <!-- 2018-10-29 可用版本 -->
+                            <!-- <router-link :to="{name:'content',path:'content',params:{code:item.code,category:selected_category}}"
+                            @click.native="selectlayer"> {{item.message}}
+                                <span class="sr-only">(current)</span>
+                            </router-link> -->
+
+                          <router-link :to="{name:'forecast',path:'forecast',params:{code:item.code,category:selected_category}}"
                             @click.native="selectlayer"> {{item.message}}
                                 <span class="sr-only">(current)</span>
                             </router-link>
+
                             <!-- 使用router-link的方式实现 -->
                             <!-- <a href="#" v-on:click="selectlayer(item.code,item)">{{item.message}}
                                 <span class="sr-only">(current)</span>
                             </a> -->
                         </li>
+                        <li id="selectmarker">
+                            <select class="selectpicker" data-style="btn-success" title="数值预报产品种类">
+                                <option value="1">西北太</option>
+                                <option value="2">测试</option>
+                            </select>
+								        </li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         <li>
@@ -54,8 +67,10 @@
 
 <script>
 import bus from '../../assets/eventBus.js'
+import '../../components/js/select/bootstrap-select.js'
+import '../../components/css/select/bootstrap-select.css'
 export default {
-  data () {
+  data() {
     return {
       items: [
         {
@@ -75,40 +90,56 @@ export default {
           code: 'a'
         }
       ],
+
       // 注意selected是items中的obj
       selected: null,
       out_shape_layer: null,
       selected_category: '',
+      // route_url: '',
       mylayer: '',
       childUrl: ''
     }
   },
   methods: {
-    selectlayer: function (val) {
-        // 鼠标点击区域操作，点击区域视角拉近到某个区域
-
+    selectlayer: function(val) {
+      // 鼠标点击区域操作，点击区域视角拉近到某个区域
       console.log(val)
     }
   },
   watch: {
-    selected: function (newData, oldData) {
+    selected: function(newData, oldData) {
       // console.log('修改为：' + new_data);
       var myself = this
-    //   this.childUrl = 'content/' + this.selected_category
+      //   this.childUrl = 'content/' + this.selected_category
       // self.fillarea(new_data.code, self.selected);
     },
-    selected_category: function (newData, oldData) {
+    selected_category: function(newData, oldData) {
       var myself = this
       this.childUrl = 'content/' + this.selected_category
     }
   },
-  created: function () {
+  created: function() {
     this.selected = {
       message: '全国',
       code: 'a'
     }
+    $('.selectpicker').selectpicker('val', '1')
+    $('.selectpicker').selectpicker('val')
+    $('.selectpicker').on('changed.bs.select', function(e, index, val) {
+      //思路
+      /*
+						由于获取不到选中的值，只能通过$('.selectpicker').selectpicker('val')取到当前选中的select的val，
+						所以每次点击时，获取当前选中的值
+						并执行其响应操作
+
+					*/
+      // console.log(e);
+      // console.log(index);
+      var select_val = $('.selectpicker').selectpicker('val')
+      console.log(select_val)
+    })
   },
-  mounted: function () {
+  mounted: function() {
     // this.selected = {
     //   message: '全国',
     //   code: 'a'
@@ -128,4 +159,7 @@ export default {
 </script>
 
 <style>
+#selectmarker {
+  margin-top: 5px;
+}
 </style>

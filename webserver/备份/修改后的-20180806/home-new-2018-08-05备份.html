@@ -1,0 +1,917 @@
+{% extends 'shared/_Layout.html' %} {% load staticfiles %} {% block bottom_js %}
+
+    <script type="application/javascript" src="{% static 'js/map/maptiles.js'%}"></script>
+    <script src="http://echarts.baidu.com/build/dist/echarts-all.js"></script>
+    <script type="application/javascript" src="{% static 'js/vue/vue.js'%}"></script>
+    <script type="application/javascript" src="{% static 'js/map/storm.js'%}"></script>
+    <script type="application/javascript" src="{% static 'js/common/stringconvert.js'%}"></script>
+    <script type="application/javascript">
+
+
+        var forecast_dict = new Array();
+        var forecast_dict_test = {};
+
+        var station_arr = [];
+        var station_dict = [];
+        var storm_arr = [];
+        var storm_obj_arr = [];
+
+        function load_targetAreaMaxData(date, area) {
+            if (area != null) {
+                var targetUrl = "/"
+                var url_arr = new Array();
+                url_arr.push("forecast");
+                url_arr.push("daily");
+                url_arr.push(date);
+                url_arr.push(area);
+                targetUrl += url_arr.join("/");
+                targetUrl += "/";
+                console.log(targetUrl)
+                //根据传入的area请求后返回字典
+                var data_checkarea = null;
+                $.ajax({
+
+                    url: targetUrl,
+                    async: false,    //同步请求时页面锁死
+                    success: function (data) {
+
+                        data_checkarea = data;
+                    },
+                });
+                return data_checkarea;
+            }
+
+
+        }
+
+        function random_forecast(key, count, max) {
+            var forecast_dict = {};
+            for (var i = 0; i < count; i++) {
+                var dict_key = key
+                if (i < 10) {
+                    dict_key += "0" + i;
+                } else {
+
+                    dict_key += i
+                }
+
+                //						forecast_dict_test[dict_key] = parseInt(Math.random() * max, 10) + 1;
+                forecast_dict[dict_key] = parseInt(Math.random() * max, 10) + 1;
+            }
+            return forecast_dict;
+        }
+
+        //function getDateStr(){
+        //   var date=new Date();
+        //   var year=date.getFullYear();
+        //   var month=date.getMonth()+1;
+        //   var day=date.getDate()
+        //   if(month<10){
+        //       month='0'+month;
+        //   }
+        //   if(day<10){
+        //       day='0'+day;
+        //   }
+        //   return mydate_str=year+month+day;
+        //}
+
+        function getDateStr(date) {
+            var year = date.getFullYear();
+            var month = date.getMonth() + 1;
+            var day = date.getDate()
+            if (month < 10) {
+                month = '0' + month;
+            }
+            if (day < 10) {
+                day = '0' + day;
+            }
+            return mydate_str = year + month + day;
+        }
+
+        //获取当前日期的前一天
+        function getYesterday(date) {
+            {#{ #var date = new Date(); # }#}
+            date.setDate(date.getDate() - 1);
+            return date;
+        }
+
+
+        function json2dict(data) {
+            //将返回的json，根据code转成dict
+            var dict4json = {};
+            $.each(data, function (index, value) {
+                var obj = $.parseJSON(value);
+                dict4json[obj.CODE] = obj;
+            })
+            return dict4json;
+        }
+
+        /*
+         * 根据设定好的色带根据传入的值返回对应的rgb颜色的值
+         */
+        function getColorbar(value) {
+            //根据传入的数值（int类型），判断其所属的区件并获取区件的颜色
+            var value_color = "rgb(248,248,255)";
+            if (value >= 2.5 && value < 3.5) {
+                value_color = "rgb(0,0,255)";
+            }
+            else if (value >= 3.5 && value < 4.5) {
+                value_color = "rgb(255,242,0)";
+            }
+            else if (value >= 4.5 && value < 6) {
+                value_color = "rgb(255,127,19)";
+            } else if (value >= 6) {
+                value_color = "rgb(255,0,0)";
+            }
+            return value_color;
+        }
+
+        /*
+         * 叠加shp文件，以geoJson的方式读取
+         */
+        function addShape(dict, data, feature, layer, map) {
+            //注意此处需要注意判断在featrues_arr中是否已经存在了指定的值（若存在则不添加）
+            $.each(data.features, function (index, obj) {
+                if ($.inArray(obj, features_arr) < 0) {
+                    features_arr.push(obj);
+                }
+            });
+            //!!!注意此处添加了shape文件后，由于是读取的geojson，文件，通过L.geoJSON后，需要将返回值赋值给geojson
+            //此处的temp_geojson与geojson相同
+            var temp_geojson = L.geoJSON(data, {
+                style: function (feature) {
+                    //获取到当前的对象的code
+                    var code = feature.properties.Code
+                    var temp_color = null;
+                    //							forecast_dict_test
+                    if (dict[code]) {
+                        temp_color = getColorbar(dict[code].HS_VALUE);
+                    }
+
+                    return {
+                        //							注意此处的填充颜色及宽度的api可参见
+
+                        fillColor: temp_color,
+                        weight: 2,
+                        opacity: 1,
+                        color: 'white',
+                        dashArray: '3',
+                        fillOpacity: 0.7
+                    };
+                },
+                //注意此处必须要将OnEachFeature放在里面才可以
+                onEachFeature: onEachFeature
+            }).bindPopup(function (layer) {
+                return layer.feature.properties.description;
+            });
+
+            geojson = temp_geojson.addTo(map);
+            return geojson;
+            //上面使用addTo，现改为addLayer
+
+        }
+
+        function highlightFeature(e) {
+            var layer = e.target;
+
+            layer.setStyle({
+                weight: 5,
+                color: '#666',
+                dashArray: '',
+                fillOpacity: 0.7
+            });
+
+            if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                layer.bringToFront();
+            }
+
+            info.update(layer.feature.properties);
+        }
+
+        function resetHighlight(e) {
+            geojson.resetStyle(e.target);
+            info.update();
+        }
+
+        //点击是拉近到当前选中的区域的所在位置，并等比例放大
+        function zoomToFeature(e) {
+            //1 垃圾视角，并等比例放大
+            mymap.fitBounds(e.target.getBounds());
+            //获取当前选定的网格的code
+            var code = e.target.feature.properties.Code;
+            var target_date = getDateStr(new Date());
+            //2 弹出modal框，加载
+            loadForecastModal(code, target_date);
+        }
+
+        function onEachFeature(feature, layer) {
+            layer.on({
+                mouseover: highlightFeature,
+                mouseout: resetHighlight,
+                click: zoomToFeature
+            });
+        }
+
+        var geojson;
+
+        var my_shp_layer;
+        var my_shp_layer_arr = [];
+
+        function readShape(file, func) {
+            shp("file").then(function (geojson) {
+                //do something with your geojson
+                func(geojson)
+            });
+        }
+
+        function clearLayer() {
+            $.each(my_shp_layer_arr, function (index, value) {
+                mymap.removeLayer(value);
+            });
+            my_shp_layer_arr = [];
+            mymap.removeLayer(my_shp_layer);
+        }
+
+        function mystyle(feature) {
+            return {
+                weight: 2,
+                opacity: 1,
+                color: 'white',
+                dashArray: '3',
+                fillOpacity: 0.7,
+                fillColor: getColor(feature.properties.density)
+            };
+        }
+
+        var info = L.control();
+
+        info.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+            this.update();
+            return this._div;
+        };
+
+        // method that we will use to update the control based on feature properties passed
+        info.update = function (props) {
+            //此处使用了三元表达式
+            this._div.innerHTML = '<h4>网格概述</h4>' + (props ?
+                '<b>网格编号：</b><br />' + props.Code :
+                '未选中');
+        };
+
+        /*
+         * 初始化echarts图标
+         */
+        function loadWaveData(date, code) {
+            var targetUrl = "/"
+            var url_arr = new Array();
+            url_arr.push("forecast");
+            url_arr.push("detial");
+            url_arr.push(date);
+            url_arr.push(code);
+            targetUrl += url_arr.join("/");
+            targetUrl += "/";
+
+            var targetUrl_code = "/";
+            var url_arr_code = new Array();
+            url_arr_code.push("grid");
+            url_arr_code.push("station");
+            url_arr_code.push(code);
+            targetUrl_code += url_arr_code.join("/");
+            targetUrl_code += "/";
+            //获取该code对应的名字
+            $.ajax({
+                url: targetUrl_code, //json文件位置
+                type: "GET", //请求方式为get
+                dataType: "json", //返回数据格式为json
+                async: false,
+                success: function (res) {
+                    //2018 06 14
+                    //修改modal框的题目
+                    $("#mymsgtitle").text("当前网格：" + res[0].name);
+                }
+            });
+
+
+            $.ajax({
+                url: targetUrl, //json文件位置
+                type: "GET", //请求方式为get
+                dataType: "json", //返回数据格式为json
+                success: function (data) { //请求成功完成后要执行的方法
+                    //					console.log(data);
+                    var hs_values = [];
+                    var hs_date = [];
+                    $.each(data, function (index, value) {
+                        //						console.log(index+value);
+                        hs_values.push(value.hs);
+
+                        hs_date.push(value.tdate);
+
+                    });
+                    //获取最大值与最小值
+                    var hs_max = Math.max.apply(null, hs_values);
+                    var hs_min = Math.min.apply(null, hs_values);
+                    var option = {
+                        tooltip: {
+                            show: true
+                        },
+                        legend: {
+                            orient: 'horizontal',
+                            x: 'center',
+                            y: 'top',
+                            textStyle: { color: 'white', fontWeigth: 'normal', fontSize: 16 },
+                            borderWidth: 2,
+                            data: ['波浪']
+                        },
+                        xAxis: [{
+                            type: 'category',
+                            data: hs_date,
+                            //使用以下方式实现显示全部x坐标上的点
+                            "axisLabel": {
+                                //interval: 0,
+                                textStyle: {
+                                    color: '#FFFFFF'
+                                },
+                                formatter: function (val) {
+                                    return val + "时";
+                                }
+                            },
+
+                            //                  interval:0
+                        }],
+                        yAxis: [{
+                            type: 'value',
+                            "axisLabel": {
+                                //					interval: 0,
+                                textStyle: {
+                                    color: '#FFFFFF'
+                                }
+                            },
+                            max: hs_max > 2.5 ? hs_max : 2.5
+                        }],
+                        series: [{
+                            "name": "波浪", //需要与legend中的data相同
+                            "type": "bar",
+                            smooth: true, //不是折线，是曲线
+                            itemStyle: {
+                                normal: {
+                                    //设置折点的颜色
+                                    lineStyle: {
+                                        color: '#00FF00'
+                                    },
+                                    //注意lineStyle需要卸载normal里面
+                                    //自定义折线颜色
+
+                                    //自定义折线下区域的颜色
+                                    //areaStyle: {
+                                    //    color: '#FFFF00'
+                                    //},
+                                    color: function (params) {
+                                        var color_arr = [];
+                                        //获取当前的hs的值
+                                        //var hs_value = params.series.data[params.seriesIndex];
+                                        var hs_value = params.data;
+                                        var hs_color = getColorbar(hs_value);
+
+                                        return hs_color;
+                                    },
+                                    //label: {
+                                    //    show: true //显示每个点的值
+                                    //}
+                                }
+
+                            }, //向下填充区域
+                            "data": hs_values,
+                            markPoint: {
+                                symbolSize: 4,
+                                //使用markPoint显示最大值及最小值
+                                data: [{
+                                    type: 'max',
+                                    name: '最大值'
+                                },
+                                    {
+                                        type: 'min',
+                                        name: '最小值'
+                                    }
+                                ],
+                                //注意设置itemStyle：不需要再加[]，相当于itemStyle中的noraml对象中的lable。。。
+                                itemStyle: {
+                                    normal: {
+                                        label: {
+                                            show: true,
+                                            textStyle: {
+                                                color: '#000080'
+                                            }
+                                        }
+                                    }
+
+                                }
+                                //								effect:show,
+                            },
+                            markLine: {
+                                data: [{
+                                    type: 'max',
+                                    name: '最大值'
+                                }, // 最大值水平线或垂直线
+                                    //									{
+                                    //										type: 'min',
+                                    //										name: '最小值'
+                                    //									}, // 最小值水平线或垂直线
+                                    {
+                                        type: 'average',
+                                        name: '平均值'
+                                    }
+                                ]
+                            },
+                            label: {
+                                normal: {
+                                    show: true
+                                }
+                            }
+                        },]
+                    };
+                    // 基于准备好的dom，初始化echarts图表
+                    var myChart = echarts.init(document.getElementById('wave_data'));
+                    // 为echarts对象加载数据
+                    myChart.setOption(option);
+
+                    //显示modal框
+                    $("#errorModal").modal();
+                }
+            });
+        }
+
+        //加载并显示指定网格的72小时预报数据的modal框
+        function loadForecastModal(code, target_date) {
+            /*
+             * 加载错误信息
+             * 1、根据后台返回的obj获取message放在modal-body中的mymsgcontent中
+             * 2、设定mymsgcontent的固定高度
+             * 3、显示滚动条
+             * 4、显示modal框				 *
+             */
+            var msg = "测试测试测";
+            var title = "海浪有效波高"
+            //				$("mymsgcontent").attr("overflow","auto");
+            document.getElementById("mymsgtitle").innerHTML = title;
+            //请求后台并填充echarts
+            loadWaveData(target_date, code);
+            //				document.getElementById("mymsgcontent").innerHTML = msg;
+
+        }
+
+        info.addTo(mymap);
+
+        //echarts控件相关
+        var point_marker = null;
+        var features_arr = [];
+        function my_onclick() {
+            var temp_code = $("#search_code").val();
+            showAndPointTargetArea(temp_code);
+        }
+
+        /*
+                 * 根据指定的code的key找到对应的code，并打点
+                 *
+                 */
+        function showAndPointTargetArea(code) {
+            //每次打点之前，需要先判断point_marker是否为空，为空需要先去掉
+            if (point_marker != null) {
+                mymap.removeLayer(point_marker);
+            }
+
+            var target_area = null;
+            $.each(features_arr, function (index, val) {
+                if (val.properties.Code == code) {
+
+                    target_area = val;
+                }
+                //						index;
+            })
+            if (target_area != null) {
+                var latlon_arr = target_area.geometry.bbox;
+                /*
+                 * 119.12344000000051
+                    25.263725000000193
+                    119.5140380859375
+                    25.621950149536133
+                 * lon：经度
+                 * lat：维度
+                 */
+                //计算中位点
+                var point_lat = (latlon_arr[1] + latlon_arr[3]) / 2;
+                var point_lon = (latlon_arr[0] + latlon_arr[2]) / 2;
+                //						point_marker=L.marker([point_lon, point_lat]).addTo(mymap).bindPopup("I am a green leaf.");
+                point_marker = L.marker([point_lat, point_lon]).addTo(mymap).bindPopup("I am a green leaf.");
+                mymap.setView([point_lat, point_lon], 8);
+            }
+
+        }
+
+        function initbar() {
+            var myBar = echarts.init(document.getElementById('mybar'));
+            return myBar;
+        }
+
+        //将字典转为arr
+        function dic2arr(dict) {
+            var arr = [];
+            for (temp in dict) {
+                arr.push({
+                    code: temp,
+                    value: dict[temp]
+                })
+            }
+            return arr;
+
+        }
+
+        //比较算法
+        function compare_forecast(prop) {
+            return function (a, b) {
+                var value_a = a[prop];
+                var value_b = b[prop];
+                return value_b - value_a;
+            }
+        }
+
+        //加载右侧的柱状图top15
+        function loadbar(bar, keys_arr, values_arr) {
+            option_mybar = {
+                title: {
+                    text: '波浪72小时预报',
+                    subtext: '测试数据',
+                    textStyle: {
+                        fontWeight: 'bolder',
+                        color: '#FFFFFF'
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                legend: {
+                    data: ['波浪']
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value',
+                    boundaryGap: [0, 0.01],
+                    axisLabel: {
+                        interval: 0,
+                        textStyle: {
+                            color: '#ddd'
+                        }
+                    },
+                    axisLine: {
+                        show: false,
+                        lineStyle: {
+                            color: '#ddd'
+                        }
+                    },
+                    splitLine: {
+                        show: false //不显示网格线
+                    },
+                },
+                yAxis: {
+                    type: 'category',
+                    splitLine: {
+                        show: false //不显示网格线
+                    },
+                    axisLabel: {
+                        interval: 0,
+                        textStyle: {
+                            color: '#FFFFFF',
+                            fontWeight: 'bold'
+                        }
+                    },
+                    data: keys_arr
+                },
+                series: [{
+                    name: '波浪',
+                    type: 'bar',
+                    data: values_arr,
+                    itemStyle: {
+                        //通常情况下：
+                        normal: {
+                            //									color: '#EEC900'
+                            //每个柱子的颜色即为colorList数组里的每一项，如果柱子数目多于colorList的长度，则柱子颜色循环使用该数组
+                            color: function (params) {
+                                var mycolor = getColorbar(params.data)
+
+                                return mycolor;
+
+                            }
+                        },
+                        //鼠标悬停时：
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    },
+                }]
+            };
+            // 为echarts对象加载数据
+            bar.setOption(option_mybar);
+        }
+
+
+        function fillarea(area) {
+            var date = new Date();
+            //var date_str=getDateStr();
+            var dict_area = null;
+            var new_layer = null;
+            switch (area) {
+
+                //北海
+                case 'n':
+                    dict_area = loadAreaMaxData_byDate(date, area);
+                    //dict_area=loadAreaMaxData(date_str,area);
+                    //缩放并定位到指定海区
+                    mymap.setView([38.3, 123], 7);
+
+                    new_layer = addshp("{% static 'files/north.zip'%}", dict_area, true);
+                    break;
+                //东海
+                case 'e':
+                    dict_area = loadAreaMaxData_byDate(date, area);
+                    //    dict_area=loadAreaMaxData(date_str,area);
+                    mymap.setView([28.6, 125.35], 6);
+
+                    new_layer = addshp("{% static 'files/east.zip'%}", dict_area, true);
+                    break;
+                //南海
+                case 's':
+                    dict_area = loadAreaMaxData_byDate(date, area);
+                    //dict_area=loadAreaMaxData(date_str,area);
+                    mymap.setView([20.2, 113.04], 7);
+
+                    new_layer = addshp("{% static 'files/south.zip'%}", dict_area, true);
+                    break;
+                //全国
+                case 'a':
+                    dict_area = loadAreaMaxData_byDate(date, area);
+                    //dict_area=loadAreaMaxData(date_str,area);
+                    addshp("{% static 'files/north.zip'%}", dict_area, false);
+                    addshp("{% static 'files/east.zip'%}", dict_area, false);
+                    addshp("{% static 'files/south.zip'%}", dict_area, false);
+                    break;
+            }
+            return [dict_area, new_layer];
+
+        }
+
+        function loadStormLayer() {
+            //加载海洋站格点
+            /*
+             ** 经测试此种方式可行：
+                  需要加入的流程还有：每次点击此方法时，需要清空layer，并清空加载grid的layer
+
+
+            */
+            //S1 删除现有图层
+            clearLayer();
+
+            //1 先加载station list
+            station_arr = loadStationData();
+            $.each(station_arr, function (index, val) {
+                // console.log(val);
+                station_dict[val.code] = val;
+            });
+            //2 获取返回的当日极值数据
+            storm_arr = loadStormData();
+
+            //3 生成storm对象
+            $.each(storm_arr, function (index, val) {
+                var station_temp = null;
+                if (val.CODE in station_dict) {
+                    station_temp = station_dict[val.CODE]
+                }
+                if (station_temp != null) {
+                    var obj = new StormData(
+                        val.CODE,
+                        station_temp.name, station_temp.Lat,
+                        station_temp.Lon,
+                        station_temp.area,
+                        val.Surge_VALUE,
+                        val.Surge_DATE,
+                        val.Tide_VALUE,
+                        val.Tide_DATE);
+                    storm_obj_arr.push(obj);
+                }
+
+
+            })
+            // add2Marker();
+            $.each(storm_obj_arr, function (index, val) {
+                addDiv2Marker(val);
+            })
+            alert("我是外部方法test2");
+        }
+
+        function clearLayer() {
+            $.each(my_shp_layer_arr, function (index, value) {
+                mymap.removeLayer(value);
+            });
+            my_shp_layer_arr = [];
+            mymap.removeLayer(my_shp_layer);
+        }
+
+
+
+        function loadAreaMaxData(date_str, area) {
+            //从后台获取指定时间，指定海区的极值数据，并以dict的方式返回
+            var data_checkarea = load_targetAreaMaxData(date_str, area);
+            var dict_area = json2dict(data_checkarea);
+            return dict_area;
+        }
+
+        function loadAreaMaxData_byDate(date, area) {
+            //从后台获取指定时间，指定海区的极值数据，并以dict的方式返回
+            var data_checkarea = [];
+            var index = 0;
+            var target_date = date;
+            while (data_checkarea.length < 1 && index < 6) {
+                index += 1;
+                var date_str = getDateStr(target_date);
+                //alert(date_str);
+                data_checkarea = load_targetAreaMaxData(date_str, area);
+
+                //讲当前日期往前推一天
+                date = getYesterday(target_date);
+                if (data_checkarea != 0) {
+                    break;
+                }
+            }
+
+            //var data_checkarea= load_targetAreaMaxData(date_str,area);
+            var dict_area = json2dict(data_checkarea);
+            return dict_area;
+        }
+
+        function loadGridLayer() {
+            //加载沿海网格layer
+            alert("我是外部方法test1");
+        }
+
+        function addshp(shp_path, dict_area, isremoveLay) {
+            var shape_layer = null;
+            //为当天地图添加图层
+            //注意此处then是异步的，所以无法返回shape_layer;
+            shp(shp_path).then(function (temp_geojson) {
+                geojson = temp_geojson;
+                //do something with your geojson
+                //当前图层不为空且删除图层的标记符为true都满足时，才清空当前图层
+                if (my_shp_layer != null & isremoveLay) {
+                    $.each(my_shp_layer_arr, function (index, value) {
+                        mymap.removeLayer(value);
+                    });
+                    my_shp_layer_arr = [];
+                    mymap.removeLayer(my_shp_layer);
+                }
+                var shp_layer = addShape(dict_area, temp_geojson, null, null, mymap);
+
+                //geojson = L.geoJson(temp_geojson, {
+                //    style: mystyle,
+                //    onEachFeature: onEachFeature
+                //}).addTo(mymap);
+                my_shp_layer = shp_layer;
+                my_shp_layer_arr.push(shp_layer);
+            }).then(function () {
+                return shape_layer;
+            });
+            return shape_layer;
+        }
+
+        $(function () {
+
+            //					var test_dic = forecast_dict;
+            //存储指定海区（北、东、南、全国）网格72小时极值的字典
+            var dict_target = null;
+            var text_index = 0;
+            var out_geo_layer = null;
+
+
+            var vm1 = new Vue({
+                el: '#top_nav_ul',
+                data: {
+                    items: [
+                        { message: '北海', code: 'n' },
+                        { message: '东海', code: 'e' },
+                        { message: '南海', code: 's' },
+                        { message: '全国', code: 'a' }],
+                    //注意selected是items中的obj
+                    selected: null,
+                    out_shape_layer: null,
+                },
+                watch: {
+                    selected: function (new_data, old_data) {
+                        console.log('修改为：' + new_data);
+                        var self = this;
+                        self.fillarea(new_data.code, self.selected);
+                    }
+                },
+                methods: {
+                    selectarea: function (code, item) {
+                        console.log('执行选中操作：' + code);
+                        var self = this;
+                        self.selected = item;
+                    },
+                    //注意加载页面时，需要执行加载全国的事件
+                    fillarea: function (value, item) {
+                        //此处的item是vm.data中的items
+                        //
+                        console.log("执行填充操作：" + value);
+                        this.selected = item;
+                        text_index += 1;
+                        //将字典转成arr
+                        var arr_keys_forecastextreme = [];
+                        var arr_values_forecastextreme = [];
+                        var arr_obj_forecastextreme = [];
+
+
+                        var info = fillarea(value);
+                        dict_target = info[0];
+                        out_geo_layer = info[1];
+                        //从当前地图中删除当前海区的layer，前提是当前海区的layer不为null，否则会报错
+                        if (dict_target != null) {
+                            var forecast_arr = dic2arr(dict_target);
+                            var forecast_arr_obj = [];
+                            $.each(forecast_arr, function (index, obj) {
+                                forecast_arr_obj.push(
+                                    {
+                                        "code": obj.value.CODE,
+                                        "HS_VALUE": obj.value.HS_VALUE
+                                    })
+                            })
+                            forecast_arr = forecast_arr_obj.sort(compare_forecast('HS_VALUE'));
+                            //从数组中取出前10个值
+                            var forecast_top10 = forecast_arr.slice(0, 15);
+
+                            for (var i = 0; i < forecast_top10.length; i++) {
+                                arr_keys_forecastextreme.push(forecast_top10[i].code);
+
+                                arr_values_forecastextreme.push(forecast_top10[i].HS_VALUE);
+                            }
+
+                            var bar = initbar();
+                            loadbar(bar, arr_keys_forecastextreme, arr_values_forecastextreme);
+                        }
+                    }
+                }
+            });
+            //页面加载后执行填充全国海区
+            vm1.selected = { message: '全国', code: 'a' };
+
+            //顶部切换图层
+            var vm2 = new Vue({
+                el: '#top_select_ul',
+                data: {
+                    items: [{ message: '沿海网格', code: 'grid' },
+                        { message: '风暴潮及增水', code: 'storm' }
+                    ],
+                    mylayer: "",
+                },
+                watch: {
+                    mylayer: function (new_data, old_data) {
+                        var self = this;
+                        // self.fillarea(null,new_data);
+                        if (new_data === "grid") {
+                            loadGridLayer();
+                        }
+                        else if (new_data === "storm") {
+                            loadStormLayer();
+                        }
+                    }
+                },
+                methods: {
+                    //选择图层
+                    selectlayer: function (value, item) {
+                        // self.selected=
+                        this.mylayer = value;
+                        console.log(value, item);
+                    }
+                }
+            })
+            vm2.mylayer = 'grid';
+
+
+            //对forecast_dict进行排序
+            //					var forecast_arr = dic2arr(forecast_dict_test);
+
+        })
+    </script>
+    <style>
+        #mytest {
+            background: #FFFFFF;
+        }
+    </style>
+{% endblock %}

@@ -1,0 +1,432 @@
+{% extends 'shared/_Layout.html' %} {% load staticfiles %} {% block bottom_js %}
+
+    <script type="application/javascript" src="{% static 'js/map/maptiles.js'%}"></script>
+    <script src="http://echarts.baidu.com/build/dist/echarts-all.js"></script>
+    <script type="application/javascript" src="{% static 'js/vue/vue.js'%}"></script>
+
+    <script type="application/javascript">
+
+
+        var forecast_dict = new Array();
+
+        var station_arr = [];
+        var station_dict = [];
+        var storm_arr = [];
+        var storm_obj_arr = [];
+
+        function load_targetAreaMaxData(date, area) {
+            if (area != null) {
+                var targetUrl = "/"
+                var url_arr = new Array();
+                url_arr.push("forecast");
+                url_arr.push("daily");
+                url_arr.push(date);
+                url_arr.push(area);
+                targetUrl += url_arr.join("/");
+                targetUrl += "/";
+                console.log(targetUrl)
+                //根据传入的area请求后返回字典
+                var data_checkarea = null;
+                $.ajax({
+
+                    url: targetUrl,
+                    async: false,    //同步请求时页面锁死
+                    success: function (data) {
+
+                        data_checkarea = data;
+                    },
+                });
+                return data_checkarea;
+            }
+
+
+        }
+
+
+
+        //function getDateStr(){
+        //   var date=new Date();
+        //   var year=date.getFullYear();
+        //   var month=date.getMonth()+1;
+        //   var day=date.getDate()
+        //   if(month<10){
+        //       month='0'+month;
+        //   }
+        //   if(day<10){
+        //       day='0'+day;
+        //   }
+        //   return mydate_str=year+month+day;
+        //}
+
+        function getDateStr(date) {
+            var year = date.getFullYear();
+            var month = date.getMonth() + 1;
+            var day = date.getDate()
+            if (month < 10) {
+                month = '0' + month;
+            }
+            if (day < 10) {
+                day = '0' + day;
+            }
+            return mydate_str = year + month + day;
+        }
+
+        //获取当前日期的前一天
+        function getYesterday(date) {
+            {#{ #var date = new Date(); # }#}
+            date.setDate(date.getDate() - 1);
+            return date;
+        }
+
+
+        function json2dict(data) {
+            //将返回的json，根据code转成dict
+            var dict4json = {};
+            $.each(data, function (index, value) {
+                var obj = $.parseJSON(value);
+                dict4json[obj.CODE] = obj;
+            })
+            return dict4json;
+        }
+
+
+
+
+        function resetHighlight(e) {
+            geojson.resetStyle(e.target);
+            info.update();
+        }
+
+        //点击是拉近到当前选中的区域的所在位置，并等比例放大
+        function zoomToFeature(e) {
+            //1 垃圾视角，并等比例放大
+            mymap.fitBounds(e.target.getBounds());
+            //获取当前选定的网格的code
+            var code = e.target.feature.properties.Code;
+            var target_date = getDateStr(new Date());
+            //2 弹出modal框，加载
+            loadForecastModal(code, target_date);
+        }
+
+        function onEachFeature(feature, layer) {
+            layer.on({
+                mouseover: highlightFeature,
+                mouseout: resetHighlight,
+                click: zoomToFeature
+            });
+        }
+
+        var geojson;
+
+        var my_shp_layer;
+        var my_shp_layer_arr = [];
+
+
+
+        function clearLayer() {
+            $.each(my_shp_layer_arr, function (index, value) {
+                mymap.removeLayer(value);
+            });
+            my_shp_layer_arr = [];
+            mymap.removeLayer(my_shp_layer);
+        }
+
+        function mystyle(feature) {
+            return {
+                weight: 2,
+                opacity: 1,
+                color: 'white',
+                dashArray: '3',
+                fillOpacity: 0.7,
+                fillColor: getColor(feature.properties.density)
+            };
+        }
+
+        var info = L.control();
+
+        info.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+            this.update();
+            return this._div;
+        };
+
+        // method that we will use to update the control based on feature properties passed
+        info.update = function (props) {
+            //此处使用了三元表达式
+            this._div.innerHTML = '<h4>网格概述</h4>' + (props ?
+                '<b>网格编号：</b><br />' + props.Code :
+                '未选中');
+        };
+
+
+        //加载并显示指定网格的72小时预报数据的modal框
+        function loadForecastModal(code, target_date) {
+            /*
+             * 加载错误信息
+             * 1、根据后台返回的obj获取message放在modal-body中的mymsgcontent中
+             * 2、设定mymsgcontent的固定高度
+             * 3、显示滚动条
+             * 4、显示modal框				 *
+             */
+            var msg = "测试测试测";
+            var title = "海浪有效波高"
+            //				$("mymsgcontent").attr("overflow","auto");
+            document.getElementById("mymsgtitle").innerHTML = title;
+            //请求后台并填充echarts
+            loadWaveData(target_date, code);
+
+        }
+
+        info.addTo(mymap);
+
+        //echarts控件相关
+        var point_marker = null;
+        var features_arr = [];
+        function my_onclick() {
+            var temp_code = $("#search_code").val();
+            showAndPointTargetArea(temp_code);
+        }
+
+        function initbar() {
+            var myBar = echarts.init(document.getElementById('mybar'));
+            return myBar;
+        }
+
+        //将字典转为arr
+        function dic2arr(dict) {
+            var arr = [];
+            for (temp in dict) {
+                arr.push({
+                    code: temp,
+                    value: dict[temp]
+                })
+            }
+            return arr;
+
+        }
+
+        //比较算法
+        function compare_forecast(prop) {
+            return function (a, b) {
+                var value_a = a[prop];
+                var value_b = b[prop];
+                return value_b - value_a;
+            }
+        }
+
+
+
+        function fillarea(area) {
+            var date = new Date();
+            //var date_str=getDateStr();
+            var dict_area = null;
+            var new_layer = null;
+            switch (area) {
+
+                //北海
+                case 'n':
+                    dict_area = loadAreaMaxData_byDate(date, area);
+                    //dict_area=loadAreaMaxData(date_str,area);
+                    //缩放并定位到指定海区
+                    mymap.setView([38.3, 123], 7);
+
+                    new_layer = addshp("{% static 'files/north.zip'%}", dict_area, true);
+                    break;
+                //东海
+                case 'e':
+                    dict_area = loadAreaMaxData_byDate(date, area);
+                    //    dict_area=loadAreaMaxData(date_str,area);
+                    mymap.setView([28.6, 125.35], 6);
+
+                    new_layer = addshp("{% static 'files/east.zip'%}", dict_area, true);
+                    break;
+                //南海
+                case 's':
+                    dict_area = loadAreaMaxData_byDate(date, area);
+                    //dict_area=loadAreaMaxData(date_str,area);
+                    mymap.setView([20.2, 113.04], 7);
+
+                    new_layer = addshp("{% static 'files/south.zip'%}", dict_area, true);
+                    break;
+                //全国
+                case 'a':
+                    dict_area = loadAreaMaxData_byDate(date, area);
+                    //dict_area=loadAreaMaxData(date_str,area);
+                    addshp("{% static 'files/north.zip'%}", dict_area, false);
+                    addshp("{% static 'files/east.zip'%}", dict_area, false);
+                    addshp("{% static 'files/south.zip'%}", dict_area, false);
+                    break;
+            }
+            return [dict_area, new_layer];
+
+        }
+
+
+        function loadAreaMaxData(date_str, area) {
+            //从后台获取指定时间，指定海区的极值数据，并以dict的方式返回
+            var data_checkarea = load_targetAreaMaxData(date_str, area);
+            var dict_area = json2dict(data_checkarea);
+            return dict_area;
+        }
+
+        //此处注意需要判断不能超过6日的数据
+        function loadAreaMaxData_byDate(date, area) {
+            //从后台获取指定时间，指定海区的极值数据，并以dict的方式返回
+            var data_checkarea = [];
+            var index = 0;
+            var target_date = date;
+            while (data_checkarea.length < 1 && index < 6) {
+                index += 1;
+                var date_str = getDateStr(target_date);
+                //alert(date_str);
+                data_checkarea = load_targetAreaMaxData(date_str, area);
+
+                //讲当前日期往前推一天
+                date = getYesterday(target_date);
+                if (data_checkarea != 0) {
+                    break;
+                }
+            }
+
+            //var data_checkarea= load_targetAreaMaxData(date_str,area);
+            var dict_area = json2dict(data_checkarea);
+            return dict_area;
+        }
+
+        function loadGridLayer() {
+            //加载沿海网格layer
+            alert("我是外部方法test1");
+        }
+
+
+        $(function () {
+
+            //					var test_dic = forecast_dict;
+            //存储指定海区（北、东、南、全国）网格72小时极值的字典
+            var dict_target = null;
+            var text_index = 0;
+            var out_geo_layer = null;
+
+
+            var vm1 = new Vue({
+                el: '#top_nav_ul',
+                data: {
+                    items: [
+                        { message: '北海', code: 'n' },
+                        { message: '东海', code: 'e' },
+                        { message: '南海', code: 's' },
+                        { message: '全国', code: 'a' }],
+                    //注意selected是items中的obj
+                    selected: null,
+                    out_shape_layer: null,
+                },
+                watch: {
+                    selected: function (new_data, old_data) {
+                        //console.log('修改为：' + new_data);
+                        var self = this;
+                        self.fillarea(new_data.code, self.selected);
+                    }
+                },
+                methods: {
+                    selectarea: function (code, item) {
+                        //console.log('执行选中操作：' + code);
+                        var self = this;
+                        self.selected = item;
+                    },
+                    //注意加载页面时，需要执行加载全国的事件
+                    fillarea: function (value, item) {
+                        //此处的item是vm.data中的items
+                        //
+                        //console.log("执行填充操作：" + value);
+                        this.selected = item;
+                        text_index += 1;
+                        //将字典转成arr
+                        var arr_keys_forecastextreme = [];
+                        var arr_values_forecastextreme = [];
+                        var arr_obj_forecastextreme = [];
+
+
+                        var info = fillarea(value);
+                        dict_target = info[0];
+                        out_geo_layer = info[1];
+                        //从当前地图中删除当前海区的layer，前提是当前海区的layer不为null，否则会报错
+                        if (dict_target != null) {
+                            var forecast_arr = dic2arr(dict_target);
+                            var forecast_arr_obj = [];
+                            $.each(forecast_arr, function (index, obj) {
+                                forecast_arr_obj.push(
+                                    {
+                                        "code": obj.value.CODE,
+                                        "HS_VALUE": obj.value.HS_VALUE
+                                    })
+                            })
+                            forecast_arr = forecast_arr_obj.sort(compare_forecast('HS_VALUE'));
+                            //从数组中取出前10个值
+                            var forecast_top10 = forecast_arr.slice(0, 15);
+
+                            for (var i = 0; i < forecast_top10.length; i++) {
+                                arr_keys_forecastextreme.push(forecast_top10[i].code);
+
+                                arr_values_forecastextreme.push(forecast_top10[i].HS_VALUE);
+                            }
+
+                            var bar = initbar();
+                            loadbar(bar, arr_keys_forecastextreme, arr_values_forecastextreme);
+                        }
+                    }
+                }
+            });
+            //页面加载后执行填充全国海区
+            vm1.selected = { message: '全国', code: 'a' };
+
+            //顶部切换图层
+            var vm2 = new Vue({
+                el: '#top_select_ul',
+                data: {
+                    items: [{ message: '沿海网格', code: 'grid' },
+                        { message: '风暴潮及增水', code: 'storm' }
+                    ],
+                    mylayer: "",
+                },
+                watch: {
+                    mylayer: function (new_data, old_data) {
+                        var self = this;
+                        // self.fillarea(null,new_data);
+                        if (new_data === "grid") {
+                            loadGridLayer();
+                        }
+                        else if (new_data === "storm") {
+                            var date=new Date();
+                            loadStormLayer(date);
+                        }
+                    }
+                },
+                methods: {
+                    //选择图层
+                    selectlayer: function (value, item) {
+                        // self.selected=
+                        this.mylayer = value;
+                        console.log(value, item);
+                    }
+                }
+            })
+            vm2.mylayer = 'grid';
+
+
+            //对forecast_dict进行排序
+            //					var forecast_arr = dic2arr(forecast_dict_test);
+
+        })
+    </script>
+    <script type="application/javascript" src="{% static 'js/map/storm.js'%}"></script>
+    <script type="application/javascript" src="{% static 'js/map/grid.js'%}"></script>
+    <script type="application/javascript" src="{% static 'js/map/search.js'%}"></script>
+    <script type="application/javascript" src="{% static 'js/common/stringconvert.js'%}"></script>
+    <script type="application/javascript" src="{% static 'js/echarts/rightbar.js'%}"></script>
+    <script type="application/javascript" src="{% static 'js/echarts/wavebar.js'%}"></script>
+    <style>
+        #mytest {
+            background: #FFFFFF;
+        }
+    </style>
+{% endblock %}

@@ -18,19 +18,19 @@ const store = new Vuex.Store({
   },
   // 涉及改变数据的
   mutations: {
-    clearDivIcon() {
-      $.each(state.stormIconDivArr, function(index, val) {
+    clearDivIcon () {
+      $.each(state.stormIconDivArr, function (index, val) {
         state.mymap.removeLayer(val)
       })
-      $.each(state.stormMarkerArr, function(index, val) {
+      $.each(state.stormMarkerArr, function (index, val) {
         state.mymap.removeLayer(val)
       })
       // 2 清除海洋站信息
       state.stormObjArr = []
     },
-    clearLayer() {
+    clearLayer () {
       // 1 清除沿海基础网格底图
-      $.each(state.my_shp_layer_arr, function(index, value) {
+      $.each(state.my_shp_layer_arr, function (index, value) {
         state.mymap.removeLayer(value)
       })
       state.my_shp_layer_arr = []

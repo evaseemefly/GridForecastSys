@@ -83,7 +83,7 @@ export const loadTargetAreaMaxData = (date, area) => {
     // 以下内容用上面的代码实现
     $.ajax({
       url: targetUrl,
-      async: false,    // 同步请求时页面锁死
+      async: false, // 同步请求时页面锁死
       success: function (data) {
         result = data
       }
@@ -92,10 +92,23 @@ export const loadTargetAreaMaxData = (date, area) => {
   }
 }
 
+// 根据指定时间，及经纬度，读取该时间的海浪nc文件中的10天的数据
+export const loadForecastWavebyNc = (date, lat, lng) => {
+  let wavebyNcUrl = `${host}/gis/waveforcedetial/`
+  var par = {
+    date: date,
+    lat: lat,
+    lng: lng
+  }
+  return axios.get(wavebyNcUrl, {
+    params: par
+  })
+}
+
 /*
-			 * 根据设定好的色带根据传入的值返回对应的rgb颜色的值
-			 */
-export const getColorbar = (value) => {
+	根据设定好的色带根据传入的值返回对应的rgb颜色的值
+ */
+export const getColorbar = value => {
   // 根据传入的数值（int类型），判断其所属的区件并获取区件的颜色
   var valueColor = ''
   if (value >= 2 && value < 4) {

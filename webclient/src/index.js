@@ -9,6 +9,10 @@ import $ from 'jquery'
 import Vuex from 'vuex'
 import store from './store/index'
 
+// 引入全局 iviews
+import iview from 'iview'
+import 'iview/dist/styles/iview.css'
+
 import 'bootstrap/dist/css/bootstrap.css'
 import './components/css/bootstrapExt/table/bootstrap-table.css'
 import './components/css/bootstrapExt/editable/bootstrap-editable.css'
@@ -41,6 +45,9 @@ import './components/css/storm/storm.css'
 Vue.prototype.moment = moment
 Vue.config.devtools = true
 Vue.use(VueRouter)
+// 引入iview
+Vue.use(iview)
+
 // Vue.use(Vuex)
 const root = document.createElement('div')
 document.body.appendChild(root)

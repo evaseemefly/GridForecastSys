@@ -1,7 +1,7 @@
 <template>
   <div>
     <baseMap ref="baseMap" :basemap.sync='mymap'></baseMap>
-    <dateModule @changeLayerIndex="changeLayerIndex"></dateModule>
+    <!-- <dateModule @changeLayerIndex="changeLayerIndex"></dateModule> -->
     <modalFrame ref="modal" :columns='modalColumns' :values='modalValues'></modalFrame>
   </div>
 </template>
@@ -27,23 +27,22 @@ import rightBar from './right_bar.vue'
 import baseMap from './center_map_base.vue'
 // modal子组件
 import modalFrame from '../module/modal.vue'
-import dateModule from '../module/date_select_module.vue'
+// import dateModule from '../module/date_select_module.vue'
 export default {
   data () {
     return {
       // 加载预报产品需要的data
       mymap: null,
-      wms_layer: null,
-      // '000','006'
-      wms_layer_index: String,
-      // 预报产品的种类
-      wms_kinds: null,
-      // 预报产品的日期
-      wms_date: null,
-      // 预报产品的间隔
-      wms_interval: null,
-      // 需要加载的经纬度
-      wms_latlng: null,
+      // forecastDict:[],
+      fubArr: [],
+      fubDict: {},
+      stormArr: {},
+      stormObjArr: [],
+      // 海洋站的marker数组
+      stormMarkerArr: [],
+      // 海洋站的IconDiv数组
+      stormIconDivArr: [],
+
       // wms_lng,
       latlng: null,
       modalTitle: '',

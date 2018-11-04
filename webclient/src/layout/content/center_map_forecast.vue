@@ -1,7 +1,7 @@
 <template>
   <div>
     <baseMap ref="baseMap" :basemap.sync='mymap'></baseMap>
-    <dateModule></dateModule>
+    <dateModule @changeLayerIndex="changeLayerIndex"></dateModule>
     <modalFrame ref="modal" :columns='modalColumns' :values='modalValues'></modalFrame>
   </div>
 </template>
@@ -34,6 +34,8 @@ export default {
       // 加载预报产品需要的data
       mymap: null,
       wms_layer: null,
+      // '000','006'
+      wms_layer_index: String,
       // 预报产品的种类
       wms_kinds: null,
       // 预报产品的日期
@@ -70,7 +72,10 @@ export default {
         this.showModal()
       }
       // return this.$store.state.latlng
-    }
+    },
+    // wms_layer:function(){
+
+    // }
   },
   methods: {
     fillarea: function (area) {
@@ -124,7 +129,8 @@ export default {
         'http://localhost:8080/geoserver/gridraster/wms',
         {
           // gridraster:swh
-          layers: 'gridraster:wave_area_northwest_hour_00',
+          // layers: 'gridraster:wave_area_northwest_hour_00',
+          layers: myself.wms_layer,
           // layers: 'gridraster:storm_nc',
           format: 'image/png',
           transparent: true
@@ -148,6 +154,11 @@ export default {
         // 调用modal子组件的showModal方法，打开modal框
         this.$refs.modal.showModal()
       })
+    },
+
+    // 接受由子组件传递过来的的layer的index（eg：000，006）
+    changeLayerIndex: function (val) {
+      this.wms_layer_index = val
     }
   },
 
@@ -167,7 +178,13 @@ export default {
     getlatlng: function (newVal, oldVal) {
       console.log(oldVal, newVal)
     },
-    getlatlngTest: function (val) { }
+    getlatlngTest: function (val) { },
+    wms_layer_index: function (val) {
+      this.wms_layer = 'gridraster:wave_area_northwest_hour_' + val
+    },
+    wms_layer: function (val) {
+      this.fillWMS()
+    }
   },
 
   created: function () {

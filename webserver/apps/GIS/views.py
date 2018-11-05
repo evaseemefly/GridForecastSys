@@ -14,6 +14,7 @@ import json
 import datetime
 import numpy as np
 from Common.ncReader import NCEnvironment
+from Common.MyMath import getRundingVal
 
 from .model_middle import WaveModel
 from .serializers import WaveModelSerializer
@@ -25,7 +26,9 @@ class WaveForceCastInfoView(APIView):
     def get(self,request):
         params_dic=request.query_params
         lat=float(params_dic.get('lat'))
+        lat=getRundingVal(lat,0.25)
         lng=float(params_dic.get('lng'))
+        lng=getRundingVal(lng,0.25)
         targetDate=params_dic.get('date')
         read= NCEnvironment('nc_reader')
         # 获取最终的数组

@@ -93,7 +93,7 @@ import { getDateStr } from '../api/moment_api'
 import rightBar from './right_bar.vue'
 
 export default {
-  data() {
+  data () {
     return {
       // forecastDict:[],
       stationArr: [],
@@ -123,15 +123,15 @@ export default {
   },
   methods: {
     // 清除所有的底图
-    clear: function() {
+    clear: function () {
       this.clearLayer()
       this.clearDivIcon()
     },
     // 清除grid的layer底图
-    clearLayer: function() {
+    clearLayer: function () {
       var myself = this
       // 1 清除沿海基础网格底图
-      $.each(myself.my_shp_layer_arr, function(index, value) {
+      $.each(myself.my_shp_layer_arr, function (index, value) {
         myself.mymap.removeLayer(value)
       })
       myself.my_shp_layer_arr = []
@@ -141,14 +141,14 @@ export default {
     },
 
     // 清除storm 的 IconDiv以及Marker
-    clearDivIcon: function() {
+    clearDivIcon: function () {
       var myself = this
       // myself.mymap.clearLayers()
       // 注意清除时，需要分别清除marker与IconDiv
-      $.each(myself.stormIconDivArr, function(index, val) {
+      $.each(myself.stormIconDivArr, function (index, val) {
         myself.mymap.removeLayer(val)
       })
-      $.each(myself.stormMarkerArr, function(index, val) {
+      $.each(myself.stormMarkerArr, function (index, val) {
         myself.mymap.removeLayer(val)
       })
       // 2 清除海洋站信息
@@ -160,7 +160,7 @@ export default {
     },
 
     // grid.js中的代码移至此处
-    random_forecast: function(key, count, max) {
+    random_forecast: function (key, count, max) {
       var forecastDict = {}
       for (var i = 0; i < count; i++) {
         var dictKey = key
@@ -195,7 +195,7 @@ export default {
     //   return value_color
     // },
 
-    addShape: function(dict, data, feature, layer, map) {
+    addShape: function (dict, data, feature, layer, map) {
       /*
 data是读取的geoJson数据
 此处已重新修改 2018-08-06
@@ -203,7 +203,7 @@ data是读取的geoJson数据
 
       // 注意此处需要注意判断在featrues_arr中是否已经存在了指定的值（若存在则不添加）
       let myself = this
-      $.each(data.features, function(index, obj) {
+      $.each(data.features, function (index, obj) {
         if ($.inArray(obj, myself.features_arr) < 0) {
           myself.features_arr.push(obj)
         }
@@ -212,7 +212,7 @@ data是读取的geoJson数据
       // 此处的temp_geojson与geojson相同
       // myself.geojson
       let tempGeoJson = L.geoJSON(data, {
-        style: function(feature) {
+        style: function (feature) {
           // 获取到当前的对象的code
 
           var code = feature.properties.Code
@@ -234,7 +234,7 @@ data是读取的geoJson数据
         },
         // 注意此处必须要将OnEachFeature放在里面才可以
         onEachFeature: myself.onEachFeature
-      }).bindPopup(function(layer) {
+      }).bindPopup(function (layer) {
         return layer.feature.properties.description
       })
       // 此处v1版本已经不确定geoJson是否为外侧的geoJson
@@ -243,7 +243,7 @@ data是读取的geoJson数据
       myself.geojson = geoJson
       return geoJson
     },
-    onEachFeature: function(feature, layer) {
+    onEachFeature: function (feature, layer) {
       let myself = this
       layer.on({
         mouseover: myself.highlightFeature,
@@ -252,18 +252,18 @@ data是读取的geoJson数据
       })
     },
     // 加载网格化的shp格式文件
-    addshp: function(shpPath, dictArea, isremoveLay) {
+    addshp: function (shpPath, dictArea, isremoveLay) {
       var shapeLayer = null
       var myself = this
       // 为当天地图添加图层
       // 注意此处then是异步的，所以无法返回shape_layer;
       shp(shpPath)
-        .then(function(tempGeojson) {
+        .then(function (tempGeojson) {
           myself.geojson = tempGeojson
           // do something with your geojson
           // 当前图层不为空且删除图层的标记符为true都满足时，才清空当前图层
           if ((myself.my_shp_layer != null) & isremoveLay) {
-            $.each(myself.my_shp_layer_arr, function(index, value) {
+            $.each(myself.my_shp_layer_arr, function (index, value) {
               myself.mymap.removeLayer(value)
             })
             myself.my_shp_layer_arr = []
@@ -284,16 +284,16 @@ data是读取的geoJson数据
           myself.my_shp_layer = shpLayer
           myself.my_shp_layer_arr.push(shpLayer)
         })
-        .then(function() {
+        .then(function () {
           return shapeLayer
         })
       return shapeLayer
     },
-    resetHighlight: function(e) {
+    resetHighlight: function (e) {
       this.geojson.resetStyle(e.target)
       this.info.update()
     },
-    highlightFeature: function(e) {
+    highlightFeature: function (e) {
       var layer = e.target
 
       layer.setStyle({
@@ -310,14 +310,14 @@ data是读取的geoJson数据
       this.info.update(layer.feature.properties)
     },
 
-    readShape: function(file, func) {
-      shp('file').then(function(geojson) {
+    readShape: function (file, func) {
+      shp('file').then(function (geojson) {
         // do something with your geojson
         func(geojson)
       })
     },
 
-    mystyle: function(feature) {
+    mystyle: function (feature) {
       return {
         weight: 2,
         opacity: 1,
@@ -329,7 +329,7 @@ data是读取的geoJson数据
     },
 
     // 注意加载页面时，需要执行加载全国的事件
-    fillGrid: function(value, item) {
+    fillGrid: function (value, item) {
       // 此处的item是vm.data中的items
       //
       // console.log("执行填充操作：" + value);
@@ -349,7 +349,7 @@ data是读取的geoJson数据
       if (dictTarget != null) {
         var forecastArr = dic2arr(dictTarget)
         var forecastArrObj = []
-        $.each(forecastArr, function(index, obj) {
+        $.each(forecastArr, function (index, obj) {
           forecastArrObj.push({
             code: obj.value.CODE,
             HS_VALUE: obj.value.HS_VALUE
@@ -375,7 +375,7 @@ data是读取的geoJson数据
       )
     },
 
-    fillarea: function(area) {
+    fillarea: function (area) {
       var date = new Date()
       // var date_str=getDateStr();
       var dictArea = null
@@ -417,7 +417,7 @@ data是读取的geoJson数据
     },
 
     // 加载风暴潮及增水
-    fillStorm: function(code) {
+    fillStorm: function (code) {
       /*
         新写的方法：
           加载风暴潮及增水的相关操作（入口方法）
@@ -436,8 +436,8 @@ data是读取的geoJson数据
       this.zoomView(code)
     },
 
-    //读取本地的netcdf文件，并加载
-    fillWMS: function() {
+    // 读取本地的netcdf文件，并加载
+    fillWMS: function () {
       var myself = this
       // var source=L.WMS.source('../../data/2018011420_08_24.nc',{
       //   'transparent':true
@@ -456,21 +456,21 @@ data是读取的geoJson数据
       wmsLayer.addTo(myself.mymap)
     },
 
-    //初始化加入监听点击事件
-    InitOnClick: function() {
-      this.mymap.on('click', function(e) {
+    // 初始化加入监听点击事件
+    InitOnClick: function () {
+      this.mymap.on('click', function (e) {
         console.log(e)
         // 获取经纬度对象
         // var cornerStr=e.latlng.toBounds()
 
-        var latLng= L.latLng(e.latlng.lat,e.latlng.lng)
+        var latLng = L.latLng(e.latlng.lat, e.latlng.lng)
         // var corner1=L.latlng(e.latlng.lat,e.latlng.lng)
 
         // var cornerStr=corner1.toBBoxString()
         console.log(cornerStr)
       })
     },
-    loadStationInfo: function() {
+    loadStationInfo: function () {
       let myself = this
       let stationInfo = loadStation()
       stationInfo.then(res => {
@@ -480,7 +480,7 @@ data是读取的geoJson数据
     },
 
     // 加载风暴潮增水图层
-    loadStormLayer: function() {
+    loadStormLayer: function () {
       // 加载风暴潮图层
       var myself = this
       // var date = new Date()
@@ -491,7 +491,7 @@ data是读取的geoJson数据
         console.log(res.data)
         myself.stationArr = res.data
 
-        $.each(myself.stationArr, function(index, val) {
+        $.each(myself.stationArr, function (index, val) {
           myself.stationDict[val.code] = val
         })
 
@@ -503,7 +503,7 @@ data是读取的geoJson数据
         myself.stormArr = getStormData(par).then(res => {
           myself.stormArr = res.data
           // 3 生成storm对象
-          $.each(myself.stormArr, function(index, val) {
+          $.each(myself.stormArr, function (index, val) {
             let stationTemp = null
             if (val.CODE in myself.stationDict) {
               stationTemp = myself.stationDict[val.CODE]
@@ -525,7 +525,7 @@ data是读取的geoJson数据
           })
 
           // 4 加入地图中
-          $.each(myself.stormObjArr, function(index, val) {
+          $.each(myself.stormObjArr, function (index, val) {
             myself.addDiv2Marker(val)
           })
         })
@@ -533,7 +533,7 @@ data是读取的geoJson数据
     },
 
     // 创建海洋站的潮位数据的div显示框
-    addDiv2Marker(stormObj) {
+    addDiv2Marker (stormObj) {
       let myself = this
       // 1 添加marker至map
       var tempMarker = L.marker([stormObj.lat, stormObj.lon])
@@ -560,7 +560,7 @@ data是读取的geoJson数据
       // 您可以选择指定侦听器的上下文（这个关键字将指向）
       tempMarker.addEventListener(
         'click',
-        function() {
+        function () {
           console.log(obj1)
           // 在此处实现弹出modal窗口，并获取预报曲线
         },
@@ -590,11 +590,11 @@ data是读取的geoJson数据
       // 将当前divIcon存起来
       myself.stormIconDivArr.push(tempDivIcon)
     },
-    infoInit: function() {
+    infoInit: function () {
       // 右上角的消息显示区域初始化
       let myself = this
       this.info = L.control()
-      this.info.onAdd = function(map) {
+      this.info.onAdd = function (map) {
         // myself._div = L.DomUtil.create('div', 'info') // create a div with a class "info"
         // myself.update()
         this._div = L.DomUtil.create('div', 'info') // create a div with a class "info"
@@ -602,7 +602,7 @@ data是读取的geoJson数据
         return this._div
       }
       // method that we will use to update the control based on feature properties passed
-      this.info.update = function(props) {
+      this.info.update = function (props) {
         // 此处使用了三元表达式
         /*
               由于使用了vue，此处的this应该为info
@@ -616,7 +616,7 @@ data是读取的geoJson数据
       }
       this.info.addTo(myself.mymap)
     },
-    zoomView: function(code) {
+    zoomView: function (code) {
       // 根据传入的code缩放至指定区域
       switch (code) {
         case 'n':
@@ -633,7 +633,7 @@ data是读取的geoJson数据
       }
     },
 
-    initMap: function() {
+    initMap: function () {
       var myself = this
       myself.mymap = L.map('basemap').setView([30.09, 127.75], 5)
       // var mymap = L.map('basemap').setView([51.505, -0.09], 13)
@@ -654,7 +654,7 @@ data是读取的geoJson数据
         tips: null,
         layer: L.layerGroup(),
         color: '#0D82D7',
-        addRectangle: function() {
+        addRectangle: function () {
           rectangleMeasure.destory()
           var bounds = []
           bounds.push(rectangleMeasure.startPoint)
@@ -666,35 +666,35 @@ data是读取的geoJson数据
           rectangleMeasure.rectangle.addTo(rectangleMeasure.layer)
 
           var northWestPoint = rectangleMeasure.rectangle
-              .getBounds()
-              .getNorthWest(),
+            .getBounds()
+            .getNorthWest(),
             southEastPoint = rectangleMeasure.rectangle
               .getBounds()
               .getSouthEast()
           rectangleMeasure.layer.addTo(map)
         },
-        mousedown: function(e) {
+        mousedown: function (e) {
           rectangleMeasure.rectangle = null
           rectangleMeasure.tips = null
           map.dragging.disable()
           rectangleMeasure.startPoint = e.latlng
           map.on('mousemove', rectangleMeasure.mousemove)
         },
-        mousemove: function(e) {
+        mousemove: function (e) {
           rectangleMeasure.endPoint = e.latlng
           rectangleMeasure.addRectangle()
           map
             .off('mousedown ', rectangleMeasure.mousedown)
             .on('mouseup', rectangleMeasure.mouseup)
         },
-        mouseup: function(e) {
+        mouseup: function (e) {
           map.dragging.enable()
           map
             .off('mousemove', rectangleMeasure.mousemove)
             .off('mouseup', rectangleMeasure.mouseup)
             .off('mousedown', rectangleMeasure.mousedown)
         },
-        destory: function() {
+        destory: function () {
           if (rectangleMeasure.rectangle) {
             rectangleMeasure.layer.removeLayer(rectangleMeasure.rectangle)
           }
@@ -708,7 +708,7 @@ data是读取的geoJson数据
 
   // 监听路由的变化写在watch中，当路由发生变化时，判断传入的种类是风暴潮还是网格
   watch: {
-    $route(to, from) {
+    $route (to, from) {
       // 当每次路由发生变化时，route会发生变化
       console.log(`to:${to},from:${from}`)
       console.log(`${to.params}`)
@@ -750,11 +750,11 @@ data是读取的geoJson数据
     }
   },
 
-  created: function() {
+  created: function () {
     // console.log('view created')
   },
 
-  mounted: function() {
+  mounted: function () {
     let code = this.$route.params.code
     // 初始化地图引擎
     this.initMap()

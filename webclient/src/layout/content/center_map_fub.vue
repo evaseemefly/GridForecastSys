@@ -19,7 +19,7 @@ require('echarts/lib/chart/bar')
 // 引入提示框和标题组件
 require('echarts/lib/component/tooltip')
 require('echarts/lib/component/title')
-import { getColorbar, loadForecastWavebyNc } from '../api/api'
+import { getColorbar } from '../api/api'
 
 import { getDateStr } from '../api/moment_api'
 import rightBar from './right_bar.vue'
@@ -29,7 +29,7 @@ import baseMap from './center_map_base.vue'
 import modalFrame from '../module/modal.vue'
 // import dateModule from '../module/date_select_module.vue'
 export default {
-  data () {
+  data() {
     return {
       // 加载预报产品需要的data
       mymap: null,
@@ -53,14 +53,14 @@ export default {
   components: {
     rightBar,
     baseMap,
-    modalFrame,
-    dateModule
+    modalFrame
+    // dateModule
   },
   computed: {
     ...mapGetters(['getlatlng']),
 
     // 当vuex中的latlng修改后，也修改此处的latlng
-    getlatlngTest: function () {
+    getlatlngTest: function() {
       var myself = this
       // 第一次加载时，store.state.latlng中没有lat属性
       // 此处需要加一个判断
@@ -71,13 +71,13 @@ export default {
         this.showModal()
       }
       // return this.$store.state.latlng
-    },
+    }
     // wms_layer:function(){
 
     // }
   },
   methods: {
-    fillarea: function (area) {
+    fillarea: function(area) {
       var date = new Date()
       // var date_str=getDateStr();
       var dictArea = null
@@ -119,7 +119,7 @@ export default {
     },
 
     // 读取本地的netcdf文件，并加载
-    fillWMS: function () {
+    fillWMS: function() {
       var myself = this
       // var source=L.WMS.source('../../data/2018011420_08_24.nc',{
       //   'transparent':true
@@ -138,13 +138,17 @@ export default {
       console.log(wmsLayer)
       wmsLayer.addTo(myself.mymap)
     },
-    showModal: function () {
+    showModal: function() {
       var myself = this
-      loadForecastWavebyNc('2018082112', myself.latlng.lat, myself.latlng.lng).then(res => {
+      loadForecastWavebyNc(
+        '2018082112',
+        myself.latlng.lat,
+        myself.latlng.lng
+      ).then(res => {
         console.log(res.data)
         var columns = []
         var values = []
-        $.each(res.data, function (index, val) {
+        $.each(res.data, function(index, val) {
           columns.push(val.date)
           values.push(val.value)
         })
@@ -156,14 +160,14 @@ export default {
     },
 
     // 接受由子组件传递过来的的layer的index（eg：000，006）
-    changeLayerIndex: function (val) {
+    changeLayerIndex: function(val) {
       this.wms_layer_index = val
     }
   },
 
   // 监听路由的变化写在watch中，当路由发生变化时，判断传入的种类是风暴潮还是网格
   watch: {
-    $route (to, from) {
+    $route(to, from) {
       // 当每次路由发生变化时，route会发生变化
       console.log(`to:${to},from:${from}`)
       console.log(`${to.params}`)
@@ -174,23 +178,23 @@ export default {
     // '$store.state.latlng': function(oldval, oldval) {
     //   console.log(oldval, oldval)
     // },
-    getlatlng: function (newVal, oldVal) {
+    getlatlng: function(newVal, oldVal) {
       console.log(oldVal, newVal)
     },
-    getlatlngTest: function (val) { },
-    wms_layer_index: function (val) {
+    getlatlngTest: function(val) {},
+    wms_layer_index: function(val) {
       this.wms_layer = 'gridraster:wave_area_northwest_hour_' + val
     },
-    wms_layer: function (val) {
+    wms_layer: function(val) {
       this.fillWMS()
     }
   },
 
-  created: function () {
+  created: function() {
     console.log('view created')
   },
 
-  mounted: function () {
+  mounted: function() {
     let code = this.$route.params.code
     // 以下部分在子组件中
     // 初始化地图引擎
@@ -206,7 +210,7 @@ export default {
     // this.clear()
     this.$refs.baseMap.clear()
     // 填充数值预报
-    this.fillWMS()
+    // this.fillWMS()
     console.log('view mounted')
   }
 }

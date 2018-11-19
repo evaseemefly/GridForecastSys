@@ -1,13 +1,8 @@
 import axios from 'axios'
 // import cookie from '../common/js/cookie';
-import {
-  loadStormData,
-  loadStationData
-} from '../../../layout/api/api'
+import { loadStormData, loadStationData } from '../../../layout/api/api'
 
-import {
-  getDateStr
-} from '../../../layout/api/moment_api'
+import { getDateStr } from '../../../layout/api/moment_api'
 let host = 'http://127.0.0.1:8000'
 axios.defaults.withCredentials = true
 
@@ -180,7 +175,15 @@ export function CreateStationIcon (name, surge, surgeDt, tide, tideDt) {
         红色：8-12  4th
     */
   this.toStr = function () {
-    var htmlStr = `<div class="myform"><table ><tr><td width="100" rowspan="2">${this.name}</td><td class="${this.surge_cls}" width="100">${this.surge}</td><td class="${this.surge_cls}" width="100">${this.surge_dt} </td></tr><tr><td class="${this.tide_cls}" width="100">${this.tide}</td><td class="${this.tide_cls}">${this.tide_dt}</td></tr></table></div>`
+    var htmlStr = `<div class="myform"><table ><tr><td width="100" rowspan="2">${
+      this.name
+    }</td><td class="${this.surge_cls}" width="100">${
+      this.surge
+    }</td><td class="${this.surge_cls}" width="100">${
+      this.surge_dt
+    } </td></tr><tr><td class="${this.tide_cls}" width="100">${
+      this.tide
+    }</td><td class="${this.tide_cls}">${this.tide_dt}</td></tr></table></div>`
     // var htmlStr = '<div class="myform"><table ><tr><td width="100" rowspan="2">{0}</td><td class="{1}" width="100">{2}</td><td class="{3}" width="100">{4} </td></tr><tr><td class="{5}" width="100">{6}</td><td class="{7}">{8}</td></tr></table></div>'.format(
     //       this.name,
     //       this.surge_cls,

@@ -1,7 +1,8 @@
 import axios from 'axios'
 // import cookie from '../common/js/cookie';
 
-let host = 'http://127.0.0.1:8000'
+// let host = 'http://127.0.0.1:8000'
+export const host = 'http://127.0.0.1:8000'
 // 允许跨域访问
 axios.defaults.withCredentials = true
 

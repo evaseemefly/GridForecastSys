@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     'GridForecast',
     'Station',
     'StormTide',
-
+    'Fub',
     # django rest framework
     'rest_framework',
     # 'xadmin',
@@ -204,6 +204,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS=[
     os.path.join(BASE_DIR,'static'),
     ('mapfiles', os.path.join(STATIC_URL, 'mapfiles').replace('\\', '/')),
+    '/Users/liusihan'
 ]
 
 AreaNames_DIR=r'D:\git仓库\GridForecastSys\extra_data\grid_data'

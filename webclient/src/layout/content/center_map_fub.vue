@@ -19,7 +19,7 @@ require('echarts/lib/chart/bar')
 // 引入提示框和标题组件
 require('echarts/lib/component/tooltip')
 require('echarts/lib/component/title')
-import { getColorbar } from '../api/api'
+import { getColorbar, loadFubStormData } from '../api/api'
 
 import { getDateStr } from '../api/moment_api'
 import rightBar from './right_bar.vue'
@@ -27,21 +27,25 @@ import rightBar from './right_bar.vue'
 import baseMap from './center_map_base.vue'
 // modal子组件
 import modalFrame from '../module/modal.vue'
+
+import {
+  CreateFubIcon,
+  loadFub
+} from '../../components/js/map/fub.js'
 // import dateModule from '../module/date_select_module.vue'
 export default {
-  data() {
+  data () {
     return {
       // 加载预报产品需要的data
       mymap: null,
       // forecastDict:[],
       fubArr: [],
       fubDict: {},
-      stormArr: {},
-      stormObjArr: [],
-      // 海洋站的marker数组
-      stormMarkerArr: [],
-      // 海洋站的IconDiv数组
-      stormIconDivArr: [],
+      fubObjArr: [],
+      // 浮标的marker数组
+      fubMarkerArr: [],
+      // 浮标的IconDiv数组
+      fubIconDivArr: [],
 
       // wms_lng,
       latlng: null,
@@ -60,7 +64,7 @@ export default {
     ...mapGetters(['getlatlng']),
 
     // 当vuex中的latlng修改后，也修改此处的latlng
-    getlatlngTest: function() {
+    getlatlngTest: function () {
       var myself = this
       // 第一次加载时，store.state.latlng中没有lat属性
       // 此处需要加一个判断
@@ -73,101 +77,122 @@ export default {
       // return this.$store.state.latlng
     }
     // wms_layer:function(){
-
     // }
   },
   methods: {
-    fillarea: function(area) {
-      var date = new Date()
-      // var date_str=getDateStr();
-      var dictArea = null
-      var newLayer = null
-      let staticUrl = '../../../static/files/'
-      switch (area) {
-        // 北海
-        case 'n':
-          // dictArea = loadAreaMaxData_byDate(date, area)
-          dictArea = loadAreaMaxDataByDate(date, area)
-          // 缩放并定位到指定海区
-          this.mymap.setView([38.3, 123], 7)
+    addDiv2Marker: function (fubObj) {
+      let myself = this
+      // 1 添加marker至map
+      var tempMarker = L.marker([fubObj.lat, fubObj.lon])
+      tempMarker.addTo(myself.mymap)
+      myself.fubMarkerArr.push(tempMarker)
 
-          newLayer = this.addshp(`${staticUrl}north.zip`, dictArea, true)
-          break
-        // 东海
-        case 'e':
-          dictArea = loadAreaMaxDataByDate(date, area)
-          this.mymap.setView([28.6, 125.35], 6)
-
-          newLayer = this.addshp(`${staticUrl}east.zip`, dictArea, true)
-          break
-        // 南海
-        case 's':
-          dictArea = loadAreaMaxDataByDate(date, area)
-          this.mymap.setView([20.2, 113.04], 7)
-
-          newLayer = this.addshp(`${staticUrl}south.zip`, dictArea, true)
-          break
-        // 全国
-        case 'a':
-          dictArea = loadAreaMaxDataByDate(date, area)
-          this.addshp(`${staticUrl}north.zip`, dictArea, false)
-          this.addshp(`${staticUrl}east.zip`, dictArea, false)
-          this.addshp(`${staticUrl}south.zip`, dictArea, false)
-          break
-      }
-      return [dictArea, newLayer]
-    },
-
-    // 读取本地的netcdf文件，并加载
-    fillWMS: function() {
-      var myself = this
-      // var source=L.WMS.source('../../data/2018011420_08_24.nc',{
-      //   'transparent':true
-      // })
-      var wmsLayer = L.tileLayer.wms(
-        'http://localhost:8080/geoserver/gridraster/wms',
-        {
-          // gridraster:swh
-          // layers: 'gridraster:wave_area_northwest_hour_00',
-          layers: myself.wms_layer,
-          // layers: 'gridraster:storm_nc',
-          format: 'image/png',
-          transparent: true
-        }
+      // 2 创建Icon至map
+      let obj1 = new CreateFubIcon(
+        fubObj.name,
+        fubObj.surge_val,
+        fubObj.surge_dt,
+        fubObj.tide_val,
+        fubObj.tide_dt
       )
-      console.log(wmsLayer)
-      wmsLayer.addTo(myself.mymap)
+
+      // 2018-10-16 为点击marker添加点击事件
+      // 方式2
+      // 此种方式，可以让点击时，获取点击的当前obj
+      // 参考：https://blog.csdn.net/ShangQuan2012/article/details/72723734
+      // https://leafletjs.com/reference-1.2.0.html#evented中的addEventListener
+      // You can optionally specify the context of the listener (object the this keyword will point to)
+      // 您可以选择指定侦听器的上下文（这个关键字将指向）
+      tempMarker.addEventListener(
+        'click',
+        function () {
+          console.log(obj1)
+          // 在此处实现弹出modal窗口，并获取预报曲线
+        },
+        this
+      )
+
+      // 方式1 ：默认方式，只能传递默认的event进来
+      let busIcon1 = L.divIcon({
+        className: 'icon_default',
+        html: obj1.toStr(),
+        // 坐标，[相对于原点的水平位置（左加右减），相对原点的垂直位置（上加下减）]
+        iconAnchor: [-20, 30]
+      })
+      // 秀英
+      var tempDivIcon = L.marker([fubObj.lat, fubObj.lon], {
+        icon: busIcon1
+      })
+
+      tempDivIcon.addTo(myself.mymap)
+      // 将当前divIcon存起来
+      myself.stormIconDivArr.push(tempDivIcon)
     },
-    showModal: function() {
+    // 浮标图层
+    loadFubLayer: function () {
+      // 加载浮标图层
       var myself = this
-      loadForecastWavebyNc(
-        '2018082112',
-        myself.latlng.lat,
-        myself.latlng.lng
-      ).then(res => {
+      // var date = new Date()
+      // 1 加载station info 存入data的stationArr中
+      let fubData = loadFub()
+      fubData.then(res => {
         console.log(res.data)
-        var columns = []
-        var values = []
-        $.each(res.data, function(index, val) {
-          columns.push(val.date)
-          values.push(val.value)
+        myself.fubArr = res.data
+
+        $.each(myself.fubArr, function (index, val) {
+          myself.fubDict[val.code] = val
         })
-        myself.modalColumns = columns
-        myself.modalValues = values
-        // 调用modal子组件的showModal方法，打开modal框
-        this.$refs.modal.showModal()
+
+        // 2 获取返回当日的极值数据
+        let nowDate = new Date()
+        let dateStr = getDateStr(nowDate)
+        // 由于测试，此处的时间暂时改为"20180807"
+        let par = { targetdate: '20180807' }
+        myself.stormArr = getStormData(par).then(res => {
+          myself.stormArr = res.data
+          // 3 生成storm对象
+          $.each(myself.stormArr, function (index, val) {
+            let stationTemp = null
+            if (val.CODE in myself.stationDict) {
+              stationTemp = myself.stationDict[val.CODE]
+            }
+            if (stationTemp != null) {
+              var obj = new StormData(
+                val.CODE,
+                stationTemp.name,
+                stationTemp.Lat,
+                stationTemp.Lon,
+                stationTemp.area,
+                val.Surge_VALUE,
+                val.Surge_DATE,
+                val.Tide_VALUE,
+                val.Tide_DATE
+              )
+              myself.stormObjArr.push(obj)
+            }
+          })
+
+          // 4 加入地图中
+          $.each(myself.stormObjArr, function (index, val) {
+            myself.addDiv2Marker(val)
+          })
+        })
       })
     },
+    // 加载浮标图层
+    fillFub: function () {
+      // 提交给后台的参数
+      let par = { targetdate: '20180807' }
+      // 加载图层
+      this.loadFubLayer()
 
-    // 接受由子组件传递过来的的layer的index（eg：000，006）
-    changeLayerIndex: function(val) {
-      this.wms_layer_index = val
     }
+
   },
 
   // 监听路由的变化写在watch中，当路由发生变化时，判断传入的种类是风暴潮还是网格
   watch: {
-    $route(to, from) {
+    $route (to, from) {
       // 当每次路由发生变化时，route会发生变化
       console.log(`to:${to},from:${from}`)
       console.log(`${to.params}`)
@@ -178,23 +203,23 @@ export default {
     // '$store.state.latlng': function(oldval, oldval) {
     //   console.log(oldval, oldval)
     // },
-    getlatlng: function(newVal, oldVal) {
+    getlatlng: function (newVal, oldVal) {
       console.log(oldVal, newVal)
     },
-    getlatlngTest: function(val) {},
-    wms_layer_index: function(val) {
+    getlatlngTest: function (val) { },
+    wms_layer_index: function (val) {
       this.wms_layer = 'gridraster:wave_area_northwest_hour_' + val
     },
-    wms_layer: function(val) {
+    wms_layer: function (val) {
       this.fillWMS()
     }
   },
 
-  created: function() {
+  created: function () {
     console.log('view created')
   },
 
-  mounted: function() {
+  mounted: function () {
     let code = this.$route.params.code
     // 以下部分在子组件中
     // 初始化地图引擎

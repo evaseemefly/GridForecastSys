@@ -31,6 +31,7 @@ urlpatterns = [
     url('^station/',include('Station.urls',namespace='sta')),
     url('^storm/',include('StormTide.urls',namespace='storm')),
     url('^gis/',include('GIS.urls',namespace='gis')),
+    url('^fub/',include('Fub.urls',namespace='fub')),
     # url(r'^getgrid/(?P<forecastdate>[0-9]+)/$',Grid.as_view(),name='getgrid'),
 
     # django resut framework

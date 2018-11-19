@@ -93,8 +93,8 @@ import { getDateStr } from '../api/moment_api'
 import rightBar from './right_bar.vue'
 
 export default {
-  data() {
-    return {      
+  data () {
+    return {
       forecastArr: [],
       // info: null,
       my_shp_layer_arr: [],
@@ -102,27 +102,27 @@ export default {
       my_shp_layer: null,
       info: null,
       geojson: null,
-      mymap:this.basemap,
-      latlng:null
+      mymap: this.basemap,
+      latlng: null
     }
   },
-  props:{
-      basemap: Object,
+  props: {
+    basemap: Object,
   },
   components: {
     rightBar
   },
   methods: {
     // 清除所有的底图
-    clear: function() {
+    clear: function () {
       this.clearLayer()
       this.clearDivIcon()
     },
     // 清除grid的layer底图
-    clearLayer: function() {
+    clearLayer: function () {
       var myself = this
       // 1 清除沿海基础网格底图
-      $.each(myself.my_shp_layer_arr, function(index, value) {
+      $.each(myself.my_shp_layer_arr, function (index, value) {
         myself.mymap.removeLayer(value)
       })
       myself.my_shp_layer_arr = []
@@ -131,14 +131,14 @@ export default {
       }
     },
     // 清除storm 的 IconDiv以及Marker
-    clearDivIcon: function() {
+    clearDivIcon: function () {
       var myself = this
       // myself.mymap.clearLayers()
       // 注意清除时，需要分别清除marker与IconDiv
-      $.each(myself.stormIconDivArr, function(index, val) {
+      $.each(myself.stormIconDivArr, function (index, val) {
         myself.mymap.removeLayer(val)
       })
-      $.each(myself.stormMarkerArr, function(index, val) {
+      $.each(myself.stormMarkerArr, function (index, val) {
         myself.mymap.removeLayer(val)
       })
       // 2 清除海洋站信息
@@ -148,7 +148,7 @@ export default {
       myself.stormIconDivArr = []
       myself.stormMarkerArr = []
     },
-    mystyle: function(feature) {
+    mystyle: function (feature) {
       return {
         weight: 2,
         opacity: 1,
@@ -158,7 +158,7 @@ export default {
         fillColor: getColor(feature.properties.density)
       }
     },
-    fillarea: function(area) {
+    fillarea: function (area) {
       var date = new Date()
       // var date_str=getDateStr();
       var dictArea = null
@@ -198,8 +198,8 @@ export default {
       }
       return [dictArea, newLayer]
     },
-    //读取本地的netcdf文件，并加载
-    fillWMS: function() {
+    // 读取本地的netcdf文件，并加载
+    fillWMS: function () {
       var myself = this
       // var source=L.WMS.source('../../data/2018011420_08_24.nc',{
       //   'transparent':true
@@ -218,11 +218,11 @@ export default {
       wmsLayer.addTo(myself.mymap)
     },
 
-    //初始化加入监听点击事件
-    InitOnClick: function() {
-      var myself=this
-      this.mymap.on('click', function(e) {
-        
+    // 初始化加入监听点击事件
+    InitOnClick: function () {
+      var myself = this
+      this.mymap.on('click', function (e) {
+
         // 获取经纬度对象
         // var cornerStr=e.latlng.toBounds()
 
@@ -230,17 +230,17 @@ export default {
         // var corner1=L.latlng(e.latlng.lat,e.latlng.lng)
 
         // var cornerStr=corner1.toBBoxString()
-        myself.$store.state.latlng=latLng
+        myself.$store.state.latlng = latLng
         console.log(myself.$store.state.latlng)
         // console.log(latLng)
       })
     },
-    
-    infoInit: function() {
+
+    infoInit: function () {
       // 右上角的消息显示区域初始化
       let myself = this
       this.info = L.control()
-      this.info.onAdd = function(map) {
+      this.info.onAdd = function (map) {
         // myself._div = L.DomUtil.create('div', 'info') // create a div with a class "info"
         // myself.update()
         this._div = L.DomUtil.create('div', 'info') // create a div with a class "info"
@@ -248,7 +248,7 @@ export default {
         return this._div
       }
       // method that we will use to update the control based on feature properties passed
-      this.info.update = function(props) {
+      this.info.update = function (props) {
         // 此处使用了三元表达式
         /*
               由于使用了vue，此处的this应该为info
@@ -262,7 +262,7 @@ export default {
       }
       this.info.addTo(myself.mymap)
     },
-    zoomView: function(code) {
+    zoomView: function (code) {
       // 根据传入的code缩放至指定区域
       switch (code) {
         case 'n':
@@ -278,9 +278,9 @@ export default {
           this.mymap.setView([20.2, 113.04], 7)
       }
     },
-    
+
     // 初始化地图
-    initMap: function() {
+    initMap: function () {
       var myself = this
       myself.mymap = L.map('basemap').setView([30.09, 127.75], 5)
       // var mymap = L.map('basemap').setView([51.505, -0.09], 13)
@@ -301,7 +301,7 @@ export default {
         tips: null,
         layer: L.layerGroup(),
         color: '#0D82D7',
-        addRectangle: function() {
+        addRectangle: function () {
           rectangleMeasure.destory()
           var bounds = []
           bounds.push(rectangleMeasure.startPoint)
@@ -313,35 +313,35 @@ export default {
           rectangleMeasure.rectangle.addTo(rectangleMeasure.layer)
 
           var northWestPoint = rectangleMeasure.rectangle
-              .getBounds()
-              .getNorthWest(),
+            .getBounds()
+            .getNorthWest(),
             southEastPoint = rectangleMeasure.rectangle
               .getBounds()
               .getSouthEast()
           rectangleMeasure.layer.addTo(map)
         },
-        mousedown: function(e) {
+        mousedown: function (e) {
           rectangleMeasure.rectangle = null
           rectangleMeasure.tips = null
           map.dragging.disable()
           rectangleMeasure.startPoint = e.latlng
           map.on('mousemove', rectangleMeasure.mousemove)
         },
-        mousemove: function(e) {
+        mousemove: function (e) {
           rectangleMeasure.endPoint = e.latlng
           rectangleMeasure.addRectangle()
           map
             .off('mousedown ', rectangleMeasure.mousedown)
             .on('mouseup', rectangleMeasure.mouseup)
         },
-        mouseup: function(e) {
+        mouseup: function (e) {
           map.dragging.enable()
           map
             .off('mousemove', rectangleMeasure.mousemove)
             .off('mouseup', rectangleMeasure.mouseup)
             .off('mousedown', rectangleMeasure.mousedown)
         },
-        destory: function() {
+        destory: function () {
           if (rectangleMeasure.rectangle) {
             rectangleMeasure.layer.removeLayer(rectangleMeasure.rectangle)
           }
@@ -351,13 +351,13 @@ export default {
         }
       }
 
-      this.$emit('update:basemap',myself.mymap)
+      this.$emit('update:basemap', myself.mymap)
     }
   },
 
   // 监听路由的变化写在watch中，当路由发生变化时，判断传入的种类是风暴潮还是网格
   watch: {
-    $route(to, from) {
+    $route (to, from) {
       // 当每次路由发生变化时，route会发生变化
       console.log(`to:${to},from:${from}`)
       console.log(`${to.params}`)
@@ -397,16 +397,16 @@ export default {
           break
       }
     },
-    mymap(newVal,oldVal){
-      this.$emit('update:basemap',newVal)
+    mymap (newVal, oldVal) {
+      this.$emit('update:basemap', newVal)
     }
   },
 
-  created: function() {
+  created: function () {
     console.log('view created')
   },
 
-  mounted: function() {
+  mounted: function () {
     let code = this.$route.params.code
     // 初始化地图引擎
     this.initMap()

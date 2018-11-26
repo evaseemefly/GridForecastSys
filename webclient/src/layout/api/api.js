@@ -51,18 +51,6 @@ export const loadStormData = par => {
   })
 }
 
-// 获取指定日期的浮标风暴潮及增水的极值
-export const loadFubStormData = par => {
-  // 获取指定日期的风暴潮及增水的极值
-
-  // var storm_data = []
-  let stormUrl = `${host}/storm/daily/`
-  // 降axios.get对象返回
-  return axios.get(stormUrl, {
-    params: par
-  })
-}
-
 // 获取海洋站相关信息
 export const loadStationData = par => {
   // 获取海洋站相关信息
@@ -75,6 +63,29 @@ export const loadFubData = par => {
   // 获取浮标相关信息
   let fubUrl = `${host}/fub/list/`
   return axios.get(fubUrl)
+}
+
+// 获取指定日期的浮标风暴潮及增水的极值
+export const loadFubStormData = par => {
+  // 获取指定日期的风暴潮及增水的极值
+
+  // var storm_data = []
+  let fubUrl = `${host}/fub/filterlist/`
+  // 降axios.get对象返回
+  return axios.get(fubUrl, {
+    params: par
+  })
+}
+
+// 获取指定日期以及指定浮标的72小时时间序列对应值
+export const loadFubDetailStormData = par => {
+  // 获取指定日期的风暴潮及增水的极值
+
+  let fubUrl = `${host}/fub/filterlist/`
+  // 降axios.get对象返回
+  return axios.get(fubUrl, {
+    params: par
+  })
 }
 
 export const loadTargetAreaMaxData = (date, area) => {

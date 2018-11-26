@@ -5,7 +5,9 @@ class FubInfoSerializer(serializers.ModelSerializer):
     # 注意此处不要继承错了，不要继承：serializers.Serializer
      class Meta:
          model=FubInfo
-         fields = ('name', 'code', 'area')
+         # fields = ('name', 'code', 'area','id')
+         fields = ('__all__')
+
 
 class FubDataInfoSerializer(serializers.ModelSerializer):
     fid=FubInfoSerializer()

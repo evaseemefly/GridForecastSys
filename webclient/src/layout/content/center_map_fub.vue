@@ -30,7 +30,9 @@ import modalFrame from '../module/modal.vue'
 
 import {
   CreateFubIcon,
-  loadFub
+  FubStormData,
+  loadFub,
+  getFubData
 } from '../../components/js/map/fub.js'
 // import dateModule from '../module/date_select_module.vue'
 export default {
@@ -40,6 +42,8 @@ export default {
       mymap: null,
       // forecastDict:[],
       fubArr: [],
+      fubids: [],
+      fubStormArr: [],
       fubDict: {},
       fubObjArr: [],
       // 浮标的marker数组
@@ -50,6 +54,8 @@ export default {
       // wms_lng,
       latlng: null,
       modalTitle: '',
+
+      // 传递给modal框的columns以及values的数组
       modalColumns: [],
       modalValues: []
     }
@@ -63,7 +69,7 @@ export default {
   computed: {
     ...mapGetters(['getlatlng']),
 
-    // 当vuex中的latlng修改后，也修改此处的latlng
+    // 当vuex中的latlng修改后，也修改此处的latlng，并展示modal框
     getlatlngTest: function () {
       var myself = this
       // 第一次加载时，store.state.latlng中没有lat属性
@@ -80,6 +86,7 @@ export default {
     // }
   },
   methods: {
+    // 在地图上加入qf的divIcon
     addDiv2Marker: function (fubObj) {
       let myself = this
       // 1 添加marker至map
@@ -89,11 +96,15 @@ export default {
 
       // 2 创建Icon至map
       let obj1 = new CreateFubIcon(
+        fubObj.code,
         fubObj.name,
-        fubObj.surge_val,
-        fubObj.surge_dt,
-        fubObj.tide_val,
-        fubObj.tide_dt
+        fubObj.lat,
+        fubObj.lon,
+        fubObj.area,
+        fubObj.maxwave,
+        fubObj.period,
+        fubObj.date,
+        fubObj.direction
       )
 
       // 2018-10-16 为点击marker添加点击事件
@@ -126,7 +137,7 @@ export default {
 
       tempDivIcon.addTo(myself.mymap)
       // 将当前divIcon存起来
-      myself.stormIconDivArr.push(tempDivIcon)
+      myself.fubIconDivArr.push(tempDivIcon)
     },
     // 浮标图层
     loadFubLayer: function () {
@@ -141,39 +152,44 @@ export default {
 
         $.each(myself.fubArr, function (index, val) {
           myself.fubDict[val.code] = val
+          myself.fubids.push(val.id)
         })
 
         // 2 获取返回当日的极值数据
         let nowDate = new Date()
         let dateStr = getDateStr(nowDate)
         // 由于测试，此处的时间暂时改为"20180807"
-        let par = { targetdate: '20180807' }
-        myself.stormArr = getStormData(par).then(res => {
-          myself.stormArr = res.data
+        let par = { nowdate: '2018-11-18', ids: myself.fubids }
+        getFubData(par).then(res => {
+          console.log(res)
+          myself.fubStormArr = res.data
+
           // 3 生成storm对象
-          $.each(myself.stormArr, function (index, val) {
-            let stationTemp = null
-            if (val.CODE in myself.stationDict) {
-              stationTemp = myself.stationDict[val.CODE]
+          $.each(myself.fubStormArr, function (index, val) {
+            let fubTemp = null
+            if (val.fid.code in myself.fubDict) {
+              // fubTemp = myself.fubDict[val.fid.code]
+              fubTemp = val
             }
-            if (stationTemp != null) {
-              var obj = new StormData(
-                val.CODE,
-                stationTemp.name,
-                stationTemp.Lat,
-                stationTemp.Lon,
-                stationTemp.area,
-                val.Surge_VALUE,
-                val.Surge_DATE,
-                val.Tide_VALUE,
-                val.Tide_DATE
+            let fubInfoTemp = fubTemp.fid
+            if (fubTemp != null) {
+              var obj = new FubStormData(
+                fubInfoTemp.code,
+                fubInfoTemp.name,
+                fubInfoTemp.Lat,
+                fubInfoTemp.Lon,
+                fubInfoTemp.area,
+                fubTemp.wv,
+                fubTemp.period,
+                fubTemp.tdate,
+                fubTemp.wvc
               )
-              myself.stormObjArr.push(obj)
+              myself.fubObjArr.push(obj)
             }
           })
 
           // 4 加入地图中
-          $.each(myself.stormObjArr, function (index, val) {
+          $.each(myself.fubObjArr, function (index, val) {
             myself.addDiv2Marker(val)
           })
         })
@@ -185,9 +201,24 @@ export default {
       let par = { targetdate: '20180807' }
       // 加载图层
       this.loadFubLayer()
-
+    },
+    // 加载modal框，调用modal框组件并显示
+    showModal: function () {
+      var myself = this
+      loadForecastWavebyNc('2018082112', myself.latlng.lat, myself.latlng.lng).then(res => {
+        console.log(res.data)
+        var columns = []
+        var values = []
+        $.each(res.data, function (index, val) {
+          columns.push(val.date)
+          values.push(val.value)
+        })
+        myself.modalColumns = columns
+        myself.modalValues = values
+        // 调用modal子组件的showModal方法，打开modal框
+        this.$refs.modal.showModal()
+      })
     }
-
   },
 
   // 监听路由的变化写在watch中，当路由发生变化时，判断传入的种类是风暴潮还是网格
@@ -234,6 +265,7 @@ export default {
     // 注意此处需要调用子组件中的方法
     // this.clear()
     this.$refs.baseMap.clear()
+    this.loadFubLayer()
     // 填充数值预报
     // this.fillWMS()
     console.log('view mounted')
@@ -241,12 +273,18 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 #mycontent {
   position: absolute;
   top: 188px;
   bottom: 0px;
   width: 100%;
   overflow: hidden;
+}
+.fub_name {
+  background-color: #2f4154;
+}
+#fub_name {
+  background-color: #2f4154;
 }
 </style>

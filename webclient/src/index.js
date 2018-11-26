@@ -41,6 +41,8 @@ import './components/css/flatui/flat-ui.css'
 import './components/css/base/base.css'
 import './components/css/base/clearfix.css'
 import './components/css/storm/storm.css'
+// 引入fub的样式
+import './components/css/fub/fub.css'
 
 Vue.prototype.moment = moment
 Vue.config.devtools = true

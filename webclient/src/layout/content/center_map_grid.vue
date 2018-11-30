@@ -1,49 +1,22 @@
 <template>
-  <!--下部的巨幕-->
-  <div id="mycontent" class="col-md-12 mycol_disPadding" style="width: 100%;">
-    <div id="basemap" style="height: 100%; width: 100%;">
-      <div class="leaflet-control-container">
-        <div class="leaflet-top leaflet-left">
-          <div class="leaflet-control-zoom leaflet-bar leaflet-control">
-            <a class="leaflet-control-zoom-in" href="http://leafletjs.com/examples/choropleth/example.html#" title="Zoom in" role="button" aria-label="Zoom in">+</a>
-            <a class="leaflet-control-zoom-out" href="http://leafletjs.com/examples/choropleth/example.html#" title="Zoom out" role="button" aria-label="Zoom out">−</a>
-          </div>
-        </div>
-        <div class="leaflet-top leaflet-right">
-          <!--<div class="info leaflet-control">
-                            <h4>网格概述</h4>未选择网格
-                        </div>-->
-        </div>
-        <div class="leaflet-bottom leaflet-left"></div>
-        <div class="leaflet-bottom leaflet-right">
-          <div class="info legend leaflet-control">
-            <i style="background:blue"></i> 2.5-3.5
-            <br>
-            <i style="background:yellow"></i> 3.5-4.5
-            <br>
-            <i style="background:orange"></i> 4.5-6
-            <br>
-            <i style="background:red"></i> 6-max
-            <br>
-          </div>
-          <div class="leaflet-control-attribution leaflet-control">
-            <!--<a href="http://leafletjs.com/" title="A JS library for interactive maps">Leaflet</a> | Map data ©
-                            <a href="http://openstreetmap.org/">OpenStreetMap</a> contributors,
-                            <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery ©-->
-            <a href="http://nmefc.com/">nmefc</a>版权所有 ©
-            <a href="http://nmefc.com/">nmefc&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
-          </div>
-        </div>
-      </div>
-      <div id="mybar" style="height:400px"></div>
-    </div>
+  <div>
+    <baseMap
+      ref="baseMap"
+      :basemap.sync='mymap'
+    ></baseMap>
+    <!-- <dateModule @changeLayerIndex="changeLayerIndex"></dateModule> -->
+    <modalFrame
+      ref="modal"
+      :columns='modalColumns'
+      :values='modalValues'
+    ></modalFrame>
   </div>
 </template>
 
 <script>
 import '../../components/js/map/leaflet'
 import '../../components/js/map/leaflet.shpfile'
-import '../../components/js/map/shp'
+import shp from 'shpjs'
 // import {
 //   StormData,
 //   loadStormLayer,
@@ -57,16 +30,17 @@ import '../../components/js/map/shp'
 // import {loadStormData} from "../../comppnents/js/map/storm";
 // import {area} from "../../components/js/map/mytest";
 import {
-  loadStation,
-  getStormData,
-  loadStormLayer,
-  StormData,
-  CreateStationIcon
-} from '../../components/js/map/storm'
+  addshp,
+  loadAreaMaxDataByDate,
+  // addShape,
+  dic2arr,
+  compareForecast
+} from '../../components/js/map/grid'
 
-import {getDateStr} from '../api/moment_api'
+import { getDateStr } from '../api/moment_api'
 // import maptiles from "../../components/js/map/maptiles"
-
+// map的base子组件
+import baseMap from './center_map_base.vue'
 export default {
   data () {
     return {
@@ -76,10 +50,15 @@ export default {
       stormArr: {},
       stormObjArr: [],
       my_shp_layer_arr: [],
+      featuresArr: [],
       mymap: null,
       my_shp_layer: null,
-      info: null
+      info: null,
+      area: 'a'
     }
+  },
+  components: {
+    baseMap
   },
   methods: {
     clearLayer: function () {
@@ -126,33 +105,36 @@ export default {
       }
       return value_color
     },
-
-    /*
-			 * 叠加shp文件，以geoJson的方式读取
-			 * data是读取的geoJson数据
-			 * 此处已重新修改 2018-08-06
-			 */
     addShape: function (dict, data, feature, layer, map) {
+      /*
+data是读取的geoJson数据
+此处已重新修改 2018-08-06
+      */
+
       // 注意此处需要注意判断在featrues_arr中是否已经存在了指定的值（若存在则不添加）
+      let myself = this
       $.each(data.features, function (index, obj) {
-        if ($.inArray(obj, features_arr) < 0) {
-          features_arr.push(obj)
+        if ($.inArray(obj, myself.featuresArr) < 0) {
+          myself.featuresArr.push(obj)
         }
       })
       //! !!注意此处添加了shape文件后，由于是读取的geojson，文件，通过L.geoJSON后，需要将返回值赋值给geojson
       // 此处的temp_geojson与geojson相同
-      var temp_geojson = L.geoJSON(data, {
+      // myself.geojson
+      let tempGeoJson = L.geoJSON(data, {
         style: function (feature) {
           // 获取到当前的对象的code
+
           var code = feature.properties.Code
-          var temp_color = null
-          //							forecast_dict_test
+          // console.log(`color:${code}`)
+          let tempColor = null
+
           if (dict[code]) {
-            temp_color = this.getColorbar(dict[code].HS_VALUE)
+            tempColor = getColorbar(dict[code].HS_VALUE)
           }
           return {
             // 注意此处的填充颜色及宽度的api可参见
-            fillColor: temp_color,
+            fillColor: tempColor,
             weight: 2,
             opacity: 1,
             color: 'white',
@@ -161,23 +143,51 @@ export default {
           }
         },
         // 注意此处必须要将OnEachFeature放在里面才可以
-        onEachFeature: onEachFeature
+        onEachFeature: myself.onEachFeature
       }).bindPopup(function (layer) {
         return layer.feature.properties.description
       })
-
-      geojson = temp_geojson.addTo(map)
-      return geojson
+      // 此处v1版本已经不确定geoJson是否为外侧的geoJson
+      let geoJson = tempGeoJson.addTo(map)
+      // 需要将genJson赋值给全局geojson
+      myself.geojson = geoJson
+      return geoJson
     },
-
-    addshp: function (shp_path, dict_area, isremoveLay) {
-      var shape_layer = null
+    infoInit: function () {
+      // 右上角的消息显示区域初始化
+      let myself = this
+      this.info = L.control()
+      this.info.onAdd = function (map) {
+        // myself._div = L.DomUtil.create('div', 'info') // create a div with a class "info"
+        // myself.update()
+        this._div = L.DomUtil.create('div', 'info') // create a div with a class "info"
+        this.update()
+        return this._div
+      }
+      // method that we will use to update the control based on feature properties passed
+      this.info.update = function (props) {
+        // 此处使用了三元表达式
+        /*
+              由于使用了vue，此处的this应该为info
+            */
+        // myself.info._div.innerHTML = '<h4>网格概述</h4>' + (props
+        //         ? '<b>网格编号：</b><br />' + props.Code
+        //         : '未选中')
+        this._div.innerHTML =
+          '<h4>网格概述</h4>' +
+          (props ? '<b>网格编号：</b><br />' + props.Code : '未选中')
+      }
+      this.info.addTo(myself.mymap)
+    },
+    // 加载网格化的shp格式文件
+    addshp: function (shpPath, dictArea, isremoveLay) {
+      var shapeLayer = null
       var myself = this
       // 为当天地图添加图层
       // 注意此处then是异步的，所以无法返回shape_layer;
-      shp(shp_path)
-        .then(function (temp_geojson) {
-          geojson = temp_geojson
+      shp(shpPath)
+        .then(function (tempGeojson) {
+          myself.geojson = tempGeojson
           // do something with your geojson
           // 当前图层不为空且删除图层的标记符为true都满足时，才清空当前图层
           if ((myself.my_shp_layer != null) & isremoveLay) {
@@ -187,9 +197,9 @@ export default {
             myself.my_shp_layer_arr = []
             myself.mymap.removeLayer(myself.my_shp_layer)
           }
-          var shp_layer = addShape(
-            dict_area,
-            temp_geojson,
+          var shpLayer = myself.addShape(
+            dictArea,
+            tempGeojson,
             null,
             null,
             myself.mymap
@@ -199,15 +209,29 @@ export default {
           //    style: mystyle,
           //    onEachFeature: onEachFeature
           // }).addTo(mymap);
-          myself.my_shp_layer = shp_layer
-          myself.my_shp_layer_arr.push(shp_layer)
+          myself.my_shp_layer = shpLayer
+          myself.my_shp_layer_arr.push(shpLayer)
         })
         .then(function () {
-          return shape_layer
+          return shapeLayer
         })
-      return shape_layer
+      return shapeLayer
     },
-
+    // 对于每一个feature
+    onEachFeature: function (feature, layer) {
+      let myself = this
+      layer.on({
+        mouseover: myself.highlightFeature,
+        mouseout: myself.resetHighlight,
+        click: myself.zoomToFeature
+      })
+    },
+    // 鼠标划出时恢复正常
+    resetHighlight: function (e) {
+      this.geojson.resetStyle(e.target)
+      this.info.update()
+    },
+    // 鼠标划入时高亮
     highlightFeature: function (e) {
       var layer = e.target
 
@@ -222,7 +246,7 @@ export default {
         layer.bringToFront()
       }
 
-      info.update(layer.feature.properties)
+      this.info.update(layer.feature.properties)
     },
 
     readShape: function (file, func) {
@@ -230,6 +254,54 @@ export default {
         // do something with your geojson
         func(geojson)
       })
+    },
+
+    // 注意加载页面时，需要执行加载全国的事件
+    fillGrid: function (value, item) {
+      // 此处的item是vm.data中的items
+      //
+      // console.log("执行填充操作：" + value);
+      this.selected = item
+      let textIndex = 1
+      textIndex += 1
+
+      // 将字典转成arr
+      this.arrKeysForecastextreme = []
+      this.arrValuesForecastextreme = []
+      // var arrObjForecastextreme = []
+
+      var info = this.fillarea(value)
+      let dictTarget = info[0]
+      // let outGeoLayer = info[1]
+      // 从当前地图中删除当前海区的layer，前提是当前海区的layer不为null，否则会报错
+      if (dictTarget != null) {
+        var forecastArr = dic2arr(dictTarget)
+        var forecastArrObj = []
+        $.each(forecastArr, function (index, obj) {
+          forecastArrObj.push({
+            code: obj.value.CODE,
+            HS_VALUE: obj.value.HS_VALUE
+          })
+        })
+        this.forecastArr = forecastArrObj.sort(compareForecast('HS_VALUE'))
+        // 从数组中取出前10个值
+        let forecastTop10 = forecastArr.slice(0, 15)
+
+        for (var i = 0; i < forecastTop10.length; i++) {
+          this.arrKeysForecastextreme.push(forecastTop10[i].code)
+
+          this.arrValuesForecastextreme.push(forecastTop10[i].value.HS_VALUE)
+        }
+
+        // var bar = this.initbar()
+        // this.loadbar(bar, this.arrKeysForecastextreme, this.arrValuesForecastextreme)
+      }
+      // 传递给子组件
+      // 暂时不加载右侧的top10
+      // this.$refs.rightBar.load(
+      //   this.arrKeysForecastextreme,
+      //   this.arrValuesForecastextreme
+      // )
     },
 
     mystyle: function (feature) {
@@ -242,133 +314,45 @@ export default {
         fillColor: getColor(feature.properties.density)
       }
     },
-
-    // 注意加载页面时，需要执行加载全国的事件
-    fillarea: function (value, item) {
-      // 此处的item是vm.data中的items
-      //
-      // console.log("执行填充操作：" + value);
-      this.selected = item
-      text_index += 1
-      // 将字典转成arr
-      var arr_keys_forecastextreme = []
-      var arr_values_forecastextreme = []
-      var arr_obj_forecastextreme = []
-
-      var info = fillarea(value)
-      dict_target = info[0]
-      out_geo_layer = info[1]
-      // 从当前地图中删除当前海区的layer，前提是当前海区的layer不为null，否则会报错
-      if (dict_target != null) {
-        var forecast_arr = dic2arr(dict_target)
-        var forecast_arr_obj = []
-        $.each(forecast_arr, function (index, obj) {
-          forecast_arr_obj.push({
-            code: obj.value.CODE,
-            HS_VALUE: obj.value.HS_VALUE
-          })
-        })
-        forecast_arr = forecast_arr_obj.sort(compare_forecast('HS_VALUE'))
-        // 从数组中取出前10个值
-        var forecast_top10 = forecast_arr.slice(0, 15)
-
-        for (var i = 0; i < forecast_top10.length; i++) {
-          arr_keys_forecastextreme.push(forecast_top10[i].code)
-
-          arr_values_forecastextreme.push(forecast_top10[i].HS_VALUE)
-        }
-
-        var bar = initbar()
-        loadbar(bar, arr_keys_forecastextreme, arr_values_forecastextreme)
-      }
-    },
-    zoomView: function (code) {
-      // 根据传入的code缩放至指定区域
-      switch (code) {
+    fillarea: function (area) {
+      var date = new Date()
+      // var date_str=getDateStr();
+      var dictArea = null
+      var newLayer = null
+      let staticUrl = '../../../static/files/'
+      switch (area) {
+        // 北海
         case 'n':
-          // 北海
+          // dictArea = loadAreaMaxData_byDate(date, area)
+          dictArea = loadAreaMaxDataByDate(date, area)
+          // 缩放并定位到指定海区
           this.mymap.setView([38.3, 123], 7)
+
+          newLayer = this.addshp(`${staticUrl}north.zip`, dictArea, true)
           break
+        // 东海
         case 'e':
-          // 东海
+          dictArea = loadAreaMaxDataByDate(date, area)
           this.mymap.setView([28.6, 125.35], 6)
+
+          newLayer = this.addshp(`${staticUrl}east.zip`, dictArea, true)
           break
+        // 南海
         case 's':
-          // 南海
+          dictArea = loadAreaMaxDataByDate(date, area)
           this.mymap.setView([20.2, 113.04], 7)
+
+          newLayer = this.addshp(`${staticUrl}south.zip`, dictArea, true)
+          break
+        // 全国
+        case 'a':
+          dictArea = loadAreaMaxDataByDate(date, area)
+          this.addshp(`${staticUrl}north.zip`, dictArea, false)
+          this.addshp(`${staticUrl}east.zip`, dictArea, false)
+          this.addshp(`${staticUrl}south.zip`, dictArea, false)
+          break
       }
-    },
-
-    initMap: function () {
-      var myself = this
-      myself.mymap = L.map('basemap').setView([30.09, 127.75], 5)
-      // var mymap = L.map('basemap').setView([51.505, -0.09], 13)
-      // mapLink = "../static/mapfiles/";
-
-      L.tileLayer('../../../static/img/mapfiles/{z}/{x}/{y}.jpg', {
-        attribution: '',
-        maxZoom: 8,
-        minZoom: 2
-      }).addTo(myself.mymap)
-      var status = 0
-      var popup = L.popup()
-
-      var rectangleMeasure = {
-        startPoint: null,
-        endPoint: null,
-        rectangle: null,
-        tips: null,
-        layer: L.layerGroup(),
-        color: '#0D82D7',
-        addRectangle: function () {
-          rectangleMeasure.destory()
-          var bounds = []
-          bounds.push(rectangleMeasure.startPoint)
-          bounds.push(rectangleMeasure.endPoint)
-          rectangleMeasure.rectangle = L.rectangle(bounds, {
-            color: rectangleMeasure.color,
-            weight: 1
-          })
-          rectangleMeasure.rectangle.addTo(rectangleMeasure.layer)
-
-          var northWestPoint = rectangleMeasure.rectangle
-              .getBounds()
-              .getNorthWest(),
-            southEastPoint = rectangleMeasure.rectangle
-              .getBounds()
-              .getSouthEast()
-          rectangleMeasure.layer.addTo(map)
-        },
-        mousedown: function (e) {
-          rectangleMeasure.rectangle = null
-          rectangleMeasure.tips = null
-          map.dragging.disable()
-          rectangleMeasure.startPoint = e.latlng
-          map.on('mousemove', rectangleMeasure.mousemove)
-        },
-        mousemove: function (e) {
-          rectangleMeasure.endPoint = e.latlng
-          rectangleMeasure.addRectangle()
-          map
-            .off('mousedown ', rectangleMeasure.mousedown)
-            .on('mouseup', rectangleMeasure.mouseup)
-        },
-        mouseup: function (e) {
-          map.dragging.enable()
-          map
-            .off('mousemove', rectangleMeasure.mousemove)
-            .off('mouseup', rectangleMeasure.mouseup)
-            .off('mousedown', rectangleMeasure.mousedown)
-        },
-        destory: function () {
-          if (rectangleMeasure.rectangle) {
-            rectangleMeasure.layer.removeLayer(rectangleMeasure.rectangle)
-          }
-          if (rectangleMeasure.tips) {
-            rectangleMeasure.layer.removeLayer(rectangleMeasure.tips)
-          }
-        }
-      }
+      return [dictArea, newLayer]
     }
   },
 
@@ -378,7 +362,9 @@ export default {
       console.log(`to:${to},from:${from}`)
       console.log(`${to.params}`)
       // 执行加载风暴潮的相关操作
-      this.fillStorm(to.params.code)
+      // this.fillStorm(to.params.code)
+      this.area = to.params.code
+
     }
 
   },
@@ -391,33 +377,16 @@ export default {
   mounted: function () {
     let code = this.$route.params.code
     // 初始化地图引擎
-    this.initMap()
+    // this.initMap()
+    // 调用父组件中的初始化地图引擎的方法
+    // 注意此处是调用base子组件中的方法，而非父组件
+    // this.$emit('initMap')
+    this.$refs.baseMap.clear()
+    this.infoInit()
+    // this.$refs.baseMap.initMap()
     // 缩放至指定海区
-    this.zoomView(code)
-
-    let par = { targetdate: '20180807' }
-    getStormData(par)
-    this.loadStormLayer()
-    // .then(function (res) {
-    //   console.log(res)
-    // })
-
-    // alert(get_data);
-    // var myself = this;
-    // this.info = L.control();
-    // info.onAdd = function(map) {
-    //   this._div = L.DomUtil.create("div", "info"); // create a div with a class "info"
-    //   this.update();
-    //   return this._div;
-    // };
-    // info.update = function(props) {
-    //   //此处使用了三元表达式
-    //   this._div.innerHTML =
-    //     "<h4>网格概述</h4>" +
-    //     (props ? "<b>网格编号：</b><br />" + props.Code : "未选中");
-    // };
-    // //此处有个问题
-    // this.info.addTo(myself.mymap);
+    this.$refs.baseMap.zoomView(code)
+    this.fillGrid(code)
   }
 }
 </script>

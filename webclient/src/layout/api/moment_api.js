@@ -1,5 +1,6 @@
 export function getDateStr (date) {
   let mydataStr = ''
+  // 注意此处可能获取到的是数字，所以不能直接相加，需要转换为str
   var year = date.getFullYear()
   var month = date.getMonth() + 1
   var day = date.getDate()
@@ -9,7 +10,7 @@ export function getDateStr (date) {
   if (day < 10) {
     day = '0' + day
   }
-  mydataStr = year + month + day
+  mydataStr = String(year) + String(month) + String(day)
   return mydataStr
 }
 export function getYesterday (date) {

@@ -19,7 +19,10 @@ require('echarts/lib/chart/bar')
 // 引入提示框和标题组件
 require('echarts/lib/component/tooltip')
 require('echarts/lib/component/title')
-import { getColorbar, loadFubStormData } from '../api/api'
+import {
+  getColorbar,
+  loadFubStormData,
+  loadFubDetailStormData} from '../api/api'
 
 import { getDateStr } from '../api/moment_api'
 import rightBar from './right_bar.vue'
@@ -50,7 +53,8 @@ export default {
       fubMarkerArr: [],
       // 浮标的IconDiv数组
       fubIconDivArr: [],
-
+      selectFubId: null,
+      targetDate: null,
       // wms_lng,
       latlng: null,
       modalTitle: '',
@@ -205,13 +209,16 @@ export default {
     // 加载modal框，调用modal框组件并显示
     showModal: function () {
       var myself = this
-      loadForecastWavebyNc('2018082112', myself.latlng.lat, myself.latlng.lng).then(res => {
+      // 以下为测试使用，生产环境下仍需修改
+      myself.selectFubId = 1
+      myself.targetDate = '2018-11-18 19:00'
+      loadFubDetailStormData({ id: myself.selectFubId, nowdate: myself.targetDate }).then(res => {
         console.log(res.data)
         var columns = []
         var values = []
         $.each(res.data, function (index, val) {
-          columns.push(val.date)
-          values.push(val.value)
+          columns.push(val.tdate)
+          values.push(val.wv)
         })
         myself.modalColumns = columns
         myself.modalValues = values

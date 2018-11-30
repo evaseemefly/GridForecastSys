@@ -4,10 +4,12 @@ import Router from 'vue-router'
 import home from '../layout/home/index.vue'
 // import login from '../layout/login/login.vue';
 import content from '../layout/content/center_map.vue'
+import gridcontent from '../layout/content/center_map_grid.vue'
 import contentForecast from '../layout/content/center_map_forecast.vue'
 // 引入浮标content
 import fubcontent from '../layout/content/center_map_fub.vue'
-
+// 引入风暴潮content
+import stormcontent from '../layout/content/center_map_storm.vue'
 // 路由改为组件的方式引入，不再使用require
 const routers = [
   {
@@ -44,12 +46,12 @@ const routers = [
       {
         name: 'storm',
         path: 'content/storm/:code',
-        component: content
+        component: stormcontent
       },
       {
         name: 'grid',
         path: 'content/grid/:code',
-        component: content
+        component: gridcontent
       },
       {
         name: 'forecast',

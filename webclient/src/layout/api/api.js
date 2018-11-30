@@ -81,7 +81,7 @@ export const loadFubStormData = par => {
 export const loadFubDetailStormData = par => {
   // 获取指定日期的风暴潮及增水的极值
 
-  let fubUrl = `${host}/fub/filterlist/`
+  let fubUrl = `${host}/fub/daily/`
   // 降axios.get对象返回
   return axios.get(fubUrl, {
     params: par

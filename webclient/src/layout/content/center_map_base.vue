@@ -1,12 +1,31 @@
 <template>
   <!--下部的巨幕-->
-  <div id="mycontent" class="col-md-12 mycol_disPadding" style="width: 100%;">
-    <div id="basemap" style="height: 100%; width: 100%;">
+  <div
+    id="mycontent"
+    class="col-md-12 mycol_disPadding"
+    style="width: 100%;"
+  >
+    <div
+      id="basemap"
+      style="height: 100%; width: 100%;"
+    >
       <div class="leaflet-control-container">
         <div class="leaflet-top leaflet-left">
           <div class="leaflet-control-zoom leaflet-bar leaflet-control">
-            <a class="leaflet-control-zoom-in" href="http://leafletjs.com/examples/choropleth/example.html#" title="Zoom in" role="button" aria-label="Zoom in">+</a>
-            <a class="leaflet-control-zoom-out" href="http://leafletjs.com/examples/choropleth/example.html#" title="Zoom out" role="button" aria-label="Zoom out">−</a>
+            <a
+              class="leaflet-control-zoom-in"
+              href="http://leafletjs.com/examples/choropleth/example.html#"
+              title="Zoom in"
+              role="button"
+              aria-label="Zoom in"
+            >+</a>
+            <a
+              class="leaflet-control-zoom-out"
+              href="http://leafletjs.com/examples/choropleth/example.html#"
+              title="Zoom out"
+              role="button"
+              aria-label="Zoom out"
+            >−</a>
           </div>
         </div>
         <div class="leaflet-top leaflet-right">
@@ -34,7 +53,11 @@
     <!-- 由下边的rightBar组件替代 -->
     <!-- <div id="mybar" style="height:400px"></div> -->
 
-    <rightBar ref="rightBar" :arrValuesForecastextreme="arrValuesForecastextreme" :arrKeysForecastextreme="arrKeysForecastextreme"></rightBar>
+    <rightBar
+      ref="rightBar"
+      :arrValuesForecastextreme="arrValuesForecastextreme"
+      :arrKeysForecastextreme="arrKeysForecastextreme"
+    ></rightBar>
   </div>
 </template>
 
@@ -236,32 +259,32 @@ export default {
       })
     },
 
-    infoInit: function () {
-      // 右上角的消息显示区域初始化
-      let myself = this
-      this.info = L.control()
-      this.info.onAdd = function (map) {
-        // myself._div = L.DomUtil.create('div', 'info') // create a div with a class "info"
-        // myself.update()
-        this._div = L.DomUtil.create('div', 'info') // create a div with a class "info"
-        this.update()
-        return this._div
-      }
-      // method that we will use to update the control based on feature properties passed
-      this.info.update = function (props) {
-        // 此处使用了三元表达式
-        /*
-              由于使用了vue，此处的this应该为info
-            */
-        // myself.info._div.innerHTML = '<h4>网格概述</h4>' + (props
-        //         ? '<b>网格编号：</b><br />' + props.Code
-        //         : '未选中')
-        this._div.innerHTML =
-          '<h4>网格概述</h4>' +
-          (props ? '<b>网格编号：</b><br />' + props.Code : '未选中')
-      }
-      this.info.addTo(myself.mymap)
-    },
+    // infoInit: function () {
+    //   // 右上角的消息显示区域初始化
+    //   let myself = this
+    //   this.info = L.control()
+    //   this.info.onAdd = function (map) {
+    //     // myself._div = L.DomUtil.create('div', 'info') // create a div with a class "info"
+    //     // myself.update()
+    //     this._div = L.DomUtil.create('div', 'info') // create a div with a class "info"
+    //     this.update()
+    //     return this._div
+    //   }
+    //   // method that we will use to update the control based on feature properties passed
+    //   this.info.update = function (props) {
+    //     // 此处使用了三元表达式
+    //     /*
+    //           由于使用了vue，此处的this应该为info
+    //         */
+    //     // myself.info._div.innerHTML = '<h4>网格概述</h4>' + (props
+    //     //         ? '<b>网格编号：</b><br />' + props.Code
+    //     //         : '未选中')
+    //     this._div.innerHTML =
+    //       '<h4>网格概述</h4>' +
+    //       (props ? '<b>网格编号：</b><br />' + props.Code : '未选中')
+    //   }
+    //   this.info.addTo(myself.mymap)
+    // },
     zoomView: function (code) {
       // 根据传入的code缩放至指定区域
       switch (code) {
@@ -282,76 +305,79 @@ export default {
     // 初始化地图
     initMap: function () {
       var myself = this
-      myself.mymap = L.map('basemap').setView([30.09, 127.75], 5)
-      // var mymap = L.map('basemap').setView([51.505, -0.09], 13)
-      // mapLink = "../static/mapfiles/";
+      if (myself.mymap == null) {
+        myself.mymap = L.map('basemap').setView([30.09, 127.75], 5)
+        // var mymap = L.map('basemap').setView([51.505, -0.09], 13)
+        // mapLink = "../static/mapfiles/";
 
-      L.tileLayer('../../../static/img/mapfiles/{z}/{x}/{y}.jpg', {
-        attribution: '',
-        maxZoom: 8,
-        minZoom: 2
-      }).addTo(myself.mymap)
-      var status = 0
-      var popup = L.popup()
+        L.tileLayer('../../../static/img/mapfiles/{z}/{x}/{y}.jpg', {
+          attribution: '',
+          maxZoom: 8,
+          minZoom: 2
+        }).addTo(myself.mymap)
+        var status = 0
+        var popup = L.popup()
 
-      var rectangleMeasure = {
-        startPoint: null,
-        endPoint: null,
-        rectangle: null,
-        tips: null,
-        layer: L.layerGroup(),
-        color: '#0D82D7',
-        addRectangle: function () {
-          rectangleMeasure.destory()
-          var bounds = []
-          bounds.push(rectangleMeasure.startPoint)
-          bounds.push(rectangleMeasure.endPoint)
-          rectangleMeasure.rectangle = L.rectangle(bounds, {
-            color: rectangleMeasure.color,
-            weight: 1
-          })
-          rectangleMeasure.rectangle.addTo(rectangleMeasure.layer)
+        var rectangleMeasure = {
+          startPoint: null,
+          endPoint: null,
+          rectangle: null,
+          tips: null,
+          layer: L.layerGroup(),
+          color: '#0D82D7',
+          addRectangle: function () {
+            rectangleMeasure.destory()
+            var bounds = []
+            bounds.push(rectangleMeasure.startPoint)
+            bounds.push(rectangleMeasure.endPoint)
+            rectangleMeasure.rectangle = L.rectangle(bounds, {
+              color: rectangleMeasure.color,
+              weight: 1
+            })
+            rectangleMeasure.rectangle.addTo(rectangleMeasure.layer)
 
-          var northWestPoint = rectangleMeasure.rectangle
-            .getBounds()
-            .getNorthWest(),
-            southEastPoint = rectangleMeasure.rectangle
+            var northWestPoint = rectangleMeasure.rectangle
               .getBounds()
-              .getSouthEast()
-          rectangleMeasure.layer.addTo(map)
-        },
-        mousedown: function (e) {
-          rectangleMeasure.rectangle = null
-          rectangleMeasure.tips = null
-          map.dragging.disable()
-          rectangleMeasure.startPoint = e.latlng
-          map.on('mousemove', rectangleMeasure.mousemove)
-        },
-        mousemove: function (e) {
-          rectangleMeasure.endPoint = e.latlng
-          rectangleMeasure.addRectangle()
-          map
-            .off('mousedown ', rectangleMeasure.mousedown)
-            .on('mouseup', rectangleMeasure.mouseup)
-        },
-        mouseup: function (e) {
-          map.dragging.enable()
-          map
-            .off('mousemove', rectangleMeasure.mousemove)
-            .off('mouseup', rectangleMeasure.mouseup)
-            .off('mousedown', rectangleMeasure.mousedown)
-        },
-        destory: function () {
-          if (rectangleMeasure.rectangle) {
-            rectangleMeasure.layer.removeLayer(rectangleMeasure.rectangle)
-          }
-          if (rectangleMeasure.tips) {
-            rectangleMeasure.layer.removeLayer(rectangleMeasure.tips)
+              .getNorthWest(),
+              southEastPoint = rectangleMeasure.rectangle
+                .getBounds()
+                .getSouthEast()
+            rectangleMeasure.layer.addTo(map)
+          },
+          mousedown: function (e) {
+            rectangleMeasure.rectangle = null
+            rectangleMeasure.tips = null
+            map.dragging.disable()
+            rectangleMeasure.startPoint = e.latlng
+            map.on('mousemove', rectangleMeasure.mousemove)
+          },
+          mousemove: function (e) {
+            rectangleMeasure.endPoint = e.latlng
+            rectangleMeasure.addRectangle()
+            map
+              .off('mousedown ', rectangleMeasure.mousedown)
+              .on('mouseup', rectangleMeasure.mouseup)
+          },
+          mouseup: function (e) {
+            map.dragging.enable()
+            map
+              .off('mousemove', rectangleMeasure.mousemove)
+              .off('mouseup', rectangleMeasure.mouseup)
+              .off('mousedown', rectangleMeasure.mousedown)
+          },
+          destory: function () {
+            if (rectangleMeasure.rectangle) {
+              rectangleMeasure.layer.removeLayer(rectangleMeasure.rectangle)
+            }
+            if (rectangleMeasure.tips) {
+              rectangleMeasure.layer.removeLayer(rectangleMeasure.tips)
+            }
           }
         }
+
+        this.$emit('update:basemap', myself.mymap)
       }
 
-      this.$emit('update:basemap', myself.mymap)
     }
   },
 
@@ -413,7 +439,8 @@ export default {
     // 缩放至指定海区
     this.zoomView(code)
     // 对info初始化
-    this.infoInit()
+    // 将其写在父组件中
+    // this.infoInit()
 
     this.InitOnClick()
   }

@@ -68,7 +68,7 @@ class FubFilterListView(APIView):
 
         # 方式4
         # 对当前的日期加上23：59：59 可行
-        now = datetime.datetime.now()
+        # now = datetime.datetime.now()
         target_date_finish= target_date+datetime.timedelta(hours=23, minutes=59, seconds=59)
         # list_fub_data = FubDataInfo.objects.filter(tdate__date__gte=now)
         list_fub_data=FubDataInfo.objects.filter(tdate__gt=target_date,tdate__lt=target_date_finish,fid__id__in=list_ids)

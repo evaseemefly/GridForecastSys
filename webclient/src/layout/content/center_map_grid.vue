@@ -10,6 +10,7 @@
       :columns='modalColumns'
       :values='modalValues'
     ></modalFrame>
+
   </div>
 </template>
 

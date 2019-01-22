@@ -1,8 +1,15 @@
 <template>
   <div>
-    <baseMap ref="baseMap" :basemap.sync='mymap'></baseMap>
+    <baseMap
+      ref="baseMap"
+      :basemap.sync='mymap'
+    ></baseMap>
     <dateModule @changeLayerIndex="changeLayerIndex"></dateModule>
-    <modalFrame ref="modal" :columns='modalColumns' :values='modalValues'></modalFrame>
+    <modalFrame
+      ref="modal"
+      :columns='modalColumns'
+      :values='modalValues'
+    ></modalFrame>
   </div>
 </template>
 

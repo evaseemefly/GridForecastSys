@@ -154,8 +154,11 @@ DATABASES = {
         # 'HOST':'127.0.0.1',
 
         # mac
+        # 'USER':'root',
+        # 'PASSWORD':'12345678'
         'USER':'root',
-        'PASSWORD':'12345678'
+        'PASSWORD':'nmefc123'
+
         # 'HOST':'127.0.0.1',
         # 'OPTIONS':{'init_command':'SET storage_engine=INNODB;'}
     }

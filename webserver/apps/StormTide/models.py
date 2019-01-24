@@ -6,7 +6,8 @@ from django.db import models
 from django.db import models
 from datetime import datetime
 
-from Station.models import StationInfo
+# from Station.models import StationInfo
+# from Station.models import StationInfo
 # Create your models here.
 
 class StormTideInfo(models.Model):
@@ -42,3 +43,35 @@ class StormTideDailyInfo(models.Model):
     class Meta:
         verbose_name=u"每日预报风暴潮及增水极值及时间"
         verbose_name_plural=verbose_name
+
+class WaveRealtimeInfo(models.Model):
+    '''
+        wv报文
+    '''
+    wid=models.AutoField(primary_key=True)
+    # 有效波高
+    wv=models.FloatField(default=999.0)
+    # 有效周期
+    wvperiod=models.FloatField(default=999.0)
+    # 波向
+    wvd=models.IntegerField(default=999)
+    code=models.CharField(max_length=6)
+    sid=models.ForeignKey('Station.StationInfo',on_delete=models.CASCADE)
+    # 时间戳
+    timestamp=models.DateTimeField(default=datetime.now)
+
+class WaveHistoryInfo(models.Model):
+    '''
+        wv报文（历史数据）
+    '''
+    wid=models.AutoField(primary_key=True)
+    # 有效波高
+    wv=models.FloatField(default=999.0)
+    # 有效周期
+    wvperiod=models.FloatField(default=999.0)
+    # 波向
+    wvd=models.IntegerField(default=999)
+    code=models.CharField(max_length=6)
+    sid=models.ForeignKey('Station.StationInfo',on_delete=models.CASCADE)
+    # 时间戳
+    timestamp=models.DateTimeField(default=datetime.now)

@@ -30,3 +30,4 @@ class StationInfo(models.Model):
     class Meta:
         verbose_name=u"海洋站信息"
         verbose_name_plural=verbose_name
+

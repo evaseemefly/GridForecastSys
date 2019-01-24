@@ -15,21 +15,28 @@ import datetime
 from .models import FubDataInfo,FubInfo
 
 # 序列化对象
-from .serializers import FubInfoSerializer,FubDataInfoSerializer
+from .serializers import FubInfoSerializer,FubDataInfoSerializer,FubRealtimeInfoSerializer,FubRealtimeInfoMidSerializer
+# base views
+from .views_base import RealtimeBaseView,FubBaseView
 # Create your views here.
+
 
 class GridView(APIView):
     def get(self,request,code):
         pass
 
-class FubAllView(APIView):
+# 获取全部浮标的列表
+class FubAllView(FubBaseView):
     '''
         获取全部浮标的列表
     '''
     def get(self,request):
-        list_fub=FubInfo.objects.filter(isShow=True)
-        json_data=FubInfoSerializer(list_fub,many=True)
+        list=self.getAllFub()
+        json_data = FubInfoSerializer(list, many=True)
         return Response(json_data.data)
+        # list_fub=FubInfo.objects.filter(isShow=True)
+        # json_data=FubInfoSerializer(list_fub,many=True)
+        # return Response(json_data.data)
 
 class FubFilterListView(APIView):
     '''
@@ -100,4 +107,15 @@ class FubDailyDataView(APIView):
         json_data = FubDataInfoSerializer(list_fub_data, many=True)
         return Response(json_data.data)
 
+
+class FubLastRealtimeView(RealtimeBaseView,APIView):
+    '''
+        获取fub最后传输的时间的观测值
+    '''
+    def get(self,request):
+        area=request.GET.get('area','a')
+
+        list=self.getAllFubLastRealtimeList(area)
+        json_data=FubRealtimeInfoMidSerializer(list,many=True).data
+        return Response(json_data)
 

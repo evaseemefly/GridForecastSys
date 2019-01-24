@@ -53,3 +53,25 @@ class FubDataInfo(models.Model):
     class Meta:
         verbose_name=u"浮标观测数据"
         verbose_name_plural=verbose_name
+
+class FubRealtimeInfo(models.Model):
+    '''
+        浮标的观测数据（实时）只保留一周
+    '''
+    wid=models.AutoField(primary_key=True)
+    # 风速
+    ws=models.FloatField(default=999.9)
+    # 风向
+    wd=models.FloatField(default=999.9)
+    # 气压
+    bp=models.FloatField(default=9999.9)
+    # 有效波高
+    wv=models.FloatField(default=999.9)
+    # 有效周期
+    wvperiod=models.FloatField(default=999.9)
+    # 波向
+    wvd=models.IntegerField(default=999)
+    code=models.CharField(max_length=6)
+    fid=models.ForeignKey('FubInfo',on_delete=models.CASCADE)
+    # 时间戳
+    timestamp=models.DateTimeField(default=datetime.now)

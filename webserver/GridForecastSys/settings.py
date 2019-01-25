@@ -191,7 +191,8 @@ REST_FRAMEWORK = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# 时区改为上海时
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 

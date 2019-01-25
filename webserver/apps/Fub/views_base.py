@@ -45,6 +45,17 @@ class RealtimeBaseView(APIView):
         list=list.values('ws','wd','bp','bp','wv','wvperiod','wvd','code','fid').annotate(Max('timestamp'))
         return list
 
+    def getDateRangFubData(self,fid,start,end):
+        '''
+            获取指定id的之间段内的数据
+        :param fid:
+        :param start:
+        :param end:
+        :return:
+        '''
+        # list = FubRealtimeInfo.objects.filter(fid__id=fid,)
+        list=FubRealtimeInfo.objects.filter(fid__id=fid,timestamp__lte=end,timestamp__gte=start)
+        return list
 
 class FubBaseView(APIView):
     '''
@@ -56,3 +67,4 @@ class FubBaseView(APIView):
         :return:
         '''
         list_fub = FubInfo.objects.filter(isShow=True)
+

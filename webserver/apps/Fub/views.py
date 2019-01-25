@@ -11,8 +11,12 @@ from rest_framework.decorators import APIView
 
 import datetime
 
+#为特定请求方法添加装饰器
+from django.utils.decorators import method_decorator
+
 # model
 from .models import FubDataInfo,FubInfo
+from Common.decorator_view import *
 
 # 序列化对象
 from .serializers import FubInfoSerializer,FubDataInfoSerializer,FubRealtimeInfoSerializer,FubRealtimeInfoMidSerializer
@@ -107,7 +111,7 @@ class FubDailyDataView(APIView):
         json_data = FubDataInfoSerializer(list_fub_data, many=True)
         return Response(json_data.data)
 
-
+# 获取fub最后传输的时间的观测值
 class FubLastRealtimeView(RealtimeBaseView,APIView):
     '''
         获取fub最后传输的时间的观测值
@@ -119,3 +123,16 @@ class FubLastRealtimeView(RealtimeBaseView,APIView):
         json_data=FubRealtimeInfoMidSerializer(list,many=True).data
         return Response(json_data)
 
+# 根据时间进行过滤获取指定fid的指定时间内的观测数据
+class FubFilterDataView(RealtimeBaseView,APIView):
+    '''
+        根据时间进行过滤获取指定fid的指定时间内的观测数据
+    '''
+    @method_decorator(date_required)
+    def get(self,request):
+        fid=int(request.GET.get('fid',-1))
+        start=request.GET.get('start')
+        end=request.GET.get('end')
+        list=self.getDateRangFubData(fid,start,end)
+        json_data=FubRealtimeInfoSerializer(list,many=True).data
+        return Response(json_data)

@@ -6,7 +6,7 @@ from django.http import HttpRequest,HttpResponse
 from django.core import serializers
 from rest_framework.response import Response
 from rest_framework.decorators import APIView
-from django.db.models import Max
+from django.db.models import Max,Count
 
 import datetime
 
@@ -42,8 +42,37 @@ class RealtimeBaseView(APIView):
             list=FubRealtimeInfo.objects
         else:
             list=FubRealtimeInfo.objects.filter(fid__area=area)
-        list=list.values('ws','wd','bp','bp','wv','wvperiod','wvd','code','fid').annotate(Max('timestamp'))
-        return list
+        # 对fid进行去重
+        # list=list.values('ws','wd','bp','bp','wv','wvperiod','wvd','code','fid','lon','lat').annotate(Max('timestamp'),fid_count=Count('fid__id'))
+        # list.group_by('fid').annotate(Max('timestamp'))
+        # list = list.values('ws', 'wd', 'bp', 'bp', 'wv', 'wvperiod', 'wvd', 'code', 'fid', 'lon', 'lat').annotate(
+        #     Max('timestamp'),fid_count=Count('fid__id'))
+        # list = list.values('ws','wd','bp','bp','wv','wvperiod','wvd','code','fid','lon','lat').annotate(Max('timestamp'))
+
+        '''
+            -- 使用子查询连接的方式（可行）
+            SELECT *
+            FROM
+            Fub_fubrealtimeinfo as f
+            JOIN(SELECT
+            fid_id, MAX(`timestamp`)
+            MAX_TIME
+            FROM
+            Fub_fubrealtimeinfo as fr
+            GROUP
+            BY
+            fid_id) as temp
+            ON
+            temp.fid_id = f.fid_id and temp.MAX_TIME = f.
+            `timestamp`
+        '''
+
+        # list_temp=list.group_by('fid').annotate(Max('timestamp')).values('fid',max_time=)
+        list_max = list.values('fid').annotate(max_time=Max('timestamp'))
+        # list_finall=list.values('ws','wd','bp','bp','wv','wvperiod','wvd','code','fid','lon','lat','timestamp').filter(fid__in=list_max.values_list('fid'),timestamp__in=list_max.values_list('max_time'))
+        list_finall = list.values('ws', 'wd', 'bp', 'bp', 'wv', 'wvperiod', 'wvd', 'code', 'fid', 'lon', 'lat',
+                                  'timestamp').filter(timestamp__in=list_max.values_list('max_time')).annotate(max_time=Max('timestamp')).annotate(count_fid=Count('fid'))
+        return list_finall
 
     def getDateRangFubData(self,fid,start,end):
         '''

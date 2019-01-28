@@ -37,4 +37,8 @@ class FubRealtimeInfoMidSerializer(serializers.Serializer):
     code = serializers.CharField()
     fid = serializers.IntegerField()
     # 时间戳
-    timestamp__max = serializers.DateTimeField()
+    # max_time=serializers.DateTimeField()
+    timestamp=serializers.DateTimeField()
+    # timestamp__max = serializers.DateTimeField()
+    lon=serializers.FloatField()
+    lat=serializers.FloatField()

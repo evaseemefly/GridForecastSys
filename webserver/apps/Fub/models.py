@@ -18,8 +18,8 @@ class FubInfo(models.Model):
     remark=models.CharField(max_length=200,verbose_name=u"备注",null=True)
     # 是否显示
     isShow=models.BooleanField(default=True)
-    Lon = models.FloatField(max_length=6, verbose_name="经度")
-    Lat = models.FloatField(max_length=6, verbose_name="维度")
+    Lon = models.FloatField(max_length=6, null=True,verbose_name="经度")
+    Lat = models.FloatField(max_length=6,null=True, verbose_name="维度")
     area_choices=(
         ('QD','beihai'),
         ('SH','donghai'),

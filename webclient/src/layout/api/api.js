@@ -61,7 +61,8 @@ export const loadStationData = par => {
 // 获取浮标相关信息
 export const loadFubData = par => {
   // 获取浮标相关信息
-  let fubUrl = `${host}/fub/list/`
+  // let fubUrl = `${host}/fub/list/`
+  let fubUrl = `${host}/fub/lastdata/`
   return axios.get(fubUrl)
 }
 
@@ -70,7 +71,8 @@ export const loadFubStormData = par => {
   // 获取指定日期的风暴潮及增水的极值
 
   // var storm_data = []
-  let fubUrl = `${host}/fub/filterlist/`
+  // let fubUrl = `${host}/fub/filterlist/`
+  let fubUrl = `${host}/fub/lastdata/`
   // 降axios.get对象返回
   return axios.get(fubUrl, {
     params: par

@@ -70,8 +70,13 @@ class RealtimeBaseView(APIView):
         # list_temp=list.group_by('fid').annotate(Max('timestamp')).values('fid',max_time=)
         list_max = list.values('fid').annotate(max_time=Max('timestamp'))
         # list_finall=list.values('ws','wd','bp','bp','wv','wvperiod','wvd','code','fid','lon','lat','timestamp').filter(fid__in=list_max.values_list('fid'),timestamp__in=list_max.values_list('max_time'))
-        list_finall = list.values('ws', 'wd', 'bp', 'bp', 'wv', 'wvperiod', 'wvd', 'code', 'fid', 'lon', 'lat',
-                                  'timestamp').filter(timestamp__in=list_max.values_list('max_time')).annotate(max_time=Max('timestamp')).annotate(count_fid=Count('fid'))
+        # list_finall = list.values('ws', 'wd', 'bp', 'bp', 'wv', 'wvperiod', 'wvd', 'code', 'fid', 'lon', 'lat',
+        #                           'timestamp').filter(timestamp__in=list_max.values_list('max_time')).annotate(max_time=Max('timestamp')).annotate(count_fid=Count('fid'))
+        # list_finall = list.values('ws', 'wd', 'bp', 'bp', 'wv', 'wvperiod', 'wvd', 'code', 'fid', 'lon', 'lat',
+        #                           'timestamp').select_related()
+        # list_finall=[]
+        list_finall=[(list.filter(fid__id=obj['fid'], timestamp=obj['max_time'])[0]) for obj in list_max]
+        # (list_finall.append(list.filter(fid__id=obj['fid'], timestamp=obj['max_time'])[0]) for obj in list_max)
         return list_finall
 
     def getDateRangFubData(self,fid,start,end):

@@ -15,6 +15,7 @@
 
 <script>
 import 'leaflet'
+import 'leaflet-rotatedmarker'
 import shp from 'shpjs'
 
 import { mapGetters } from 'vuex'
@@ -147,8 +148,26 @@ export default {
       })
 
       tempDivIcon.addTo(myself.mymap)
+
+      // 对于需要加载方向的
+      this.addDirIcon(fubObj.lat, fubObj.lon, fubObj.direction)
+
       // 将当前divIcon存起来
       myself.fubIconDivArr.push(tempDivIcon)
+    },
+    // 添加带箭头的icon
+    addDirIcon: function (lat, lon, dir) {
+      var myself = this
+      var dirIcon = L.icon({
+        iconUrl: '../../../static/img/icon/arrows.png',
+        iconSize: [24.6, 20],
+        iconAnchor: [0, 0],
+        popupAnchor: [-3, -76]
+      })
+      L.marker([lat, lon], {
+        icon: dirIcon,
+        rotationAngle: dir - 90
+      }).addTo(myself.mymap)
     },
     // 浮标图层
     loadFubLayer: function () {
@@ -157,53 +176,89 @@ export default {
       // var date = new Date()
       // 1 加载station info 存入data的stationArr中
       let fubData = loadFub()
+      myself.fubArr = []
       fubData.then(res => {
-        console.log(res.data)
-        myself.fubArr = res.data
-
-        $.each(myself.fubArr, function (index, val) {
-          myself.fubDict[val.code] = val
-          myself.fubids.push(val.id)
-        })
-
-        // 2 获取返回当日的极值数据
-        let nowDate = new Date()
-        let dateStr = getDateStr(nowDate)
-        // 由于测试，此处的时间暂时改为"20180807"
-        let par = { nowdate: '2018-11-18', ids: myself.fubids }
-        getFubData(par).then(res => {
-          console.log(res)
-          myself.fubStormArr = res.data
-
-          // 3 生成storm对象
-          $.each(myself.fubStormArr, function (index, val) {
-            let fubTemp = null
-            if (val.fid.code in myself.fubDict) {
-              // fubTemp = myself.fubDict[val.fid.code]
-              fubTemp = val
-            }
-            let fubInfoTemp = fubTemp.fid
-            if (fubTemp != null) {
-              var obj = new FubStormData(
-                fubInfoTemp.code,
-                fubInfoTemp.name,
-                fubInfoTemp.Lat,
-                fubInfoTemp.Lon,
-                fubInfoTemp.area,
-                fubTemp.wv,
-                fubTemp.period,
-                fubTemp.tdate,
-                fubTemp.wvc
-              )
-              myself.fubObjArr.push(obj)
-            }
+        // 判断状态是否正确
+        if (res.status === 200) {
+          // 若正确取出里面的data
+          myself.fubArr = res.data
+          $.each(myself.fubArr, function (index, val) {
+            myself.fubDict[val.code] = val
+            myself.fubids.push(val.fid)
+            var fubTemp = new FubStormData(
+              val.code,
+              val.code,
+              val.lat,
+              val.lon,
+              null,
+              val.wv,
+              val.wvperiod,
+              val.timestamp,
+              val.wvd
+            )
+            myself.fubObjArr.push(fubTemp)
           })
+
+          // 2 获取返回当日的极值数据
+          let nowDate = new Date()
+          let dateStr = getDateStr(nowDate)
+          // 由于测试，此处的时间暂时改为"20180807"
+          // let par = { nowdate: '2018-11-18', ids: myself.fubids }
+          // getFubData(par).then(res => {
+          //   console.log(res)
+          //   myself.fubStormArr = res.data
+
+          //   // 3 生成storm对象
+          //   $.each(myself.fubStormArr, function (index, val) {
+          //     let fubTemp = null
+          //     if (val.fid.code in myself.fubDict) {
+          //       // fubTemp = myself.fubDict[val.fid.code]
+          //       fubTemp = val
+          //     }
+          //     let fubInfoTemp = fubTemp.fid
+          //     if (fubTemp != null) {
+          //       var obj = new FubStormData(
+          //         fubInfoTemp.code,
+          //         fubInfoTemp.name,
+          //         fubInfoTemp.Lat,
+          //         fubInfoTemp.Lon,
+          //         fubInfoTemp.area,
+          //         fubTemp.wv,
+          //         fubTemp.period,
+          //         fubTemp.tdate,
+          //         fubTemp.wvc
+          //       )
+          //       myself.fubObjArr.push(obj)
+          //     }
+          //   })
+
+          // $.each(myself.fubStormArr, function (index, val) {
+          //   let fubTemp = null
+          //   if (val.fid.code in myself.fubDict) {
+          //     // fubTemp = myself.fubDict[val.fid.code]
+          //     fubTemp = val
+          //   }
+          //   let fubInfoTemp = fubTemp.fid
+          //   if (fubTemp != null) {
+          //     var obj = new FubStormData(
+          //       fubInfoTemp.code,
+          //       fubInfoTemp.name,
+          //       fubInfoTemp.Lat,
+          //       fubInfoTemp.Lon,
+          //       fubInfoTemp.area,
+          //       fubTemp.wv,
+          //       fubTemp.period,
+          //       fubTemp.tdate,
+          //       fubTemp.wvc
+          //     )
+          //     myself.fubObjArr.push(obj)
+          //   }
+          // })
 
           // 4 加入地图中
           $.each(myself.fubObjArr, function (index, val) {
             myself.addDiv2Marker(val)
-          })
-        })
+          })        }
       })
     },
     // 加载浮标图层

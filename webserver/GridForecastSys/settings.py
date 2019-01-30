@@ -154,11 +154,11 @@ DATABASES = {
         # 'HOST':'127.0.0.1',
 
         # mac
-        'USER':'root',
-        'PASSWORD':'12345678'
-        # mac 840
         # 'USER':'root',
-        # 'PASSWORD':'nmefc123'
+        # 'PASSWORD':'12345678'
+        # mac 840
+        'USER':'root',
+        'PASSWORD':'nmefc123'
 
         # 'HOST':'127.0.0.1',
         # 'OPTIONS':{'init_command':'SET storage_engine=INNODB;'}
@@ -218,3 +218,7 @@ AreaNames_Dict={'n':'names_N','e':'names_E','s':'names_S'}
 
 NCReader_DIR=r'/Users/liusihan/Documents/01project/GridForecastSys/extra_data/nc_data'
 
+# celery需要的相关配置
+CELERY_BROKER_URL='redis://127.0.0.1:6379/0'
+CELERY_RESULT_BACKEND='redis://127.0.0.1:6379/0'
+CELERY_TASK_ERIALIZER='json'

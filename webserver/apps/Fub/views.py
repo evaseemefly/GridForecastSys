@@ -24,6 +24,7 @@ from .serializers import FubInfoSerializer,FubDataInfoSerializer,FubRealtimeInfo
 from .views_base import RealtimeBaseView,FubBaseView
 # Create your views here.
 
+from apps.mycelery.tasks import add
 
 class GridView(APIView):
     def get(self,request,code):
@@ -136,3 +137,11 @@ class FubFilterDataView(RealtimeBaseView,APIView):
         list=self.getDateRangFubData(fid,start,end)
         json_data=FubRealtimeInfoSerializer(list,many=True).data
         return Response(json_data)
+
+class FubTaskView(APIView):
+    '''
+        引入celery的测试视图
+    '''
+    def get(self,request):
+        result=add.delay(2,10)
+        return Response(None)

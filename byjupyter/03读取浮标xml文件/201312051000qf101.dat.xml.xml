@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="GB2312"?>
 <OceanObservatingDataFile>
-    <BuoyageRpt>    <BuoyInfo id="QF101" Type="锚系浮标" Name="大型浮标" NO="QF101" Kind="大型浮标">    <Location longitude="120°9.85′E" latitude="38°19.98′N"></Location>
+    <BuoyageRpt>    
+    <BuoyInfo id="QF101" Type="锚系浮标" Name="大型浮标" NO="QF101" Kind="大型浮标">    
+    <Location longitude="120°9.85′E" latitude="38°19.98′N"></Location>
 </BuoyInfo>
     <DateTime DT="201312051000"></DateTime>
     <HugeBuoyData>    <RunningStatus Style="0000" Status="" DY="16.0" lean="XXX.X" azimuth="268"></RunningStatus>

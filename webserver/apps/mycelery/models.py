@@ -54,9 +54,12 @@ class OceanObservationgData:
         '''
         # 先判断指定路径是否存在
         try:
-            os.path.exists(self.dir)
-            os.chdir(self.dir)
-            return True
+            isExists=os.path.exists(self.dir)
+            if isExists:
+                os.chdir(self.dir)
+                return True
+            else:
+                return False
         except Exception as exc:
             print(exc)
             return False
@@ -68,6 +71,11 @@ class OceanObservationgData:
             # 以xml的方式读取指定文件
             self.fileData=etree.parse(self.filename)
 
+    def getRoot(self):
+        root = self.fileData.getroot()
+        if len(list(root)) == 1:
+            return (root if root.tag == 'OceanObservatingDataFile' else None)
+
     @property
     def fubInfo(self):
         '''
@@ -76,17 +84,20 @@ class OceanObservationgData:
         '''
         if(self.fileData==None):
             self._readFile()
-        buoyageRpt=self.fileData.getchildren()[0]
+        root=self.getRoot()
+        # buoyageRpt=self.fileData.getchildren()[0]
+        buoyageRpt = root.getchildren()[0]
+        buoyInfo=buoyageRpt.find('BuoyInfo')
         # 1 获取buoyInfo
         # 2 获取lat与lon
         location = buoyageRpt.find('BuoyInfo').getchildren()[0]
-        lon = location.get('longitude')
-        lat = location.get('latitude')
+        lon = location.get('longitude','')
+        lat = location.get('latitude','')
         # 3 获取时间
         dt = buoyageRpt.find('DateTime').get('DT')
         dt=datetime.strptime(dt,'%Y%m%d%H%M')
 
-        buoyInfo=BuoyInfo(buoyageRpt.get('Type'),buoyageRpt.get('id'),buoyageRpt.get('Name'),buoyageRpt.get('NO'),buoyageRpt.get('Kind'),lat,lon,dt)
+        buoyInfo=BuoyInfo(buoyInfo.get('Type'),buoyInfo.get('id'),buoyInfo.get('Name'),buoyInfo.get('NO'),buoyInfo.get('Kind'),lat,lon,dt)
         return buoyInfo
 
     @property
@@ -97,7 +108,8 @@ class OceanObservationgData:
         '''
         if (self.fileData == None):
             self._readFile()
-        buoyageRpt = self.fileData.getchildren()[0]
+        root = self.getRoot()
+        buoyageRpt = root.getchildren()[0]
         realData=buoyageRpt.find('HugeBuoyData').find('BuoyData')
         realtimeInfo=RealtimeInfo(realData.get('WS'),realData.get('WD'),realData.get('AT'),realData.get('BP'),realData.get('HU'),realData.get('WT'),realData.get('SL'),realData.get('BG'),realData.get('YBG'),realData.get('YZQ'))
         return realtimeInfo

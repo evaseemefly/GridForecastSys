@@ -2,10 +2,6 @@
 __author__ = 'evaseemefly'
 __date__ = '2018/11/17 10：05'
 
-from django.shortcuts import render
-from django.views.generic.base import View
-from django.http import HttpRequest,HttpResponse
-from django.core import serializers
 from rest_framework.response import Response
 from rest_framework.decorators import APIView
 
@@ -15,7 +11,7 @@ import datetime
 from django.utils.decorators import method_decorator
 
 # model
-from .models import FubDataInfo,FubInfo
+from .models import FubDataInfo
 from Common.decorator_view import *
 
 # 序列化对象
@@ -24,7 +20,7 @@ from .serializers import FubInfoSerializer,FubDataInfoSerializer,FubRealtimeInfo
 from .views_base import RealtimeBaseView,FubBaseView
 # Create your views here.
 
-from apps.mycelery.tasks import add
+from apps.MyCelery.tasks import add
 
 class GridView(APIView):
     def get(self,request,code):

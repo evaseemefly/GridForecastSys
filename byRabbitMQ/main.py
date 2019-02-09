@@ -1,17 +1,23 @@
 import pika
+import sys
+import settings
+from mq.send import SenderBuilder
+from mq.receive import ReceiveBuilder
 
-def on_open(connection):
-    # Invoked when the connection is open
-    pass
 
-# Create our connection object, passing in the on_open method
-connection = pika.SelectConnection(on_open_callback=on_open)
+def main():
 
-try:
-    # Loop so we can communicate with RabbitMQ
-    connection.ioloop.start()
-except KeyboardInterrupt:
-    # Gracefully close the connection
-    connection.close()
-    # Loop until we're fully closed, will stop on its own
-    connection.ioloop.start()
+    params=sys.argv[1:]
+    print(params)
+    if len(params)==0 or params[0]!='send':
+        enginerr = ReceiveBuilder(settings.RABBITMQ_USER, settings.RABBITMQ_PWD, settings.RABBITMQ_HOST,
+                                  settings.RABBITMQ_PORT)
+        enginerr.receive(settings.RABBITMQ_QUEUE, settings.RABBITMQ_ROUTING_KEY)
+    elif params[0]=='send':
+        enginerr = SenderBuilder(settings.RABBITMQ_USER, settings.RABBITMQ_PWD, settings.RABBITMQ_HOST,
+                                 settings.RABBITMQ_PORT)
+        enginerr.send(settings.RABBITMQ_QUEUE, settings.RABBITMQ_ROUTING_KEY, '测试发送的消息')
+
+
+if __name__=='__main__':
+    main()

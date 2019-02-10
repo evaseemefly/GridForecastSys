@@ -6,7 +6,6 @@ from mq.receive import ReceiveBuilder
 
 
 def main():
-
     params=sys.argv[1:]
     print(params)
     if len(params)==0 or params[0]!='send':

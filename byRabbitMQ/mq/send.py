@@ -155,25 +155,25 @@ class BaseBuilder:
             self.builder.createQueue(queue_name))]
 
 class SenderBuilder:
-    def __init__(self,user,pwd,host,port):
-        self.builder=None
-        self.user=user
-        self.pwd=pwd
-        self.host=host
-        self.port=port
-
-    def _construct_sender(self,queue_name):
-        '''
-            使用建造者模式依次执行各方法，由send方法直接调用
-        :param queue_name:
-        :return:
-        '''
-        self.builder=Sender(self.user,self.pwd)
-        [step for step in (
-            self.builder.createConnection(host=self.host,port=self.port),
-            self.builder.createChannel(),
-            # self.builder.createBroker(),
-            self.builder.createQueue(queue_name))]
+    # def __init__(self,user,pwd,host,port):
+    #     self.builder=None
+    #     self.user=user
+    #     self.pwd=pwd
+    #     self.host=host
+    #     self.port=port
+    #
+    # def _construct_sender(self,queue_name):
+    #     '''
+    #         使用建造者模式依次执行各方法，由send方法直接调用
+    #     :param queue_name:
+    #     :return:
+    #     '''
+    #     self.builder=Sender(self.user,self.pwd)
+    #     [step for step in (
+    #         self.builder.createConnection(host=self.host,port=self.port),
+    #         self.builder.createChannel(),
+    #         # self.builder.createBroker(),
+    #         self.builder.createQueue(queue_name))]
 
     def send(self,queue_name,routing_key,msg):
         '''

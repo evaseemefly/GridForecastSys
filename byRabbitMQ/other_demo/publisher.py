@@ -17,7 +17,10 @@ class ExamplePublisher(object):
     look at the output, as there are limited reasons why the connection may
     be closed, which usually are tied to permission related issues or
     socket timeouts.
-
+    如果RabbitMQ关闭连接，它将重新打开它。你应该
+看看输出，因为连接可能的原因有限
+被关闭，这通常与权限相关的问题或
+套接字超时。
     It uses delivery confirmations and illustrates one way to keep track of
     messages that have been sent and if they've been confirmed by RabbitMQ.
 

@@ -1,7 +1,7 @@
 import pika
 import sys
 import settings
-from mq.send import BaseMQ
+from mq.send import BaseMQ,BaseBuilder
 
 class Receiver(BaseMQ):
 
@@ -20,21 +20,21 @@ class Receiver(BaseMQ):
                               no_ack=True)
         self.channel.start_consuming()
 
-class ReceiveBuilder:
-    def __init__(self,user,pwd,host,port):
-        self.builder=None
-        self.user=user
-        self.pwd=pwd
-        self.host=host
-        self.port=port
-
-    def _construct_sender(self,queue_name):
-        self.builder=Receiver(self.user,self.pwd)
-        [step for step in (
-            self.builder.createConnection(host=self.host,port=self.port),
-            self.builder.createChannel(),
-            # self.builder.createBroker(),
-            self.builder.createQueue(queue_name))]
+class ReceiveBuilder(BaseBuilder):
+    # def __init__(self,user,pwd,host,port):
+    #     self.builder=None
+    #     self.user=user
+    #     self.pwd=pwd
+    #     self.host=host
+    #     self.port=port
+    #
+    # def _construct_sender(self,queue_name):
+    #     self.builder=Receiver(self.user,self.pwd)
+    #     [step for step in (
+    #         self.builder.createConnection(host=self.host,port=self.port),
+    #         self.builder.createChannel(),
+    #         # self.builder.createBroker(),
+    #         self.builder.createQueue(queue_name))]
 
     def receive(self,queue_name,routing_key):
         self._construct_sender(queue_name)

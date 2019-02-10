@@ -1,6 +1,5 @@
-import pika
 import sys
-import settings
+from conf import settings
 from mq.send import SenderBuilder
 from mq.receive import ReceiveBuilder
 

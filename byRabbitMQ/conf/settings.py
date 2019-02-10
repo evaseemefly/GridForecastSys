@@ -13,3 +13,5 @@ RABBITMQ_QUEUE='test'
 # 路由键
 RABBITMQ_ROUTING_KEY='test'
 
+WATCH_DIR='/Users/evaseemefly/Documents/01project/GridForecastSys/byRabbitMQ/watcherDir'
+

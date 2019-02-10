@@ -1,6 +1,6 @@
 import pika
-import sys
-import settings
+from conf import settings
+
 
 class BaseMQ:
     def __init__(self,user,pwd):
@@ -154,7 +154,7 @@ class BaseBuilder:
             # self.builder.createBroker(),
             self.builder.createQueue(queue_name))]
 
-class SenderBuilder:
+class SenderBuilder(BaseBuilder):
     # def __init__(self,user,pwd,host,port):
     #     self.builder=None
     #     self.user=user
@@ -192,8 +192,9 @@ def test():
         测试Sender的创建
     :return:
     '''
-    enginerr=SenderBuilder(settings.RABBITMQ_USER,settings.RABBITMQ_PWD,settings.RABBITMQ_HOST,settings.RABBITMQ_PORT)
-    enginerr.send(settings.RABBITMQ_QUEUE,settings.RABBITMQ_ROUTING_KEY,'测试发送的消息')
+    enginerr=SenderBuilder(settings.RABBITMQ_USER, settings.RABBITMQ_PWD, settings.RABBITMQ_HOST,
+                           settings.RABBITMQ_PORT)
+    enginerr.send(settings.RABBITMQ_QUEUE, settings.RABBITMQ_ROUTING_KEY, '测试发送的消息')
 
 
 # 以下代码暂时注释

@@ -5,15 +5,14 @@ from datetime import datetime
 import re
 
 # sqlalchemy
-from sqlalchemy import Column, String, create_engine,Integer,Float,DateTime
+from sqlalchemy import Column, String, create_engine,Integer,Float,DateTime,Boolean
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 # Create your models here.
 
 Base=declarative_base()
 
-class BuoyInfo(Base):
-    __tablename__=''
+class BuoyInfo:
     '''
         浮标基础信息
     '''
@@ -27,21 +26,47 @@ class BuoyInfo(Base):
         self.lon=lon
         self.dt=dt
 
-    id=Column(Integer,primary_key=True)
-    type=Column(String(5))
-    name=Column(String(10))
-    no=Column(String(10))
-    Kind=Column(String(10))
-    lat=Column(Float)
-    lon=Column(Float)
-    dt=Column(DateTime)
+class FubInfo(Base):
+    __tablename__ = 'Fub_fubinfo'
+    '''
+        浮标基础信息
+    '''
+    id = Column(Integer, primary_key=True)
+    # type=Column(String(5))
+    name = Column(String(20))
+    remark = Column(String(256))
+    # no=Column(String(10))
+    code = Column(String(10))
+    # Kind=Column(String(10))
+    area = Column(String(2))
+    lat = Column(Float)
+    lon = Column(Float)
+    isShow=Column()
+    # dt=Column(DateTime)
 
+class FubRealtimeInfo(Base):
+    __tablename__ = 'Fub_fubrealtimeinfo'
+    '''
+        浮标基础信息
+    '''
+    wid = Column(Integer, primary_key=True)
+    ws= Column(Float)
+    wd= Column(Float)
+    bp= Column(Float)
+    wv= Column(Float)
+    wvperiod= Column(Float)
+    wvd= Column(Integer)
+    code= Column(String(6))
+    timestamp= Column(DateTime)
+    fid_id= Column(Integer)
+    lat= Column(Float)
+    lon= Column(Float)
 
 class RealtimeInfo:
     '''
         浮标数据中的观测值
     '''
-    def __init__(self,ws,wd,at,bp,hu,wt,sl,bg,ybg,yzq):
+    def __init__(self,ws,wd,at,bp,hu,wt,sl,bg,ybg,yzq,wvd):
         self.ws=ws
         self.wd=wd
         self.at=at
@@ -50,20 +75,12 @@ class RealtimeInfo:
         self.wt=wt
         self.sl=sl
         self.bg=bg
+        # 有效波高
         self.ybg=ybg
+        # 波周期
         self.yzq=yzq
-
-    fid_id = Column(Integer, primary_key=True)
-    ws = Column(Float)
-    wd = Column(Float)
-    at = Column(Float)
-    bp = Column(Float)
-    hu = Column(Float)
-    wt = Column(Float)
-    sl = Column(Float)
-    bg = Column(Float)
-    wv = Column(Float)
-    wvd = Column(Float)
+        # 平均波向
+        self.wvd=wvd
 
 class OceanObservationgData:
     '''
@@ -151,5 +168,8 @@ class OceanObservationgData:
         root = self.getRoot()
         buoyageRpt = root.getchildren()[0]
         realData=buoyageRpt.find('HugeBuoyData').find('BuoyData')
-        realtimeInfo=RealtimeInfo(float(realData.get('WS')),float(realData.get('WD')),float(realData.get('AT')),float(realData.get('BP')),float(realData.get('HU')),float(realData.get('WT')),float(realData.get('SL')),float(realData.get('BG')),float(realData.get('YBG')),float(realData.get('YZQ')))
+        try:
+            realtimeInfo=RealtimeInfo(float(realData.get('WS')),float(realData.get('WD')),float(realData.get('AT')),float(realData.get('BP')),float(realData.get('HU')),float(realData.get('WT')),float(realData.get('SL')),float(realData.get('BG')),float(realData.get('YBG')),float(realData.get('YZQ')),int(realData.get('BX')))
+        except ValueError as ex:
+            raise ex
         return realtimeInfo

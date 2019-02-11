@@ -1,6 +1,7 @@
 from conf import settings
 from mq.send import BaseMQ,BaseBuilder
 from core.models import *
+from core.bll import *
 
 class Receiver(BaseMQ):
 
@@ -22,13 +23,28 @@ class Receiver(BaseMQ):
             '''
             if isinstance(body, bytes):
                 body = str(body, encoding="utf-8")
-            print(f" [x] Received %r {body}")
-            oceanData=OceanObservationgData(settings.WATCH_DIR,body)
-            fubInfo = oceanData.fubInfo
-            realtimeInfo = oceanData.realtimeInfo
-
-            # time.sleep(body.count('.'))
-            print('[x] Done')
+            print(f"[x] Received %r {body}")
+            try:
+                oceanData=OceanObservationgData(settings.WATCH_DIR,body)
+                fubInfo = oceanData.fubInfo
+                realtimeInfo = oceanData.realtimeInfo
+                fub = BuoInfoBLL()
+                realtime = RealtimeInfoBLL()
+                fub_temp = fub.isExist(fubInfo.no)
+                if fub_temp == None:
+                    # 插入fubinfo，并返回插入后的（带有自增主键id的fubinfo）
+                    fub_temp = fub.create(fubInfo)
+                else:
+                    pass
+                # 插入realtimeinfo
+                realtime.create(realtimeInfo, fub_temp, fubInfo.dt)
+                # time.sleep(body.count('.'))
+                print(f"[x] 插入成功")
+                print('[x] Done')
+            except Exception as ex:
+                print(ex)
+                print(f"[!] 解析失败 {body}")
+                print('[x] Error')
 
         self.channel.basic_consume(callback,
                               queue=routing_key,

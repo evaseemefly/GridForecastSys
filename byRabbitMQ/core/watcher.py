@@ -5,8 +5,8 @@ from watchdog.events import FileSystemEventHandler
 from mq.send import SenderBuilder
 from conf import settings
 
-path='/Users/evaseemefly/Documents/01project/GridForecastSys/byRabbitMQ/watcherDir'
-
+# path='/Users/evaseemefly/Documents/01project/GridForecastSys/byRabbitMQ/watcherDir'
+path='/Users/liusihan/Documents/01project/GridForecastSys/byRabbitMQ/watcherDir'
 class MyHandler(FileSystemEventHandler):
     def on_created(self, event):
         '''

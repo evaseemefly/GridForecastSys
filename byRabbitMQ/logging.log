@@ -1,0 +1,8 @@
+2019-02-12 11:00:52,737 - pika.adapters.base_connection - ERROR - Connection to ::1:5672 failed: [Errno 61] Connection refused
+2019-02-12 11:30:42,722 - pika.adapters.base_connection - ERROR - Connection to ::1:5672 failed: [Errno 61] Connection refused
+2019-02-12 14:19:11,186 - pika.adapters.base_connection - ERROR - Connection to ::1:5672 failed: [Errno 61] Connection refused
+2019-02-12 14:20:59,042 - pika.adapters.base_connection - ERROR - Connection to ::1:5672 failed: [Errno 61] Connection refused
+2019-02-12 14:26:03,668 - pika.adapters.base_connection - ERROR - Connection to ::1:5672 failed: [Errno 61] Connection refused
+2019-02-12 14:35:40,697 - pika.adapters.base_connection - ERROR - Connection to ::1:5672 failed: [Errno 61] Connection refused
+2019-02-12 14:38:08,093 - pika.adapters.base_connection - ERROR - Connection to ::1:5672 failed: [Errno 61] Connection refused
+2019-02-12 14:40:13,461 - pika.adapters.base_connection - ERROR - Connection to ::1:5672 failed: [Errno 61] Connection refused

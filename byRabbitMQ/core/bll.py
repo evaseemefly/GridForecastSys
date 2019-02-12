@@ -5,6 +5,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from conf import settings
 
+'''
+    模仿传统的三层中的业务逻辑层    
+'''
+
 class Connection:
     def __init__(self):
         '''

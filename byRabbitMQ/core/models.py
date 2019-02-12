@@ -155,6 +155,7 @@ class OceanObservationgData:
             buoyInfo=BuoyInfo(buoyInfo.get('Type'),buoyInfo.get('id'),buoyInfo.get('Name'),buoyInfo.get('NO'),buoyInfo.get('Kind'),lat,lon,dt)
             return buoyInfo
         except AttributeError as ex:
+            raise ex
             print(ex)
 
     @property

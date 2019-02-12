@@ -2,6 +2,9 @@ from conf import settings
 from mq.send import BaseMQ,BaseBuilder
 from core.models import *
 from core.bll import *
+# from core.log import logger
+from log.log import MyLog
+
 
 class Receiver(BaseMQ):
 
@@ -39,11 +42,16 @@ class Receiver(BaseMQ):
                 # 插入realtimeinfo
                 realtime.create(realtimeInfo, fub_temp, fubInfo.dt)
                 # time.sleep(body.count('.'))
-                print(f"[x] 插入成功")
+                # print(f"[x] 插入成功")
+                # logger.info(f"[x] 插入成功")
+                MyLog.addInfo(f"[~] {body}插入成功")
+                print(f"[~] {body}插入成功")
                 print('[x] Done')
             except Exception as ex:
-                print(ex)
-                print(f"[!] 解析失败 {body}")
+                # print(ex)
+                # logger.warn(f'[!] 解析失败{body}')
+                MyLog.addWarn(f'[!] 解析失败{body}|错误原因:{ex}')
+                # print(f"[!] 解析失败 {body}")
                 print('[x] Error')
 
         self.channel.basic_consume(callback,

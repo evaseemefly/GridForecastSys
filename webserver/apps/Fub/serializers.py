@@ -42,3 +42,12 @@ class FubRealtimeInfoMidSerializer(serializers.Serializer):
     # timestamp__max = serializers.DateTimeField()
     lon=serializers.FloatField()
     lat=serializers.FloatField()
+
+class RealtimeWdWsSerializer(serializers.Serializer):
+    timestamp = serializers.DateTimeField()
+    # val=serializers.FloatField()
+    val = serializers.DictField()
+
+class RealtimeSimpSerializer(serializers.Serializer):
+    timestamp=serializers.DateTimeField()
+    val=serializers.FloatField()

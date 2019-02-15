@@ -12,7 +12,7 @@ import datetime
 
 # model
 from .models import FubDataInfo,FubInfo,FubRealtimeInfo
-
+from .middle_model import RealtimeMidInfo
 # 序列化对象
 from .serializers import FubInfoSerializer,FubDataInfoSerializer
 
@@ -20,7 +20,7 @@ class RealtimeBaseView(APIView):
     '''
         浮标实时数据的基类
     '''
-    def getTargetFubRealtimeInfo(self,fid,start,end=None):
+    def _getTargetFubRealtimeInfo(self,code,start,end=None):
         '''
             根据起止时间获取指定时间内的指定fub数据
         :param start:
@@ -28,10 +28,44 @@ class RealtimeBaseView(APIView):
         :return:
         '''
         if end is None:
-            list=FubRealtimeInfo.objects.filter(timestamp=start,fid__id=fid)
+            list=FubRealtimeInfo.objects.filter(timestamp=start,code=code)
         else:
-            list=FubRealtimeInfo.objects.filter(timestamp__gte=start,timestamp__lte=end,fid__id=fid)
+            list=FubRealtimeInfo.objects.filter(timestamp__gte=start,timestamp__lte=end,code=code)
         return list
+
+    def getTargetFactorList(self,start,end,factor,fid=-1,**kwargs):
+        '''
+            获取指定船舶的指定要素观测值
+        :param fid:
+        :param start:
+        :param end:
+        :param factor:
+        :return:
+        '''
+
+        # 对于风速与风向，要同时获取
+        code=''
+        if fid==-1 and kwargs.get('code')!=None:
+            code=kwargs.get('code')
+        if factor=='ws' or factor=='wd':
+            list=self._getTargetFubRealtimeInfo(code,start,end).order_by('timestamp').values('timestamp','wd','ws')
+            # list=list[:3]
+            list_convert = [RealtimeMidInfo(temp['timestamp'].strftime('%Y-%m-%d %H:%M:%S'),
+                                {'ws':temp['ws'].__round__(2),
+                                 'wd':temp['wd']})
+                            for temp in list]
+        else:
+            list = self._getTargetFubRealtimeInfo(code,start,end).order_by('timestamp').values('timestamp',factor)
+            list_convert=[RealtimeMidInfo(temp['timestamp'].strftime('%Y-%m-%d %H:%M:%S'),temp[factor].__round__(2)) for temp in list]
+        #为了如果没得到任何结果，让屏幕显示点东西
+        if len(list_convert) == 0:
+            # 对于风向风速为val填充{}，其他默认填充0
+            defaultAppend= lambda :{} if (factor=='wd' or factor=='ws') else 0
+            dict_first = {'timestamp':start.strftime('%Y-%m-%d %H:%M:%S'),'val':defaultAppend()}
+            dict_last={'timestamp':end.strftime('%Y-%m-%d %H:%M:%S'),'val':defaultAppend()}
+            list_convert.append(dict_first)
+            list_convert.append(dict_last)
+        return list_convert
 
     def getAllFubLastRealtimeList(self,area):
         '''

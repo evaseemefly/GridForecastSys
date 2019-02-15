@@ -139,6 +139,14 @@ export const loadForecastWavebyNc = (date, lat, lng) => {
   })
 }
 
+// 获取指定bbx的指定时间的指定要素的观测列表
+export const loadFubRealtime = par => {
+  let realtimeUrl = `${host}/fub/factorlist`
+  return axios.get(realtimeUrl, {
+    params: par
+  })
+}
+
 /*
 	根据设定好的色带根据传入的值返回对应的rgb颜色的值
  */

@@ -37,7 +37,8 @@ import rightBar from './right_bar.vue'
 // map的base子组件
 import baseMap from './center_map_base.vue'
 // modal子组件
-import modalFrame from '../module/modal.vue'
+import modalFrame from '../member/modal/modal_main.vue'
+// import modalFrame from '../module/modal.vue'
 
 import {
   CreateFubIcon,
@@ -103,7 +104,12 @@ export default {
       let myself = this
       // 1 添加marker至map
       var tempMarker = L.marker([fubObj.lat, fubObj.lon])
-      tempMarker.addTo(myself.mymap)
+      tempMarker.addTo(myself.mymap).on('click', function (e) {
+        // alert(fubObj)
+        console.log(fubObj)
+        myself.showModal(fubObj.code)
+      })
+
       myself.fubMarkerArr.push(tempMarker)
 
       // 2 创建Icon至map
@@ -269,24 +275,25 @@ export default {
       this.loadFubLayer()
     },
     // 加载modal框，调用modal框组件并显示
-    showModal: function () {
+    showModal: function (code) {
       var myself = this
       // 以下为测试使用，生产环境下仍需修改
       myself.selectFubId = 1
       myself.targetDate = '2018-11-18 19:00'
-      loadFubDetailStormData({ id: myself.selectFubId, nowdate: myself.targetDate }).then(res => {
-        console.log(res.data)
-        var columns = []
-        var values = []
-        $.each(res.data, function (index, val) {
-          columns.push(val.tdate)
-          values.push(val.wv)
-        })
-        myself.modalColumns = columns
-        myself.modalValues = values
-        // 调用modal子组件的showModal方法，打开modal框
-        this.$refs.modal.showModal()
-      })
+      this.$refs.modal.showModal(code)
+      // loadFubDetailStormData({ id: myself.selectFubId, nowdate: myself.targetDate }).then(res => {
+      //   console.log(res.data)
+      //   var columns = []
+      //   var values = []
+      //   $.each(res.data, function (index, val) {
+      //     columns.push(val.tdate)
+      //     values.push(val.wv)
+      //   })
+      //   myself.modalColumns = columns
+      //   myself.modalValues = values
+      //   // 调用modal子组件的showModal方法，打开modal框
+      //   this.$refs.modal.showModal()
+      // })
     }
   },
 

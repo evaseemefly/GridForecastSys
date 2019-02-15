@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import APIView
 
 import datetime
+import time
 
 #为特定请求方法添加装饰器
 from django.utils.decorators import method_decorator
@@ -15,7 +16,7 @@ from .models import FubDataInfo
 from Common.decorator_view import *
 
 # 序列化对象
-from .serializers import FubInfoSerializer,FubDataInfoSerializer,FubRealtimeInfoSerializer,FubRealtimeInfoMidSerializer
+from .serializers import FubInfoSerializer,FubDataInfoSerializer,FubRealtimeInfoSerializer,FubRealtimeInfoMidSerializer,RealtimeWdWsSerializer,RealtimeSimpSerializer
 # base views
 from .views_base import RealtimeBaseView,FubBaseView
 # Create your views here.
@@ -93,20 +94,22 @@ class FubDailyDataView(APIView):
     '''
     def get(self,request):
         # 获取指定fub的ids
-        id = request.GET.get('id')
+        id = request.GET.get('fid')
         target_date_str = request.GET.get('nowdate')
         # 将传入的nowdate转换为date类型
-        target_date_later = datetime.datetime.strptime(target_date_str, '%Y-%m-%d %H:%M')
+        target_date_later = datetime.strptime(target_date_str, '%Y-%m-%d %H:%M')
 
         # 2 根据ids进行查询
         # 下面处理关于datetime对象的筛查问题：
         # 方式4
         # 对当前的日期加上23：59：59 可行
-        target_date_early = target_date_later - datetime.timedelta(days=3)
-        list_fub_data = FubDataInfo.objects.filter(tdate__gt=target_date_early, tdate__lt=target_date_later,
-                                                   fid__id=id)
-        json_data = FubDataInfoSerializer(list_fub_data, many=True)
-        return Response(json_data.data)
+        target_date_early = target_date_later - timedelta(days=1)
+        # list_fub_data=FubRealtimeInfo.objects.filter(timestamp__gte=target_date_early,timestamp__lte=target_date_later,fid_id=id)
+        # list_fub_data = FubDataInfo.objects.filter(tdate__gt=target_date_early, tdate__lt=target_date_later,fid__id=id)
+        # json_data = FubDataInfoSerializer(list_fub_data, many=True)
+        # json_data=FubRealtimeInfoSerializer(list_fub_data,many=True)
+        pass
+        # return Response(json_data.data)
 
 # 获取fub最后传输的时间的观测值
 class FubLastRealtimeView(RealtimeBaseView,APIView):
@@ -133,6 +136,33 @@ class FubFilterDataView(RealtimeBaseView,APIView):
         list=self.getDateRangFubData(fid,start,end)
         json_data=FubRealtimeInfoSerializer(list,many=True).data
         return Response(json_data)
+
+class RealtimeListView(RealtimeBaseView):
+    def get(self,request):
+        factor = request.GET.get('factor', '')
+        fid = int(request.GET.get('fid', -1))
+        code=request.GET.get('code','')
+        dateRangeStr = request.GET.get('dateRange', '')
+        kind = request.GET.get('kind')
+        # 此处加一个判断，若未传入target，则将当前的时间赋给targetdate
+        targetdate = request.GET.get('targetdate', None)
+        targetdate = targetdate if targetdate is not None else datetime.now().strftime('%Y-%m-%d')
+        try:
+            tmp_arr = dateRangeStr.split(' ')
+            start_date=tmp_arr[0]
+            end_date=tmp_arr[1]
+            start_date = datetime.strptime(start_date + ' 00:00', '%Y-%m-%d %H:%M')
+            end_date = datetime.strptime(end_date + ' 23:59', '%Y-%m-%d %H:%M')
+        except Exception  as e:
+            now =  datetime.strptime(targetdate,'%Y-%m-%d')
+
+            (start_date,end_date)=(now - timedelta(hours=24),now) if kind=='now' else (now,now+timedelta(hours=24))
+
+        list= self.getTargetFactorList(start_date,end_date,factor,fid,code=code)
+        json_data= RealtimeWdWsSerializer(list,many=True).data if (factor=='wd' or factor=='ws') else RealtimeSimpSerializer(list,many=True).data
+        # json_data=RealtimeSimpSerializer(list,many=True).data
+        return Response(json_data)
+
 
 class FubTaskView(APIView):
     '''

@@ -77,3 +77,6 @@ class FubRealtimeInfo(models.Model):
     timestamp=models.DateTimeField(default=datetime.now)
     lon=models.FloatField(max_length=6,verbose_name="经度")
     lat=models.FloatField(max_length=6,verbose_name="纬度")
+
+    # class Meta:
+    #     ordering=['timestamp']

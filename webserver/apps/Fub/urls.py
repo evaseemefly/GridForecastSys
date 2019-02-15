@@ -3,7 +3,7 @@ __author__ = 'evaseemefly'
 __date__ = '2018/11/17 10：05'
 
 from django.conf.urls import url, include
-from .views import FubAllView,FubFilterListView,FubDailyDataView,FubLastRealtimeView,FubFilterDataView,FubTaskView
+from .views import FubAllView,FubFilterListView,FubDailyDataView,FubLastRealtimeView,FubFilterDataView,FubTaskView,RealtimeListView
 app_name='[Fub]'
 
 urlpatterns=[
@@ -17,5 +17,7 @@ urlpatterns=[
     url(r'daily/$',FubDailyDataView.as_view(),name="fub-daily"),
     # 获取全部浮标的最后时间的观测值
     url(r'lastdata/$',FubLastRealtimeView.as_view()),
+    # 根据要素信息获取观测数据
+    url(r'^factorlist/$',RealtimeListView.as_view()),
     url(r'task/$',FubTaskView.as_view())
 ]

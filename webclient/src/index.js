@@ -44,6 +44,10 @@ import './components/css/storm/storm.css'
 // 引入fub的样式
 import './components/css/fub/fub.css'
 
+// 引入echarts
+// 引入echarts
+window.echarts = require('echarts')
+import 'echarts/'
 Vue.prototype.moment = moment
 Vue.config.devtools = true
 Vue.use(VueRouter)

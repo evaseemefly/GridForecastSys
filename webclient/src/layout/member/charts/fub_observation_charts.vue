@@ -19,9 +19,6 @@ import { loadRealtime } from '../../api/api.js'
 export default {
   data () {
     return {
-      // title:title,
-      // columns:columns,
-      // values:values
       mychart: null
     }
   },
@@ -38,19 +35,19 @@ export default {
     // 销毁echarts
     disposeCharts: function () {
       if (this.mychart != null) {
-        this.mychart.dispose();
+        this.mychart.dispose()
       }
     },
     // 初始化echarts表格    
     initCharts: function (params) {
       // 基于准备好的dom，初始化echarts图表
-      var myself = this;
-      myself.mychart = null;
-      this.disposeCharts();
+      var myself = this
+      myself.mychart = null
+      this.disposeCharts()
       if (myself.myChart === null) {
 
       }
-      myself.myChart = echarts.init(document.getElementById('main'));
+      myself.myChart = echarts.init(document.getElementById('main'))
 
       var option = {
         tooltip: {

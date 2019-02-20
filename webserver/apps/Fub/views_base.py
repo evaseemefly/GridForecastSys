@@ -16,6 +16,15 @@ from .middle_model import RealtimeMidInfo
 # 序列化对象
 from .serializers import FubInfoSerializer,FubDataInfoSerializer
 
+# TODO 定义的前后端factor不同的对照字典
+dict_factor={
+    'ws':'ws',          # 风速
+    'wd':'wd',          # 风向
+    'bp':'bp',          # 气压
+    'ybg':'wv',         # 有效波高
+    'yzq':'wvperiod',   # 有效波周期
+}
+
 class RealtimeBaseView(APIView):
     '''
         浮标实时数据的基类
@@ -45,6 +54,8 @@ class RealtimeBaseView(APIView):
 
         # 对于风速与风向，要同时获取
         code=''
+        # TODO 注意此处需要转换一下（还需要加入判断）
+        factor=dict_factor.get(factor)
         if fid==-1 and kwargs.get('code')!=None:
             code=kwargs.get('code')
         if factor=='ws' or factor=='wd':
@@ -55,6 +66,7 @@ class RealtimeBaseView(APIView):
                                  'wd':temp['wd']})
                             for temp in list]
         else:
+
             list = self._getTargetFubRealtimeInfo(code,start,end).order_by('timestamp').values('timestamp',factor)
             list_convert=[RealtimeMidInfo(temp['timestamp'].strftime('%Y-%m-%d %H:%M:%S'),temp[factor].__round__(2)) for temp in list]
         #为了如果没得到任何结果，让屏幕显示点东西

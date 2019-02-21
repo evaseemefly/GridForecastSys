@@ -16,7 +16,7 @@
                 <td>{{code}}</td>
                 <td>{{name}}</td>
                 <td class="my-th-normal">{{area}}</td>
-                <td class="my-th-warm">{{ton}}</td>
+                <td class="my-th-warm">{{remark}}</td>
               </tr>
             </tbody>
           </table>
@@ -27,20 +27,20 @@
 </template>
 
 <script>
-import { loadBBXDetail } from '../../api/api.js'
+import { loadFubDetail } from '../../api/api.js'
 // import { } from '../../../components/js/common/'
 // import { areaDict } from '../../../components/js/common/area.js'
 export default {
   data () {
     return {
-      // 船舶名称
+      // fub名称
       name: null,
       // 海区
       area: null,
-      // 吨位
-      ton: null,
-      // 呼号
-      code: null
+      // 编号
+      code: null,
+      // 备注
+      remark: null
 
     }
   },
@@ -48,22 +48,24 @@ export default {
     // 组件传递来的fub基础信息
     detailInfo: Object,
     // fid
-    fid: Number
+    fid: Number,
+    code: String
   },
   methods: {
     // 加载详情table信息
-    initTable: function (bid) {
-      var myself = this;
+    initTable: function (code) {
+      var myself = this
       var params = {
-        bid: bid
+        code: code
       }
-      // 根据bid加载船舶的详情信息
-      loadBBXDetail(params).then(res => {
+      // 根据fid加载fub的详情信息
+      loadFubDetail(params).then(res => {
         // console.log(res);
-        myself.code = res.data.code;
-        myself.name = res.data.desc;
+        myself.code = res.data[0].code
+        myself.name = res.data[0].name
+        myself.area = res.data[0].area
         // myself.area = areaDict[res.data.area];
-        myself.ton = res.data.shipton;
+        // myself.ton = res.data[0].shipton
       })
     }
   },
@@ -73,9 +75,9 @@ export default {
   },
   watch: {
     // 当bid修改时重新加载表格
-    bid: function (newVal) {
-      console.log(newVal);
-      this.initTable(newVal);
+    code: function (newVal) {
+      // console.log(newVal)
+      this.initTable(newVal)
     }
   }
 

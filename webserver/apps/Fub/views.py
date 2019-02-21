@@ -12,7 +12,7 @@ import time
 from django.utils.decorators import method_decorator
 
 # model
-from .models import FubDataInfo
+from .models import FubDataInfo,FubInfo
 from Common.decorator_view import *
 
 # 序列化对象
@@ -136,6 +136,20 @@ class FubFilterDataView(RealtimeBaseView,APIView):
         list=self.getDateRangFubData(fid,start,end)
         json_data=FubRealtimeInfoSerializer(list,many=True).data
         return Response(json_data)
+
+class FubInfoView(APIView):
+    '''
+        获取浮标基础数据
+    '''
+    def get(self,request):
+        fid=int(request.GET.get('fid',-1))
+        # 需要大写
+        code=request.GET.get('code','').upper()
+
+        list=FubInfo.objects.filter(code=code)
+        json_data=FubInfoSerializer(list,many=True).data
+        return Response(json_data)
+
 
 class RealtimeListView(RealtimeBaseView):
     def get(self,request):

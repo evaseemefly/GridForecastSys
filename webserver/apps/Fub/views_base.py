@@ -23,6 +23,7 @@ dict_factor={
     'bp':'bp',          # 气压
     'ybg':'wv',         # 有效波高
     'yzq':'wvperiod',   # 有效波周期
+    'bx':'wvd'          # 波向
 }
 
 class RealtimeBaseView(APIView):

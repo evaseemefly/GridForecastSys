@@ -22,7 +22,10 @@
         </div>
         <div class="modal-body my-content-primary">
           <div>
-            <fubDetailTable :bid="bid"></fubDetailTable>
+            <fubDetailTable
+              :fid="fid"
+              :code="fubCode"
+            ></fubDetailTable>
             <ul
               id="mytabs"
               class="nav nav-tabs"
@@ -85,18 +88,28 @@ export default {
       fubCode: null,
       fid: -1,
       targetDate: null,
-      kind: null
+      kind: null,
+      childVals: [],
+      childColumns: []
     }
   },
   methods: {
+    // 由fub_Base调用的显示modal的方法
+    /*
+      加载modal窗
+      并获取fub的基础信息并加载
+    */
     showModal: function (code) {
       this.fubCode = code
       $('#mymodal').modal()
+      // 每次加载modal框时需要销毁echarts子组件
+      this.$refs.fubObs.destroyCharts()
     },
     // 点击 tab 时触发的操作
     active: function (index) {
       this.indexMenu = index
     },
+    // 加载指定fub的观测数据
     loadDetailData: function (code, fid, factor, date, kind) {
       var myself = this
       let params = {
@@ -150,5 +163,26 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+#modal_content {
+  width: 850px;
+}
+.my-content-primary {
+  background: #143b4d;
+}
+.my-th-normal {
+  color: #4154de;
+}
+.my-th-warm {
+  color: rgba(255, 0, 0, 0.838);
+}
+/* 带一个阴影 */
+.boxshadow {
+  box-shadow: 2px 2px 10px grey;
+}
+/* 顶部字体加粗加大 */
+.panel-heading {
+  font-weight: bolder;
+  font-size: large;
+}
 </style>

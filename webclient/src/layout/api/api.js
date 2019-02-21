@@ -147,6 +147,13 @@ export const loadFubRealtime = par => {
   })
 }
 
+export const loadFubDetail = par => {
+  let fubDetailUrl = `${host}/fub/baseinfo`
+  return axios.get(fubDetailUrl, {
+    params: par
+  })
+}
+
 /*
 	根据设定好的色带根据传入的值返回对应的rgb颜色的值
  */

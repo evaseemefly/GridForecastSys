@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- <p>{{mytest}}</p> -->
-    <div id="main"></div>
+    <div id="main_chart"></div>
   </div>
 </template>
 
@@ -47,7 +47,7 @@ export default {
       if (myself.myChart === null) {
 
       }
-      myself.myChart = echarts.init(document.getElementById('main'))
+      myself.myChart = echarts.init(document.getElementById('main_chart'))
 
       var option = {
         tooltip: {
@@ -141,11 +141,11 @@ export default {
     },
     // 下拉
     slideDown: function () {
-      $('#main').slideDown("slow");
+      $('#main_chart').slideDown("slow");
     },
     // 收起
     slideUp: function () {
-      $('#main').slideUp("slow");
+      $('#main_chart').slideUp("slow");
     }
   },
   mounted: function () {
@@ -165,8 +165,8 @@ export default {
 </script>
 
 <style scoped>
-#main {
+#main_chart {
   height: 500px;
-  width: 900px;
+  width: 800px;
 }
 </style>

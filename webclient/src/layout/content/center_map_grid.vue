@@ -329,28 +329,28 @@ data是读取的geoJson数据
           // 缩放并定位到指定海区
           this.mymap.setView([38.3, 123], 7)
 
-          newLayer = this.addshp(`${staticUrl}north.zip`, dictArea, true)
+          // newLayer = this.addshp(`${staticUrl}north.zip`, dictArea, true)
           break
         // 东海
         case 'e':
           dictArea = loadAreaMaxDataByDate(date, area)
           this.mymap.setView([28.6, 125.35], 6)
 
-          newLayer = this.addshp(`${staticUrl}east.zip`, dictArea, true)
+          // newLayer = this.addshp(`${staticUrl}east.zip`, dictArea, true)
           break
         // 南海
         case 's':
           dictArea = loadAreaMaxDataByDate(date, area)
           this.mymap.setView([20.2, 113.04], 7)
 
-          newLayer = this.addshp(`${staticUrl}south.zip`, dictArea, true)
+          // newLayer = this.addshp(`${staticUrl}south.zip`, dictArea, true)
           break
         // 全国
         case 'a':
           dictArea = loadAreaMaxDataByDate(date, area)
-          this.addshp(`${staticUrl}north.zip`, dictArea, false)
-          this.addshp(`${staticUrl}east.zip`, dictArea, false)
-          this.addshp(`${staticUrl}south.zip`, dictArea, false)
+          // this.addshp(`${staticUrl}north.zip`, dictArea, false)
+          // this.addshp(`${staticUrl}east.zip`, dictArea, false)
+          // this.addshp(`${staticUrl}south.zip`, dictArea, false)
           break
       }
       return [dictArea, newLayer]

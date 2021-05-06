@@ -110,7 +110,7 @@ import { getDateStr } from '../api/moment_api'
 // import maptiles from "../../components/js/map/maptiles"
 import rightBar from './right_bar.vue'
 // TODO:[-] 21-05-06 引入 东海的 grid wms
-import {WMSMidModel,WMSOptionsMidModel} from '../../middle_model/geo.ts'
+// import {WMSMidModel,WMSOptionsMidModel} from '../../middle_model/geo.ts'
 
 export default {
   data () {
@@ -124,10 +124,10 @@ export default {
       geojson: null,
       mymap: this.basemap,
       latlng: null,
-      gridEast : new WMSMidModel(
-        'http://localhost:8082/geoserver/nmefc_common/wms?',
-        new WMSOptionsMidModel('nmefc_common:grid_east')
-    )
+    //   gridEast : new WMSMidModel(
+    //     'http://localhost:8082/geoserver/nmefc_common/wms?',
+    //     new WMSOptionsMidModel('nmefc_common:grid_east')
+    // )
     }
   },
   props: {
@@ -208,27 +208,27 @@ export default {
 
           // newLayer = this.addshp(`${staticUrl}east.zip`, dictArea, true)
           // TODO:[-] 21-05-06 此处使用 加载 geoserver发布的 wms的方式实现
-          var eastGridWmsTitleLayer = L.tileLayer.wms(that.gridEast.url, {
-              layers: that.gridEast.options.layer,
-              format: that.gridEast.options.format,
-              transparent: true,
-              attribution: "Weather data © 2012 IEM Nexrad"
-          });
-          that.mymap.addLayer(eastGridWmsTitleLayer)
+          // var eastGridWmsTitleLayer = L.tileLayer.wms(that.gridEast.url, {
+          //     layers: that.gridEast.options.layer,
+          //     format: that.gridEast.options.format,
+          //     transparent: true,
+          //     attribution: "Weather data © 2012 IEM Nexrad"
+          // });
+          // that.mymap.addLayer(eastGridWmsTitleLayer)
           break
         // 南海
         case 's':
           dictArea = loadAreaMaxDataByDate(date, area)
           this.mymap.setView([20.2, 113.04], 7)
 
-          newLayer = this.addshp(`${staticUrl}south.zip`, dictArea, true)
+          // newLayer = this.addshp(`${staticUrl}south.zip`, dictArea, true)
           break
         // 全国
         case 'a':
           dictArea = loadAreaMaxDataByDate(date, area)
-          this.addshp(`${staticUrl}north.zip`, dictArea, false)
-          this.addshp(`${staticUrl}east.zip`, dictArea, false)
-          this.addshp(`${staticUrl}south.zip`, dictArea, false)
+          // this.addshp(`${staticUrl}north.zip`, dictArea, false)
+          // this.addshp(`${staticUrl}east.zip`, dictArea, false)
+          // this.addshp(`${staticUrl}south.zip`, dictArea, false)
           break
       }
       return [dictArea, newLayer]

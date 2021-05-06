@@ -1,14 +1,7 @@
 <template>
   <!--下部的巨幕-->
-  <div
-    id="mycontent"
-    class="col-md-12 mycol_disPadding"
-    style="width: 100%;"
-  >
-    <div
-      id="basemap"
-      style="height: 100%; width: 100%;"
-    >
+  <div id="mycontent" class="col-md-12 mycol_disPadding" style="width: 100%">
+    <div id="basemap" style="height: 100%; width: 100%">
       <div class="leaflet-control-container">
         <div class="leaflet-top leaflet-left">
           <div class="leaflet-control-zoom leaflet-bar leaflet-control">
@@ -18,37 +11,39 @@
               title="Zoom in"
               role="button"
               aria-label="Zoom in"
-            >+</a>
+              >+</a
+            >
             <a
               class="leaflet-control-zoom-out"
               href="http://leafletjs.com/examples/choropleth/example.html#"
               title="Zoom out"
               role="button"
               aria-label="Zoom out"
-            >−</a>
+              >−</a
+            >
           </div>
         </div>
-        <div class="leaflet-top leaflet-right">
-        </div>
+        <div class="leaflet-top leaflet-right"></div>
         <div class="leaflet-bottom leaflet-left"></div>
         <div class="leaflet-bottom leaflet-right">
           <div class="info legend leaflet-control">
-            <i style="background:blue"></i> 2.5-3.5
-            <br>
-            <i style="background:yellow"></i> 3.5-4.5
-            <br>
-            <i style="background:orange"></i> 4.5-6
-            <br>
-            <i style="background:red"></i> 6-max
-            <br>
+            <i style="background: blue"></i> 2.5-3.5
+            <br />
+            <i style="background: yellow"></i> 3.5-4.5
+            <br />
+            <i style="background: orange"></i> 4.5-6
+            <br />
+            <i style="background: red"></i> 6-max
+            <br />
           </div>
           <div class="leaflet-control-attribution leaflet-control">
             <a href="http://nmefc.com/">nmefc</a>版权所有 ©
-            <a href="http://nmefc.com/">nmefc&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+            <a href="http://nmefc.com/"
+              >nmefc&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a
+            >
           </div>
         </div>
       </div>
-
     </div>
     <!-- 由下边的rightBar组件替代 -->
     <!-- <div id="mybar" style="height:400px"></div> -->
@@ -114,6 +109,8 @@ import {
 import { getDateStr } from '../api/moment_api'
 // import maptiles from "../../components/js/map/maptiles"
 import rightBar from './right_bar.vue'
+// TODO:[-] 21-05-06 引入 东海的 grid wms
+import {WMSMidModel,WMSOptionsMidModel} from '../../middle_model/geo.ts'
 
 export default {
   data () {
@@ -126,7 +123,11 @@ export default {
       info: null,
       geojson: null,
       mymap: this.basemap,
-      latlng: null
+      latlng: null,
+      gridEast : new WMSMidModel(
+        'http://localhost:8082/geoserver/nmefc_common/wms?',
+        new WMSOptionsMidModel('nmefc_common:grid_east')
+    )
     }
   },
   props: {
@@ -187,6 +188,7 @@ export default {
       var dictArea = null
       var newLayer = null
       let staticUrl = '../../../static/files/'
+      const that=this
       switch (area) {
         // 北海
         case 'n':
@@ -195,14 +197,24 @@ export default {
           // 缩放并定位到指定海区
           this.mymap.setView([38.3, 123], 7)
 
-          newLayer = this.addshp(`${staticUrl}north.zip`, dictArea, true)
+          // newLayer = this.addshp(`${staticUrl}north.zip`, dictArea, true)
+          
+          
           break
         // 东海
         case 'e':
           dictArea = loadAreaMaxDataByDate(date, area)
           this.mymap.setView([28.6, 125.35], 6)
 
-          newLayer = this.addshp(`${staticUrl}east.zip`, dictArea, true)
+          // newLayer = this.addshp(`${staticUrl}east.zip`, dictArea, true)
+          // TODO:[-] 21-05-06 此处使用 加载 geoserver发布的 wms的方式实现
+          var eastGridWmsTitleLayer = L.tileLayer.wms(that.gridEast.url, {
+              layers: that.gridEast.options.layer,
+              format: that.gridEast.options.format,
+              transparent: true,
+              attribution: "Weather data © 2012 IEM Nexrad"
+          });
+          that.mymap.addLayer(eastGridWmsTitleLayer)
           break
         // 南海
         case 's':
@@ -310,7 +322,7 @@ export default {
         // var mymap = L.map('basemap').setView([51.505, -0.09], 13)
         // mapLink = "../static/mapfiles/";
 
-        L.tileLayer('../../../static/img/mapfiles/{z}/{x}/{y}.jpg', {
+        L.tileLayer('http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/{z}/{y}/{x}', {
           attribution: '',
           maxZoom: 8,
           minZoom: 2

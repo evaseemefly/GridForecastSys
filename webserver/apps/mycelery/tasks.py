@@ -19,4 +19,5 @@ def readFubXml(filename):
     realtimeInfo=oceanData.realtimeInfo
 
 
-readFubXml('201312051000qf101.dat.xml.xml')
+# TODO:[-] 21-05-06 暂时去掉此部分
+# readFubXml('201312051000qf101.dat.xml.xml')

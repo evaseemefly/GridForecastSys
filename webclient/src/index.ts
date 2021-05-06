@@ -3,7 +3,7 @@ import App from './app.vue';
 import VueRouter from 'vue-router'
 // import Routers from './router/router';
 // import Routers from './router/router';
-import router from './router/router.ts';
+import router from './router/router.js';
 
 import $ from 'jquery'
 import 'bootstrap/dist/css/bootstrap.css'

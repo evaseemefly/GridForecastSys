@@ -1,3 +1,4 @@
 /apps/GridForecast/migrations
 /apps/Station/migrations
 /static/mapfiles
+/webclient/node_modules

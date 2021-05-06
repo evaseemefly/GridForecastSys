@@ -3,7 +3,7 @@ import App from './app.vue';
 import VueRouter from 'vue-router'
 // import Routers from './router/router';
 // import Routers from './router/router';
-import router from './router/router.js';
+import router from './router/router';
 
 import $ from 'jquery'
 import 'bootstrap/dist/css/bootstrap.css'
@@ -52,5 +52,6 @@ document.body.appendChild(root)
 new Vue({
     //使用箭头语法等同于下面的写法
     render:(h)=>h(App),
-    router:router
+    // router:
+    router
 }).$mount(root)     //$mount为vue中的手动挂载

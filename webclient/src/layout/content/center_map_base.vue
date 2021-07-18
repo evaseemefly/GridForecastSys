@@ -93,7 +93,7 @@ import {
   getStormData,
   loadStormLayer,
   StormData,
-  CreateStationIcon,
+  CreateStationIcon
 } from '../../components/js/map/storm'
 
 import { getColorbar } from '../api/api'
@@ -103,17 +103,17 @@ import {
   loadAreaMaxDataByDate,
   // addShape,
   dic2arr,
-  compareForecast,
+  compareForecast
 } from '../../components/js/map/grid'
 
 import { getDateStr } from '../api/moment_api'
 // import maptiles from "../../components/js/map/maptiles"
 import rightBar from './right_bar.vue'
 // TODO:[-] 21-05-06 引入 东海的 grid wms
-import { WMSMidModel, WMSOptionsMidModel } from '../../middle_model/geo.ts'
+// import {WMSMidModel,WMSOptionsMidModel} from '../../middle_model/geo.ts'
 
 export default {
-  data() {
+  data () {
     return {
       forecastArr: [],
       // info: null,
@@ -124,17 +124,17 @@ export default {
       geojson: null,
       mymap: this.basemap,
       latlng: null,
-      gridEast: new WMSMidModel(
-        'http://localhost:8082/geoserver/GRID_SYS/wms?',
-        new WMSOptionsMidModel('GRID_SYS:grid_east')
-      ),
+    //   gridEast : new WMSMidModel(
+    //     'http://localhost:8082/geoserver/nmefc_common/wms?',
+    //     new WMSOptionsMidModel('nmefc_common:grid_east')
+    // )
     }
   },
   props: {
     basemap: Object,
   },
   components: {
-    rightBar,
+    rightBar
   },
   methods: {
     // 清除所有的底图
@@ -179,7 +179,7 @@ export default {
         color: 'white',
         dashArray: '3',
         fillOpacity: 0.7,
-        fillColor: getColor(feature.properties.density),
+        fillColor: getColor(feature.properties.density)
       }
     },
     fillarea: function (area) {
@@ -188,7 +188,7 @@ export default {
       var dictArea = null
       var newLayer = null
       let staticUrl = '../../../static/files/'
-      const that = this
+      const that=this
       switch (area) {
         // 北海
         case 'n':
@@ -198,7 +198,8 @@ export default {
           this.mymap.setView([38.3, 123], 7)
 
           // newLayer = this.addshp(`${staticUrl}north.zip`, dictArea, true)
-
+          
+          
           break
         // 东海
         case 'e':
@@ -245,27 +246,18 @@ export default {
           layers: 'gridraster:wave_area_northwest_hour_00',
           // layers: 'gridraster:storm_nc',
           format: 'image/png',
-          transparent: true,
+          transparent: true
         }
       )
       console.log(wmsLayer)
       wmsLayer.addTo(myself.mymap)
     },
 
-    loadGridWMS: function (map) {
-      const that = this
-      L.tileLayer(that.gridEast.url, {
-        id: 'mapbox/light-v9',
-        attribution: '',
-        tileSize: 512,
-        zoomOffset: -1,
-      }).addTo(map)
-    },
-
     // 初始化加入监听点击事件
     InitOnClick: function () {
       var myself = this
       this.mymap.on('click', function (e) {
+
         // 获取经纬度对象
         // var cornerStr=e.latlng.toBounds()
 
@@ -330,16 +322,11 @@ export default {
         // var mymap = L.map('basemap').setView([51.505, -0.09], 13)
         // mapLink = "../static/mapfiles/";
 
-        L.tileLayer(
-          'http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/{z}/{y}/{x}',
-          {
-            attribution: '',
-            maxZoom: 8,
-            minZoom: 2,
-          }
-        ).addTo(myself.mymap)
-        // TODO:[*] 21-07-18 加入了网格化发布后的 wms 的加载测试
-        this.loadGridWMS(myself.mymap)
+        L.tileLayer('http://map.geoq.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/{z}/{y}/{x}', {
+          attribution: '',
+          maxZoom: 8,
+          minZoom: 2
+        }).addTo(myself.mymap)
         var status = 0
         var popup = L.popup()
 
@@ -357,13 +344,13 @@ export default {
             bounds.push(rectangleMeasure.endPoint)
             rectangleMeasure.rectangle = L.rectangle(bounds, {
               color: rectangleMeasure.color,
-              weight: 1,
+              weight: 1
             })
             rectangleMeasure.rectangle.addTo(rectangleMeasure.layer)
 
             var northWestPoint = rectangleMeasure.rectangle
-                .getBounds()
-                .getNorthWest(),
+              .getBounds()
+              .getNorthWest(),
               southEastPoint = rectangleMeasure.rectangle
                 .getBounds()
                 .getSouthEast()
@@ -397,17 +384,18 @@ export default {
             if (rectangleMeasure.tips) {
               rectangleMeasure.layer.removeLayer(rectangleMeasure.tips)
             }
-          },
+          }
         }
 
         this.$emit('update:basemap', myself.mymap)
       }
-    },
+
+    }
   },
 
   // 监听路由的变化写在watch中，当路由发生变化时，判断传入的种类是风暴潮还是网格
   watch: {
-    $route(to, from) {
+    $route (to, from) {
       // 当每次路由发生变化时，route会发生变化
       console.log(`to:${to},from:${from}`)
       console.log(`${to.params}`)
@@ -447,9 +435,9 @@ export default {
           break
       }
     },
-    mymap(newVal, oldVal) {
+    mymap (newVal, oldVal) {
       this.$emit('update:basemap', newVal)
-    },
+    }
   },
 
   created: function () {
@@ -467,7 +455,7 @@ export default {
     // this.infoInit()
 
     this.InitOnClick()
-  },
+  }
 }
 </script>
 

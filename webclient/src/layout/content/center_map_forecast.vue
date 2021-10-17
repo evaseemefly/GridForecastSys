@@ -40,7 +40,7 @@ export default {
     return {
       // 加载预报产品需要的data
       mymap: null,
-      wms_layer: null,
+      wms_layer: 'GRID_SYS:grid_east',
       // '000','006'
       wms_layer_index: String,
       // 预报产品的种类
@@ -133,7 +133,7 @@ export default {
       //   'transparent':true
       // })
       var wmsLayer = L.tileLayer.wms(
-        'http://localhost:8080/geoserver/gridraster/wms',
+        'http://localhost:8082/geoserver/gridraster/wms',
         {
           // gridraster:swh
           // layers: 'gridraster:wave_area_northwest_hour_00',

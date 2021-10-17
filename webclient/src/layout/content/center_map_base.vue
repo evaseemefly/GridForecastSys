@@ -419,7 +419,7 @@ export default {
           // this.clearLayer()
           // this.clearDivIcon()
           this.clear()
-          this.fillGrid(to.params.code)
+          // this.fillGrid(to.params.code)
           break
         case 'forecast':
           // 注意此处还需要获取传过来的一些其他参数（1、时间；2、种类、3、是否只显示当前时间的）

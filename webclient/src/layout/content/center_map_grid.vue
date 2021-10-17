@@ -1,16 +1,12 @@
 <template>
   <div>
-    <baseMap
-      ref="baseMap"
-      :basemap.sync='mymap'
-    ></baseMap>
+    <baseMap ref="baseMap" :basemap.sync="mymap"></baseMap>
     <!-- <dateModule @changeLayerIndex="changeLayerIndex"></dateModule> -->
     <modalFrame
       ref="modal"
-      :columns='modalColumns'
-      :values='modalValues'
+      :columns="modalColumns"
+      :values="modalValues"
     ></modalFrame>
-
   </div>
 </template>
 
@@ -18,18 +14,6 @@
 import '../../components/js/map/leaflet'
 import '../../components/js/map/leaflet.shpfile'
 import shp from 'shpjs'
-// import {
-//   StormData,
-//   loadStormLayer,
-//   createStationIcon,
-//   getStormData,
-//   loadStationData,
-//   getAlarmLevel,
-//   addDiv2Marker,
-//   loadStormData
-// } from '../../comppnents/js/map/storm.js'
-// import {loadStormData} from "../../comppnents/js/map/storm";
-// import {area} from "../../components/js/map/mytest";
 import {
   addshp,
   loadAreaMaxDataByDate,
@@ -39,11 +23,13 @@ import {
 } from '../../components/js/map/grid'
 
 import { getDateStr } from '../api/moment_api'
+import { getGridWfsJson } from '../api/api'
 // import maptiles from "../../components/js/map/maptiles"
 // map的base子组件
 import baseMap from './center_map_base.vue'
+// import func from 'vue-editor-bridge'
 export default {
-  data () {
+  data() {
     return {
       // forecast_dict:[],
       stationArr: [],
@@ -55,16 +41,36 @@ export default {
       mymap: null,
       my_shp_layer: null,
       info: null,
-      area: 'a'
+      area: 'a',
+      wms_layer: 'GRID_SYS:grid_east'
     }
   },
   components: {
     baseMap
   },
   methods: {
-    clearLayer: function () {
+    // [-] 21-10-17 改为加载geoserver发布的服务的方式加载
+    // 注意使用 wms 加载的话相当于只能作为卫片加载，并不能获取feature info，需要通过 wfs 加载
+    fillWMS() {
       var myself = this
-      $.each(myself.my_shp_layer_arr, function (index, value) {
+      var wmsLayer = L.tileLayer.wms(
+        'http://localhost:8082/geoserver/GRID_SYS/wms',
+        {
+          layers: myself.wms_layer,
+          format: 'image/png',
+          transparent: true
+        }
+      )
+      console.log(wmsLayer)
+      wmsLayer.addTo(myself.mymap)
+    },
+    //
+    fillWFS(area) {
+      return getGridWfsJson(area)
+    },
+    clearLayer() {
+      var myself = this
+      $.each(myself.my_shp_layer_arr, function(index, value) {
         myself.mymap.removeLayer(value)
       })
       myself.my_shp_layer_arr = []
@@ -72,7 +78,7 @@ export default {
     },
 
     // grid.js中的代码移至此处
-    random_forecast: function (key, count, max) {
+    random_forecast(key, count, max) {
       var forecast_dict = {}
       for (var i = 0; i < count; i++) {
         var dict_key = key
@@ -88,11 +94,8 @@ export default {
       return forecast_dict
     },
 
-    /*
-			 * 根据设定好的色带根据传入的值返回对应的rgb颜色的值
-			 */
-
-    getColorbar: function (value) {
+    //根据设定好的色带根据传入的值返回对应的rgb颜色的值
+    getColorbar(value) {
       // 根据传入的数值（int类型），判断其所属的区件并获取区件的颜色
       var value_color
       if (value >= 2 && value < 4) {
@@ -106,15 +109,20 @@ export default {
       }
       return value_color
     },
-    addShape: function (dict, data, feature, layer, map) {
+    addShape(dict, data, feature, layer, map) {
       /*
-data是读取的geoJson数据
-此处已重新修改 2018-08-06
+          data是读取的geoJson数据
+          此处已重新修改 2021-10-17
+          data: {type: "FeatureCollection",
+                  features: Array(85),
+                  totalFeatures: 85,
+                  numberMatched: 85,
+                  numberReturned: 85, …}
       */
 
       // 注意此处需要注意判断在featrues_arr中是否已经存在了指定的值（若存在则不添加）
       let myself = this
-      $.each(data.features, function (index, obj) {
+      $.each(data.features, function(index, obj) {
         if ($.inArray(obj, myself.featuresArr) < 0) {
           myself.featuresArr.push(obj)
         }
@@ -123,7 +131,7 @@ data是读取的geoJson数据
       // 此处的temp_geojson与geojson相同
       // myself.geojson
       let tempGeoJson = L.geoJSON(data, {
-        style: function (feature) {
+        style: function(feature) {
           // 获取到当前的对象的code
 
           var code = feature.properties.Code
@@ -145,7 +153,7 @@ data是读取的geoJson数据
         },
         // 注意此处必须要将OnEachFeature放在里面才可以
         onEachFeature: myself.onEachFeature
-      }).bindPopup(function (layer) {
+      }).bindPopup(function(layer) {
         return layer.feature.properties.description
       })
       // 此处v1版本已经不确定geoJson是否为外侧的geoJson
@@ -154,11 +162,11 @@ data是读取的geoJson数据
       myself.geojson = geoJson
       return geoJson
     },
-    infoInit: function () {
+    infoInit() {
       // 右上角的消息显示区域初始化
       let myself = this
       this.info = L.control()
-      this.info.onAdd = function (map) {
+      this.info.onAdd = function(map) {
         // myself._div = L.DomUtil.create('div', 'info') // create a div with a class "info"
         // myself.update()
         this._div = L.DomUtil.create('div', 'info') // create a div with a class "info"
@@ -166,7 +174,7 @@ data是读取的geoJson数据
         return this._div
       }
       // method that we will use to update the control based on feature properties passed
-      this.info.update = function (props) {
+      this.info.update = function(props) {
         // 此处使用了三元表达式
         /*
               由于使用了vue，此处的this应该为info
@@ -181,45 +189,44 @@ data是读取的geoJson数据
       this.info.addTo(myself.mymap)
     },
     // 加载网格化的shp格式文件
-    addshp: function (shpPath, dictArea, isremoveLay) {
+    addshp(area, dictArea, isremoveLay) {
       var shapeLayer = null
       var myself = this
       // 为当天地图添加图层
       // 注意此处then是异步的，所以无法返回shape_layer;
-      shp(shpPath)
-        .then(function (tempGeojson) {
-          myself.geojson = tempGeojson
-          // do something with your geojson
-          // 当前图层不为空且删除图层的标记符为true都满足时，才清空当前图层
-          if ((myself.my_shp_layer != null) & isremoveLay) {
-            $.each(myself.my_shp_layer_arr, function (index, value) {
-              myself.mymap.removeLayer(value)
-            })
-            myself.my_shp_layer_arr = []
-            myself.mymap.removeLayer(myself.my_shp_layer)
-          }
-          var shpLayer = myself.addShape(
-            dictArea,
-            tempGeojson,
-            null,
-            null,
-            myself.mymap
-          )
+      this.fillWFS(area).then(tempGeojson => {
+        // TODO:[-] 21-10-17 注意此处获取的 geojson 只是
+        /*
+          data: {type: "FeatureCollection
+                features: Array(85),
+                totalFeatures: 85,
+                numberMatched: 85,
+                numberReturned: 85, …}
+        */
+        myself.geojson = tempGeojson.data
+        // do something with your geojson
+        // 当前图层不为空且删除图层的标记符为true都满足时，才清空当前图层
+        if ((myself.my_shp_layer != null) & isremoveLay) {
+          $.each(myself.my_shp_layer_arr, function(index, value) {
+            myself.mymap.removeLayer(value)
+          })
+          myself.my_shp_layer_arr = []
+          myself.mymap.removeLayer(myself.my_shp_layer)
+        }
+        var shpLayer = myself.addShape(
+          dictArea,
+          myself.geojson,
+          null,
+          null,
+          myself.mymap
+        )
 
-          // geojson = L.geoJson(temp_geojson, {
-          //    style: mystyle,
-          //    onEachFeature: onEachFeature
-          // }).addTo(mymap);
-          myself.my_shp_layer = shpLayer
-          myself.my_shp_layer_arr.push(shpLayer)
-        })
-        .then(function () {
-          return shapeLayer
-        })
-      return shapeLayer
+        myself.my_shp_layer = shpLayer
+        myself.my_shp_layer_arr.push(shpLayer)
+      })
     },
     // 对于每一个feature
-    onEachFeature: function (feature, layer) {
+    onEachFeature(feature, layer) {
       let myself = this
       layer.on({
         mouseover: myself.highlightFeature,
@@ -228,12 +235,12 @@ data是读取的geoJson数据
       })
     },
     // 鼠标划出时恢复正常
-    resetHighlight: function (e) {
+    resetHighlight(e) {
       this.geojson.resetStyle(e.target)
       this.info.update()
     },
     // 鼠标划入时高亮
-    highlightFeature: function (e) {
+    highlightFeature(e) {
       var layer = e.target
 
       layer.setStyle({
@@ -250,15 +257,15 @@ data是读取的geoJson数据
       this.info.update(layer.feature.properties)
     },
 
-    readShape: function (file, func) {
-      shp('file').then(function (geojson) {
+    readShape(file, func) {
+      shp('file').then(function(geojson) {
         // do something with your geojson
         func(geojson)
       })
     },
 
     // 注意加载页面时，需要执行加载全国的事件
-    fillGrid: function (value, item) {
+    fillGrid(value, item) {
       // 此处的item是vm.data中的items
       //
       // console.log("执行填充操作：" + value);
@@ -278,7 +285,7 @@ data是读取的geoJson数据
       if (dictTarget != null) {
         var forecastArr = dic2arr(dictTarget)
         var forecastArrObj = []
-        $.each(forecastArr, function (index, obj) {
+        $.each(forecastArr, function(index, obj) {
           forecastArrObj.push({
             code: obj.value.CODE,
             HS_VALUE: obj.value.HS_VALUE
@@ -305,7 +312,7 @@ data是读取的geoJson数据
       // )
     },
 
-    mystyle: function (feature) {
+    mystyle(feature) {
       return {
         weight: 2,
         opacity: 1,
@@ -315,33 +322,34 @@ data是读取的geoJson数据
         fillColor: getColor(feature.properties.density)
       }
     },
-    fillarea: function (area) {
+    fillArea(area) {
       var date = new Date()
       // var date_str=getDateStr();
       var dictArea = null
       var newLayer = null
       let staticUrl = '../../../static/files/'
+      let myself = this
       switch (area) {
         // 北海
         case 'n':
           // dictArea = loadAreaMaxData_byDate(date, area)
           dictArea = loadAreaMaxDataByDate(date, area)
           // 缩放并定位到指定海区
-          this.mymap.setView([38.3, 123], 7)
+          // this.mymap.setView([38.3, 123], 7)
 
-          // newLayer = this.addshp(`${staticUrl}north.zip`, dictArea, true)
+          newLayer = myself.addshp(`${staticUrl}north.zip`, dictArea, true)
           break
         // 东海
         case 'e':
           dictArea = loadAreaMaxDataByDate(date, area)
-          this.mymap.setView([28.6, 125.35], 6)
+          // myself.mymap.setView([28.6, 125.35], 6)
 
-          // newLayer = this.addshp(`${staticUrl}east.zip`, dictArea, true)
+          newLayer = myself.addshp('grid_east', dictArea, true)
           break
         // 南海
         case 's':
           dictArea = loadAreaMaxDataByDate(date, area)
-          this.mymap.setView([20.2, 113.04], 7)
+          myself.mymap.setView([20.2, 113.04], 7)
 
           // newLayer = this.addshp(`${staticUrl}south.zip`, dictArea, true)
           break
@@ -351,6 +359,7 @@ data是读取的geoJson数据
           // this.addshp(`${staticUrl}north.zip`, dictArea, false)
           // this.addshp(`${staticUrl}east.zip`, dictArea, false)
           // this.addshp(`${staticUrl}south.zip`, dictArea, false)
+          newLayer = myself.addshp('grid_east', dictArea, true)
           break
       }
       return [dictArea, newLayer]
@@ -358,24 +367,32 @@ data是读取的geoJson数据
   },
 
   watch: {
-    '$route' (to, from) {
+    $route(to, from) {
       // 当每次路由发生变化时，route会发生变化
       console.log(`to:${to},from:${from}`)
       console.log(`${to.params}`)
       // 执行加载风暴潮的相关操作
       // this.fillStorm(to.params.code)
       this.area = to.params.code
-
+    },
+    // TODO:[*] 注意 监听中不要使用箭头函数,?
+    area: function(newVal) {
+      const dictArea = {
+        a: 'a',
+        n: 'grid_north',
+        e: 'grid_east',
+        s: 'south'
+      }
+      this.fillArea(newVal)
     }
-
   },
-  created: function () {
+  created: function() {
     console.log('view created')
   },
   // created () {
   //   console.log('view created')
   // },
-  mounted: function () {
+  mounted() {
     let code = this.$route.params.code
     // 初始化地图引擎
     // this.initMap()
@@ -387,7 +404,10 @@ data是读取的geoJson数据
     // this.$refs.baseMap.initMap()
     // 缩放至指定海区
     this.$refs.baseMap.zoomView(code)
-    this.fillGrid(code)
+    // TODO:[-] 21-10-16 加入了手动填充网格的操作
+    // this.fillWMS()
+    // this.fillWFS()
+    // this.fillGrid(code)
   }
 }
 </script>

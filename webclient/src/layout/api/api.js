@@ -3,6 +3,8 @@ import axios from 'axios'
 
 // let host = 'http://127.0.0.1:8000'
 export const host = 'http://127.0.0.1:8000'
+export const geoserverHost = 'http://127.0.0.1:8082/geoserver'
+export const geoserverNameSpace = 'GRID_SYS'
 // 允许跨域访问
 axios.defaults.withCredentials = true
 
@@ -170,4 +172,40 @@ export const getColorbar = value => {
     valueColor = 'rgb(255,0,0)'
   }
   return valueColor
+}
+
+/**
+ * TODO:[-] 21-10-17 获取三个海区对应的沿海网格 wfs 服务并转换为 geojson
+ *  config: {
+ *      transformRequest: {…},
+ *      transformResponse: {…},
+ *      timeout: 0,
+ *      xsrfCookieName: "XSRF-TOKEN",
+ *      adapter: ƒ, …}
+ *      data: {type: "FeatureCollection",
+ *             features: Array(85),
+ *             totalFeatures: 85,
+ *             numberMatched: 85,
+ *             numberReturned: 85, …}
+ *      headers: {content-type: "application/json;charset=utf-8"}
+ *      request: XMLHttpRequest
+ *        {readyState: 4, timeout: 0,
+ *        withCredentials: true, upload: XMLHttpRequestUpload,
+ *        onreadystatechange: ƒ, …}
+ *      status: 200
+ * @param {*} area
+ * @return {*}
+ */
+export const getGridWfsJson = area => {
+  let wfsUrl = `${geoserverHost}/${geoserverNameSpace}/wfs`
+  return axios.get(wfsUrl, {
+    params: {
+      service: 'WFS',
+      version: '1.0.0',
+      request: 'GetFeature',
+      typeName: area,
+      outputFormat: 'application/json'
+      // srsName: crs
+    }
+  })
 }
